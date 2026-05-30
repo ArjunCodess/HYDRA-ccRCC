@@ -16,7 +16,7 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 - **Cross-cohort DEG filtering:** TCGA-only tumor-normal differential expression is narrowed into a reproducible evidence table requiring TCGA significance, same-direction GEO support, and nominal validation evidence.
 - **Discordance framing:** The central plot compares absolute tumor-normal log2 fold change against absolute adjusted Cox log hazard ratio, directly testing whether tumor-normal magnitude aligns with survival effect.
 - **Evidence-funnel framing:** A generated funnel figure shows compression from TCGA DEG to reproducible DEG to survival-associated genes to strict and high-confidence candidates.
-- **Interpretation scaffolding:** The pipeline generates a ranked shortlist, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, and generated gene dossiers.
+- **Interpretation scaffolding:** The pipeline generates a ranked shortlist, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, and generated gene dossiers. A manual skeptical biological review of the final 24 genes is now available at [`results/manual_biological_review_24_candidates.md`](results/manual_biological_review_24_candidates.md).
 - **Transparent outputs:** Major result tables and figures are written under `results/`, while large downloaded and processed data artifacts are ignored by git.
 - **Cautious scientific interpretation:** The current run is pipeline-complete but not publication-final. The broad survival signal is treated as a reason to tighten modeling, not as a finished biomarker list.
 
@@ -66,21 +66,37 @@ The novelty is not a new algorithm. The contribution is the analysis discipline:
 
 ## Current Results
 
-| Metric | Value |
-| --- | ---: |
-| TCGA primary tumor samples | 541 |
-| TCGA solid tissue normal samples | 72 |
-| GSE40435 tumor/normal samples | 101/101 |
-| GSE53757 tumor/normal samples | 72/72 |
-| TCGA significant genes after symbol mapping | 8,852 |
-| Same-direction genes in both GEO cohorts | 9,149 |
-| Reproducible DEGs | 3,304 |
-| Strict reproducible prognostic candidates | 519 |
-| High-confidence candidates | 24 |
+| Metric                                      |   Value |
+| ------------------------------------------- | ------: |
+| TCGA primary tumor samples                  |     541 |
+| TCGA solid tissue normal samples            |      72 |
+| GSE40435 tumor/normal samples               | 101/101 |
+| GSE53757 tumor/normal samples               |   72/72 |
+| TCGA significant genes after symbol mapping |   8,852 |
+| Same-direction genes in both GEO cohorts    |   9,149 |
+| Reproducible DEGs                           |   3,304 |
+| Strict reproducible prognostic candidates   |     519 |
+| High-confidence candidates                  |      24 |
 
 The high-confidence count is intentionally conservative: it requires reproducibility, stage/grade-complete Cox significance, proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction stage/grade sensitivity checks.
 
 The generated shortlist is still not a final biological truth table. It is an auditable worklist for deciding which candidate prognostic associations deserve deeper manual review.
+
+### Manual Biological Review
+
+A post-pipeline biological review has now been added: [`results/manual_biological_review_24_candidates.md`](results/manual_biological_review_24_candidates.md).
+
+This review does not add new analyses. It evaluates each of the 24 high-confidence candidate genes against known biology, ccRCC literature, kidney biology, cancer relevance, pathway plausibility, contradictory evidence, confounding explanations, validation options, and a final confidence score.
+
+Main takeaways from the review:
+
+- The strongest manuscript candidates are `KL`, `ACADM`, `CRYL1`, `ACAT1`, and `DDC`.
+- Close alternates are `PANK1`, `TCIRG1`, `DBT`, and `CLCN5`.
+- The most biologically interesting candidates include `HHLA2`, `TCIRG1`, `GRAMD1A`, `C1QTNF6`, and `CLCN5`.
+- `IFFO1`, `CADPS2`, `LRBA`, and `FUT6` should not be highlighted without independent validation.
+- `TEK`, `EMCN`, `PODXL`, and `FHOD1` should be treated as composition/pathway flags rather than core tumor-cell biomarker candidates.
+
+The review supports the central HYDRA-ccRCC premise that reproducible tumor-normal dysregulation and prognostic importance are not equivalent. It also sharpens the biological interpretation: the strongest signal is better described as **hypoxia-linked renal metabolic dedifferentiation/adaptation plus immune and vascular composition effects**, not a generic hypoxia-only program.
 
 ## How To Run
 
@@ -135,6 +151,7 @@ HYDRA-ccRCC/
 - [`analysis/12_validate_outputs.R`](analysis/12_validate_outputs.R): final output validation step.
 - [`protocol.md`](protocol.md): locked research question, thresholds, and limitations.
 - [`paper/main.pdf`](paper/main.pdf): first IEEE-style manuscript draft.
+- [`results/manual_biological_review_24_candidates.md`](results/manual_biological_review_24_candidates.md): skeptical biological review, ranking, confidence scores, removal recommendations, and refined interpretation for the final 24 candidates.
 
 ## Dataset Rules
 
@@ -170,5 +187,4 @@ The implemented v1 pipeline now includes the stress tests that were previously l
 
 ## Remaining Scientific Work
 
-The codebase is pipeline-complete, but the science is not publication-final. The next work is manual candidate-level interpretation: use the generated 24-gene dossiers and literature table to review ccRCC literature, kidney cell-type expression, and independent validation options before making any gene-level claims.
-
+The codebase is pipeline-complete, and a first manual candidate-level biological review has been added. The science is still not publication-final: before making strong gene-level claims, the review recommendations should be followed with independent validation in external transcriptomic, proteomic, spatial, single-cell, or IHC/TMA resources.
