@@ -24,6 +24,9 @@ required_files <- c(
   file.path(DIRS$tables, "deg_vs_prognostic_comparison.csv"),
   file.path(DIRS$tables, "cell_type_sanity_check.csv"),
   file.path(DIRS$tables, "high_confidence_literature_table.csv"),
+  file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
+  file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"),
+  file.path(DIRS$tables, "composition_marker_score_availability.csv"),
   file.path(DIRS$tables, "high_confidence_gene_dossiers.md"),
   file.path(DIRS$tables, "evidence_funnel.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_pathway_summary.csv"),
@@ -31,6 +34,8 @@ required_files <- c(
   file.path(DIRS$figures, "tcga_kirc_pca.png"),
   file.path(DIRS$figures, "tcga_kirc_volcano.png"),
   file.path(DIRS$figures, "tcga_kirc_discordance.png"),
+  file.path(DIRS$figures, "tcga_kirc_directional_discordance.png"),
+  file.path(DIRS$figures, "candidate_forest_plot.png"),
   file.path(DIRS$figures, "evidence_funnel.png")
 )
 
@@ -76,6 +81,18 @@ required_survival_cols <- c("main_hr", "main_hr_ci_low", "main_hr_ci_high", "mai
 missing_survival_cols <- setdiff(required_survival_cols, names(survival_report))
 if (length(missing_survival_cols) > 0) {
   stop("candidate_survival_report.csv is missing columns: ", paste(missing_survival_cols, collapse = ", "))
+}
+
+composition <- read_csv(file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"), show_col_types = FALSE)
+required_composition_cols <- c(
+  "symbol",
+  "gene_lrt_fdr_vs_clinical",
+  "composition_adjusted_fdr",
+  "same_direction_after_composition"
+)
+missing_composition_cols <- setdiff(required_composition_cols, names(composition))
+if (length(missing_composition_cols) > 0) {
+  stop("candidate_clinical_composition_sensitivity.csv is missing columns: ", paste(missing_composition_cols, collapse = ", "))
 }
 
 message("Output validation complete.")

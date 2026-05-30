@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/plotting.R")
+source("analysis/functions/tcga_metadata.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -9,6 +10,8 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(AnnotationDbi)
   library(org.Hs.eg.db)
+  library(survival)
+  library(broom)
 })
 
 candidates <- read_csv(file.path(DIRS$tables, "candidate_gene_evidence_table.csv"), show_col_types = FALSE)
@@ -129,6 +132,174 @@ ranked_shortlist <- high_conf |>
 
 write_csv_atomic(ranked_shortlist, file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"))
 
+manual_priority <- tribble(
+  ~symbol, ~manual_tier, ~manuscript_role,
+  "KL", "lead", "renal epithelial/metabolic retention",
+  "ACADM", "lead", "fatty-acid oxidation and mitochondrial metabolism",
+  "CRYL1", "lead", "renal metabolic differentiation",
+  "ACAT1", "lead", "ketone, acetyl-CoA, and mitochondrial metabolism",
+  "DDC", "lead", "amino-acid and biogenic-amine metabolism",
+  "PANK1", "supporting", "CoA metabolism and mitochondrial function",
+  "DBT", "supporting", "branched-chain amino-acid metabolism",
+  "CLCN5", "supporting", "proximal-tubule endosomal/metabolic differentiation",
+  "TCIRG1", "supporting risk", "lysosomal acidification, glycolytic/immune risk",
+  "HHLA2", "interpret cautiously", "immune-checkpoint paradox",
+  "GRAMD1A", "interpret cautiously", "cholesterol-contact-site biology",
+  "C1QTNF6", "interpret cautiously", "secreted inflammatory/metabolic risk",
+  "CYFIP2", "interpret cautiously", "cytoskeletal and broad tumor-suppressor-like signal",
+  "IQGAP2", "interpret cautiously", "cytoskeletal scaffold signal",
+  "TEK", "composition flag", "endothelial/vascular composition",
+  "EMCN", "composition flag", "endothelial/vascular composition",
+  "PODXL", "composition flag", "podocyte/endothelial/renal compartment signal",
+  "FHOD1", "composition flag", "stromal/EMT and actin-remodeling signal",
+  "IFFO1", "do not highlight", "weak ccRCC-specific biological support",
+  "CADPS2", "do not highlight", "weak ccRCC-specific biological support",
+  "LRBA", "do not highlight", "immune-composition signal",
+  "FUT6", "do not highlight", "weak and directionally fragile glycosylation signal",
+  "HIBCH", "do not highlight", "plausible but under-validated metabolic signal",
+  "TNFAIP2", "do not highlight", "non-specific inflammatory signal"
+)
+
+manuscript_candidates <- ranked_shortlist |>
+  left_join(manual_priority, by = "symbol") |>
+  mutate(
+    manual_tier = replace_na(manual_tier, "interpret cautiously"),
+    manuscript_role = replace_na(manuscript_role, "candidate prognostic association requiring validation"),
+    survival_direction = if_else(main_hr < 1, "higher expression associated with lower hazard", "higher expression associated with higher hazard"),
+    tumor_direction = if_else(tcga_log2fc < 0, "lower in tumor", "higher in tumor")
+  ) |>
+  arrange(
+    factor(manual_tier, levels = c("lead", "supporting", "supporting risk", "interpret cautiously", "composition flag", "do not highlight")),
+    main_fdr
+  )
+
+write_csv_atomic(manuscript_candidates, file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"))
+
+fit_composition_sensitivity <- function(high_conf_symbols) {
+  vst_mat <- read_required_rds(FILES$tcga_vst)
+  coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+  clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
+  repro <- read_csv(file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse53757.csv"), show_col_types = FALSE)
+
+  ensembl <- sub("\\..*$", "", rownames(vst_mat))
+  full_map <- AnnotationDbi::select(
+    org.Hs.eg.db,
+    keys = unique(ensembl),
+    keytype = "ENSEMBL",
+    columns = "SYMBOL"
+  ) |>
+    filter(!is.na(SYMBOL)) |>
+    distinct(SYMBOL, .keep_all = TRUE) |>
+    transmute(symbol = SYMBOL, gene_id = rownames(vst_mat)[match(ENSEMBL, ensembl)])
+
+  clinical_surv <- clinical |>
+    transmute(
+      patient_barcode = submitter_id,
+      os_time = os_time,
+      os_event = os_event,
+      age_years = suppressWarnings(as.numeric(age_at_diagnosis)) / 365.25,
+      sex = gender,
+      stage_clean = normalize_stage(ajcc_pathologic_stage),
+      grade_clean = normalize_grade(tumor_grade)
+    )
+
+  tumor_samples <- coldata |>
+    filter(sample_type == "Primary Tumor") |>
+    mutate(patient_barcode = tcga_patient_barcode(sample_barcode)) |>
+    inner_join(clinical_surv, by = "patient_barcode") |>
+    filter(!is.na(os_time), os_time > 0, !is.na(os_event), sample_barcode %in% colnames(vst_mat))
+
+  sample_barcodes <- tumor_samples$sample_barcode
+
+  marker_sets <- list(
+    proximal_tubule = c("AQP1", "LRP2", "CUBN", "SLC5A2", "ALDOB"),
+    endothelial = c("PECAM1", "VWF", "KDR", "EMCN", "TEK"),
+    immune = c("PTPRC", "CD3D", "CD8A", "MS4A1", "CD68"),
+    stromal = c("COL1A1", "COL1A2", "DCN", "LUM", "ACTA2")
+  )
+
+  score_df <- tibble(sample_barcode = sample_barcodes)
+  marker_availability <- bind_rows(lapply(names(marker_sets), function(score_name) {
+    present <- intersect(marker_sets[[score_name]], full_map$symbol)
+    gene_ids <- full_map$gene_id[match(present, full_map$symbol)]
+    gene_ids <- gene_ids[!is.na(gene_ids)]
+    if (length(gene_ids) == 0) {
+      score_df[[score_name]] <<- NA_real_
+    } else {
+      mat <- vst_mat[gene_ids, sample_barcodes, drop = FALSE]
+      score_df[[score_name]] <<- as.numeric(scale(colMeans(t(scale(t(mat))), na.rm = TRUE)))
+    }
+    tibble(score = score_name, requested_markers = paste(marker_sets[[score_name]], collapse = ";"), used_markers = paste(present, collapse = ";"), n_used = length(gene_ids))
+  }))
+
+  base_dat <- tumor_samples |>
+    transmute(
+      sample_barcode,
+      os_time,
+      os_event,
+      age = age_years,
+      sex = factor(sex),
+      stage = factor(stage_clean),
+      grade = factor(case_when(
+        grade_clean %in% c("G1", "G2") ~ "Low grade",
+        grade_clean %in% c("G3", "G4") ~ "High grade",
+        TRUE ~ NA_character_
+      ))
+    ) |>
+    left_join(score_df, by = "sample_barcode")
+
+  fit_one <- function(symbol) {
+    gene_id <- repro$tcga_gene_id[match(symbol, repro$symbol)]
+    if (is.na(gene_id) || !gene_id %in% rownames(vst_mat)) return(NULL)
+
+    dat <- base_dat |>
+      mutate(expr = as.numeric(scale(vst_mat[gene_id, sample_barcode]))) |>
+      dplyr::select(os_time, os_event, expr, age, sex, stage, grade, proximal_tubule, endothelial, immune, stromal) |>
+      filter(if_all(everything(), ~ !is.na(.x))) |>
+      mutate(across(c(sex, stage, grade), droplevels))
+
+    if (nrow(dat) < 100 || sum(dat$os_event == 1) < 25) return(NULL)
+    if (any(vapply(dat[c("sex", "stage", "grade")], nlevels, integer(1)) < 2)) return(NULL)
+
+    clinical_fit <- coxph(Surv(os_time, os_event) ~ age + sex + stage + grade, data = dat)
+    gene_fit <- coxph(Surv(os_time, os_event) ~ expr + age + sex + stage + grade, data = dat)
+    composition_fit <- coxph(Surv(os_time, os_event) ~ expr + age + sex + stage + grade + proximal_tubule + endothelial + immune + stromal, data = dat)
+    gene_term <- tidy(gene_fit, conf.int = TRUE) |> filter(term == "expr")
+    comp_term <- tidy(composition_fit, conf.int = TRUE) |> filter(term == "expr")
+    lrt_gene <- anova(clinical_fit, gene_fit, test = "LRT")
+
+    tibble(
+      symbol = symbol,
+      n = gene_fit$n,
+      events = gene_fit$nevent,
+      clinical_concordance = unname(summary(clinical_fit)$concordance[1]),
+      gene_model_concordance = unname(summary(gene_fit)$concordance[1]),
+      composition_model_concordance = unname(summary(composition_fit)$concordance[1]),
+      delta_concordance_gene_vs_clinical = gene_model_concordance - clinical_concordance,
+      gene_lrt_p_vs_clinical = lrt_gene[2, "Pr(>|Chi|)"],
+      base_log_hr = gene_term$estimate,
+      base_hr = exp(gene_term$estimate),
+      base_p_value = gene_term$p.value,
+      composition_adjusted_log_hr = comp_term$estimate,
+      composition_adjusted_hr = exp(comp_term$estimate),
+      composition_adjusted_p_value = comp_term$p.value,
+      same_direction_after_composition = sign(base_log_hr) == sign(composition_adjusted_log_hr)
+    )
+  }
+
+  sensitivity <- bind_rows(lapply(high_conf_symbols, fit_one)) |>
+    mutate(
+      gene_lrt_fdr_vs_clinical = p.adjust(gene_lrt_p_vs_clinical, method = "BH"),
+      composition_adjusted_fdr = p.adjust(composition_adjusted_p_value, method = "BH")
+    ) |>
+    arrange(gene_lrt_fdr_vs_clinical, composition_adjusted_fdr)
+
+  write_csv_atomic(sensitivity, file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"))
+  write_csv_atomic(marker_availability, file.path(DIRS$tables, "composition_marker_score_availability.csv"))
+}
+
+fit_composition_sensitivity(ranked_shortlist$symbol)
+
 survival_report <- candidates |>
   filter(strict_candidate | high_confidence_candidate) |>
   transmute(
@@ -141,6 +312,8 @@ survival_report <- candidates |>
     main_log_hr,
     main_fdr,
     main_ph_p_value,
+    main_n,
+    main_events,
     ph_status = if_else(ph_pass, "pass", "fail"),
     main_warning_count,
     main_warning_text,
