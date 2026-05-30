@@ -96,7 +96,8 @@ This review does not add new analyses. It evaluates each of the 24 high-confiden
 
 Main takeaways from the review:
 
-- The strongest manuscript candidates are `KL`, `ACADM`, `CRYL1`, `ACAT1`, and `DDC`.
+- The strongest TCGA-derived manuscript hypothesis candidates are `KL`, `ACADM`, `CRYL1`, `ACAT1`, and `DDC`.
+- `ACAT1` and `DDC` have nominal opposite-direction signals in the small GSE29609 check, so lead status must not be read as external validation.
 - Close alternates are `PANK1`, `TCIRG1`, `DBT`, and `CLCN5`.
 - The most biologically interesting candidates include `HHLA2`, `TCIRG1`, `GRAMD1A`, `C1QTNF6`, and `CLCN5`.
 - `IFFO1`, `CADPS2`, `LRBA`, and `FUT6` should not be highlighted without independent validation.
