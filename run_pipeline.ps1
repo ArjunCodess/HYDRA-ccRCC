@@ -71,8 +71,9 @@ $steps += @(
   "analysis/07_survival_tcga.R",
   "analysis/08_enrichment_tcga.R",
   "analysis/10_candidate_table.R",
+  "analysis/11_hardening_outputs.R",
   "analysis/09_figures_tcga.R",
-  "analysis/11_validate_outputs.R"
+  "analysis/12_validate_outputs.R"
 )
 
 foreach ($step in $steps) {

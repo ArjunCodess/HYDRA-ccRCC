@@ -18,7 +18,7 @@ Email: placeholder@example.com}
 \maketitle
 
 \begin{abstract}
-Clear cell renal cell carcinoma (ccRCC) is strongly shaped by VHL/HIF-associated hypoxia biology, but genes that distinguish tumor from normal kidney are not necessarily the same genes that carry prognostic information. This study builds a reproducible public-data pipeline to test whether tumor-normal differential expression magnitude aligns with survival-associated effect size in ccRCC. TCGA-KIRC STAR-count RNA-seq data were analyzed with DESeq2, and two independent GEO cohorts, GSE40435 and GSE53757, were analyzed with limma. Reproducibility was defined by TCGA significance, consistent direction across both GEO cohorts, and nominal validation support in at least one GEO cohort. Cox proportional hazards models were fit in TCGA primary tumors using continuous expression, stage, grade, age, and sex. The current run identified 3,304 reproducible differentially expressed genes, 519 strict reproducible prognostic candidates, and 24 high-confidence candidates after proportional-hazards, effect-size, GEO-effect, and sensitivity filtering. These results remain computational and retrospective, but the candidate set is now compact enough for focused biological interpretation rather than broad gene-list reporting. The main contribution is a transparent framework for stress-testing the assumption that tumor identity genes are also prognostic genes.
+Clear cell renal cell carcinoma (ccRCC) is strongly shaped by VHL/HIF-associated hypoxia biology, but genes that distinguish tumor from normal kidney are not necessarily the same genes that carry prognostic information. This study builds a reproducible public-data pipeline to test whether tumor-normal differential expression magnitude aligns with survival-associated effect size in ccRCC. TCGA-KIRC STAR-count RNA-seq data were analyzed with DESeq2, and two independent GEO cohorts, GSE40435 and GSE53757, were analyzed with limma. Reproducibility was defined by TCGA significance, consistent direction across both GEO cohorts, and nominal validation support in at least one GEO cohort. Cox proportional hazards models were fit in TCGA primary tumors using continuous expression, stage, grade, age, and sex. The current run identified 3,304 reproducible differentially expressed genes, 519 strict reproducible prognostic candidates, and 24 high-confidence candidate prognostic associations after proportional-hazards, effect-size, GEO-effect, and sensitivity filtering. The pipeline also generates threshold-sensitivity, null-overlap, cell-type sanity, literature-seed, and gene-dossier outputs to prevent the shortlist from being interpreted as a final biomarker list. The main contribution is a transparent framework for stress-testing the assumption that tumor identity genes are also prognostic genes.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -52,11 +52,21 @@ Survival analysis used TCGA primary tumor samples only. Cox proportional hazards
 \subsection{Enrichment and Visualization}
 GO Biological Process over-representation analysis was implemented directly with \texttt{org.Hs.eg.db} and \texttt{GO.db} to avoid fragile plotting dependencies. Hypergeometric tests were corrected with Benjamini-Hochberg adjustment. The signature visualization is a discordance plot with absolute tumor-normal log$_2$ fold change on the x-axis and absolute adjusted Cox log hazard ratio on the y-axis. Point size represents survival significance, and reproducible genes are emphasized.
 
+\subsection{Candidate Hardening}
+High-confidence genes were ranked with a transparent composite score combining reproducibility, expression effect magnitude, survival strength, proportional-hazards support, sensitivity-model support, pathway annotation, and a seeded literature/biology prior. The pipeline also generated a threshold-sensitivity table, a null-overlap check that permuted reproducible-DEG labels among genes with Cox results, a comparison between the largest tumor-normal changes and largest survival effects, cell-type sanity flags, a literature-review seed table, and one generated dossier section per high-confidence gene. These outputs are intended to support manual review, not to replace it.
+
 \section{Results}
 \subsection{TCGA and GEO Differential Expression}
 The TCGA-KIRC analysis identified 14,337 Ensembl-level genes passing the initial DESeq2 threshold. After mapping to symbols, 8,852 TCGA-significant genes were available for cross-cohort comparison. GSE40435 produced 1,076 significant genes under the same effect-size threshold, and GSE53757 produced 3,139 significant genes.
 
 The cross-cohort evidence funnel identified 3,304 reproducible differentially expressed genes. This reduction is important: the TCGA-only DEG count is large enough to be biologically diffuse, while the reproducibility filter begins to separate robust ccRCC expression programs from single-cohort findings.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../results/figures/evidence_funnel.png}
+\caption{Evidence funnel showing compression from broad tumor-normal differential expression to reproducible, survival-associated, sensitivity-supported, strict, and high-confidence candidate prognostic associations.}
+\label{fig:funnel}
+\end{figure}
 
 \begin{table}[htbp]
 \caption{First-pass evidence funnel}
@@ -80,7 +90,7 @@ High-confidence candidates & 24 \\
 \end{table}
 
 \subsection{Survival Association and Discordance}
-Among reproducible DEGs, 1,176 were associated with overall survival in the main stage/grade-complete Cox model at FDR $<0.05$. Additional proportional-hazards, effect-size, GEO-effect, and sensitivity filters reduced this to 519 strict candidates and 24 high-confidence candidates. The high-confidence set is small enough for candidate-level review while preserving the full audit trail. The result supports the project premise: final interpretation must prioritize effect size, proportional hazards behavior, clinical covariate robustness, validation magnitude, and pathway coherence rather than FDR alone.
+Among reproducible DEGs, 1,176 were associated with overall survival in the main stage/grade-complete Cox model at FDR $<0.05$. Additional proportional-hazards, effect-size, GEO-effect, and sensitivity filters reduced this to 519 strict candidates and 24 high-confidence candidates. Survival outputs report hazard ratios, confidence intervals, adjusted significance, proportional-hazards results, warning counts, and sensitivity-model direction. The high-confidence set is small enough for candidate-level review while preserving the full audit trail. The result supports the project premise: final interpretation must prioritize effect size, proportional hazards behavior, clinical covariate robustness, validation magnitude, and pathway coherence rather than FDR alone.
 
 Top high-confidence candidates included CYFIP2, CRYL1, HHLA2, DDC, KL, PANK1, IQGAP2, and ACADM, many of which were downregulated in tumor and associated with lower hazard when expression was higher. Some genes had strong TCGA effects but weaker GEO fold changes, emphasizing why the final project should rank genes by cross-cohort evidence rather than a single statistic.
 
@@ -108,11 +118,16 @@ The most important scientific next step is not to add machine learning. It is ca
 
 The enrichment results currently emphasize metabolic candidates with a smaller immune component. That may reflect genuine ccRCC adaptation biology, but it may also reflect bulk tissue composition. This is precisely the kind of ambiguity the project should preserve rather than hide. Because metabolism currently dominates the annotated high-confidence set more than hypoxia itself, the final interpretation should be revised toward hypoxia-linked metabolic adaptation rather than a generic hypoxia-only claim.
 
+The generated threshold-sensitivity and null-overlap outputs are deliberately conservative checks. They do not prove causality or external clinical validity, but they make it harder to overread a visually appealing candidate list. The cell-type sanity table similarly keeps endothelial, immune, stromal, and renal epithelial explanations visible instead of forcing every signal into a tumor-cell-intrinsic narrative.
+
+\section{Threshold Rationale}
+The TCGA differential-expression threshold of FDR $<0.05$ and absolute log$_2$ fold change at least 1 defines large tumor-normal changes before validation. GEO directionality is used as a reproducibility filter rather than as an independent prognostic test. The main survival threshold of Cox FDR $<0.05$ limits survival claims to adjusted models. The high-confidence layer uses Cox FDR $<0.01$, absolute log hazard ratio at least $\log(1.5)$, proportional-hazards $p \geq 0.05$, GEO absolute log$_2$ fold change at least 0.25 in both validation cohorts, and same-direction nominal support in stage-complete and grade-complete sensitivity models. These thresholds are not proof of biology; they are predeclared gates that make candidate retention auditable.
+
 \section{Limitations}
 This analysis is retrospective and uses public bulk transcriptomic data. Adjacent normal kidney is not identical to healthy kidney. Cox associations do not prove causality. GEO validation currently uses Series Matrix expression values rather than fully reprocessed raw arrays. Clinical covariate completeness varies across TCGA samples. No wet-lab validation is included. Therefore, all gene-level findings should be framed as candidate prognostic associations, not therapeutic targets.
 
 \section{Conclusion}
-HYDRA-ccRCC now has a complete reproducible first-pass pipeline for testing discordance between tumor-normal differential expression and prognostic survival signal in ccRCC. The current analysis identifies 3,304 reproducible DEGs, 519 strict reproducible prognostic candidates, and 24 high-confidence candidates. The main contribution at this stage is not a final biomarker list, but a transparent framework for deciding which findings deserve deeper biological interpretation.
+HYDRA-ccRCC now has a complete reproducible first-pass pipeline for testing discordance between tumor-normal differential expression and prognostic survival signal in ccRCC. The current analysis identifies 3,304 reproducible DEGs, 519 strict reproducible prognostic candidates, and 24 high-confidence candidate prognostic associations. The main contribution at this stage is not a final biomarker list, but a transparent framework for deciding which findings deserve deeper biological interpretation.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
