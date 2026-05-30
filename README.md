@@ -10,17 +10,15 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 
 ## Key Achievements
 
-- **One-command analysis reproducibility:** `.\run_pipeline.ps1` runs package setup, cached data checks/downloads, TCGA QC, TCGA DESeq2, GEO limma validation, reproducibility scoring, Cox survival modeling, GO enrichment, and figure generation.
-- **TCGA discovery cohort:** The pipeline downloads TCGA-KIRC STAR-count RNA-seq data and clinical metadata, then analyzes `541` primary tumor and `72` solid tissue normal samples.
-- **Independent GEO validation:** The current validation pass includes `GSE40435` with `101` tumor and `101` adjacent non-tumor samples, plus `GSE53757` with `72` tumor and `72` normal samples.
-- **Cross-cohort DEG filtering:** TCGA-only tumor-normal differential expression is narrowed into a reproducible evidence table requiring TCGA significance, same-direction GEO support, and nominal validation evidence.
-- **Discordance framing:** The central plots compare tumor-normal log2 fold change against adjusted Cox log hazard ratio, both directionally and by absolute magnitude, to test whether tumor-normal expression magnitude aligns with survival effect.
-- **Evidence-funnel framing:** A generated funnel figure shows compression from TCGA DEG to reproducible DEG to survival-associated genes to strict and high-confidence candidates.
-- **Clinical and composition hardening:** The pipeline compares clinical-only versus clinical-plus-gene survival models for high-confidence candidates and adds crude proximal-tubule, endothelial, immune, and stromal marker-score sensitivity checks.
-- **External survival reality check:** `GSE29609` is used as a small external survival-direction check. It does not broadly validate the TCGA-derived shortlist, which is now reported as a major caution rather than hidden.
-- **Interpretation scaffolding:** The pipeline generates a ranked shortlist, manuscript-prioritized candidate table, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, and generated gene dossiers. A manual skeptical biological review of the final 24 genes is now available at [`results/manual_biological_review_24_candidates.md`](results/manual_biological_review_24_candidates.md).
-- **Transparent outputs:** Major result tables and figures are written under `results/`, while large downloaded and processed data artifacts are ignored by git.
-- **Cautious scientific interpretation:** The current run is pipeline-complete but not publication-final. The broad survival signal is treated as a reason to tighten modeling, not as a finished biomarker list.
+- **Evidence hardening instead of hub-gene inflation:** `8,852` TCGA-significant tumor-normal genes are compressed to `3,304` reproducible DEGs, `519` strict reproducible prognostic candidates, and `24` high-confidence candidate prognostic associations.
+- **Clear separation of expression reproducibility from prognosis:** The analysis explicitly tests whether reproducible tumor-normal dysregulation overlaps with adjusted survival association, rather than assuming large DEGs are clinically important.
+- **Direction-preserving discordance analysis:** The central figures preserve whether a gene is higher or lower in tumor and whether higher expression is associated with higher or lower hazard, making contradictory biology visible instead of flattening it into a ranked list.
+- **Clinical and composition stress-testing:** High-confidence candidates are checked against clinical-only models and crude proximal-tubule, endothelial, immune, and stromal marker-score adjustment, with candidate-specific leave-one-out marker scores to avoid circular composition adjustment.
+- **Negative external survival check reported honestly:** The small `GSE29609` outcome check does not broadly support the TCGA-derived shortlist: `22/24` candidates are platform-present, `4` keep the TCGA hazard direction, `0` have same-direction nominal support, and `4` show nominal opposite-direction signals.
+- **Candidate hierarchy instead of a fake panel:** The project separates TCGA-derived lead hypotheses (`KL`, `ACADM`, `CRYL1`, `ACAT1`, `DDC`) from supporting genes, composition/pathway flags, and genes that should not be highlighted without independent validation.
+- **Overclaim-resistant biological framing:** The interpretation has been narrowed from a generic hypoxia story to loss or retention of renal epithelial metabolic differentiation with immune and vascular composition effects.
+- **Reviewer-auditable outputs:** The pipeline generates a ranked shortlist, manuscript-prioritized candidate table, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, generated gene dossiers, and a skeptical manual biological review.
+- **Reproducible end-to-end execution:** `.\run_pipeline.ps1` rebuilds the analysis outputs from public inputs through validation checks and figures, while the manuscript is built separately from the analysis pipeline.
 
 ## Overview
 
