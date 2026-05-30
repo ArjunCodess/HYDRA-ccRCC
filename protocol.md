@@ -12,13 +12,15 @@ The strongest tumor-normal transcriptional changes in ccRCC are not necessarily 
 
 - Discovery: TCGA-KIRC RNA-seq STAR raw counts and clinical data from GDC.
 - GEO validation for v1: GSE40435 and GSE53757.
-- Secondary datasets are deferred until after the v1 candidate set is manually reviewed.
+- Small external survival-direction check: GSE29609.
+- Larger independent survival-validation datasets are deferred until after the v1 candidate set is manually reviewed.
 
 ## Inclusion And Exclusion Criteria
 
 - TCGA expression: include primary tumor and solid tissue normal samples for DEG.
 - TCGA survival: include primary tumor samples with usable overall survival time/status.
 - GEO validation: include human ccRCC tumor and matched/adjacent normal kidney samples.
+- External survival check: include ccRCC tumor cohorts with usable expression and survival time/status.
 - Exclude xenograft/tumorgraft samples from main validation.
 - Defer additional validation cohorts until after candidate-level interpretation.
 
@@ -87,6 +89,14 @@ A gene is a reproducible DEG if it satisfies all of:
 - Treat any candidate that loses direction or significance after composition adjustment as a tissue-composition hypothesis rather than a tumor-cell-intrinsic candidate.
 - These sensitivity analyses do not replace external validation; they exist to expose the main confounding risks in bulk RNA-seq.
 
+## External Survival Check
+
+- Use GSE29609 as a small external survival-direction check for the 24 high-confidence candidates.
+- Fit univariable continuous-expression Cox models because the cohort has only 39 samples and 17 overall-survival events.
+- Report platform coverage, hazard-ratio direction relative to TCGA, nominal p values, FDR values, and whether same-direction nominal support is observed.
+- Treat discordant or unsupported GSE29609 results as evidence against biomarker language.
+- Do not treat GSE29609 as definitive validation or refutation for individual genes because of limited power, different platform technology, and incomplete gene coverage.
+
 ## Known Limitations
 
 - Bulk RNA-seq cannot identify cell-type source of expression.
@@ -96,4 +106,5 @@ A gene is a reproducible DEG if it satisfies all of:
 - No wet-lab validation in v1.
 - GEO expression cohorts validate tumor-normal expression direction, not survival.
 - TCGA-derived survival candidates require independent outcome validation before biomarker language.
+- GSE29609 is underpowered and should be interpreted as a small external stress test.
 - Bulk candidate genes may mark retained renal epithelium, endothelial content, immune infiltration, stromal admixture, tumor purity, or necrosis rather than tumor-cell-intrinsic programs.

@@ -2,7 +2,7 @@
 
 **High-Discipline Reproducible Analysis of Clear Cell Renal Cell Carcinoma**
 
-**TL;DR:** HYDRA-ccRCC is a reproducible transcriptomics pipeline for testing whether the genes most consistently dysregulated between ccRCC tumor and normal kidney are also the genes that carry prognostic survival signal. It downloads TCGA-KIRC STAR-count RNA-seq data and two GEO validation cohorts, runs DESeq2/limma differential expression, builds a cross-cohort reproducible DEG table, fits adjusted Cox survival models, performs GO enrichment, and generates discordance, evidence-funnel, clinical/composition sensitivity, null-check, and interpretation outputs. The IEEE-style paper is built separately from the analysis pipeline.
+**TL;DR:** HYDRA-ccRCC is a reproducible transcriptomics pipeline for testing whether the genes most consistently dysregulated between ccRCC tumor and normal kidney are also the genes that carry prognostic survival signal. It downloads TCGA-KIRC STAR-count RNA-seq data, two GEO expression-validation cohorts, and one small GEO survival-check cohort; runs DESeq2/limma differential expression; builds a cross-cohort reproducible DEG table; fits adjusted Cox survival models; performs GO enrichment; and generates discordance, evidence-funnel, clinical/composition sensitivity, external survival-check, null-check, and interpretation outputs. The IEEE-style paper is built separately from the analysis pipeline.
 
 HYDRA-ccRCC asks a narrow question: can we move from "this gene is differentially expressed in ccRCC" to "this gene is reproducibly dysregulated and has evidence of survival relevance"? The current answer is useful but disciplined: the first complete run identifies `3,304` reproducible DEGs, `519` strict candidate genes, and `24` high-confidence candidate prognostic associations. The high-confidence set is small enough for focused review, but still requires literature and biological validation before any final gene-level claim.
 
@@ -17,6 +17,7 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 - **Discordance framing:** The central plots compare tumor-normal log2 fold change against adjusted Cox log hazard ratio, both directionally and by absolute magnitude, to test whether tumor-normal expression magnitude aligns with survival effect.
 - **Evidence-funnel framing:** A generated funnel figure shows compression from TCGA DEG to reproducible DEG to survival-associated genes to strict and high-confidence candidates.
 - **Clinical and composition hardening:** The pipeline compares clinical-only versus clinical-plus-gene survival models for high-confidence candidates and adds crude proximal-tubule, endothelial, immune, and stromal marker-score sensitivity checks.
+- **External survival reality check:** `GSE29609` is used as a small external survival-direction check. It does not broadly validate the TCGA-derived shortlist, which is now reported as a major caution rather than hidden.
 - **Interpretation scaffolding:** The pipeline generates a ranked shortlist, manuscript-prioritized candidate table, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, and generated gene dossiers. A manual skeptical biological review of the final 24 genes is now available at [`results/manual_biological_review_24_candidates.md`](results/manual_biological_review_24_candidates.md).
 - **Transparent outputs:** Major result tables and figures are written under `results/`, while large downloaded and processed data artifacts are ignored by git.
 - **Cautious scientific interpretation:** The current run is pipeline-complete but not publication-final. The broad survival signal is treated as a reason to tighten modeling, not as a finished biomarker list.
@@ -40,6 +41,7 @@ The pipeline produces:
 - ranked high-confidence shortlist
 - manuscript-prioritized candidate table
 - clinical/composition sensitivity table
+- external survival-check table
 - threshold sensitivity table
 - null-overlap check
 - DEG-versus-prognostic comparison table
@@ -75,6 +77,7 @@ The novelty is not a new algorithm. The contribution is the analysis discipline:
 | TCGA solid tissue normal samples            |      72 |
 | GSE40435 tumor/normal samples               | 101/101 |
 | GSE53757 tumor/normal samples               |   72/72 |
+| GSE29609 survival-check samples/events      |   39/17 |
 | TCGA significant genes after symbol mapping |   8,852 |
 | Same-direction genes in both GEO cohorts    |   9,149 |
 | Reproducible DEGs                           |   3,304 |
@@ -83,7 +86,7 @@ The novelty is not a new algorithm. The contribution is the analysis discipline:
 
 The high-confidence count is intentionally conservative: it requires reproducibility, stage/grade-complete Cox significance, proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction stage/grade sensitivity checks.
 
-The generated shortlist is still not a final biological truth table. It is an auditable worklist for deciding which candidate prognostic associations deserve deeper manual review.
+The generated shortlist is still not a final biological truth table. It is an auditable worklist for deciding which candidate prognostic associations deserve deeper manual review. The small GSE29609 external survival check is not broadly supportive: 22 of 24 candidates are present on the platform, only 4 keep the TCGA hazard direction, none have same-direction nominal survival support, and 4 have nominal opposite-direction signals. This makes the final interpretation more conservative, not less useful.
 
 ### Manual Biological Review
 
@@ -151,6 +154,7 @@ HYDRA-ccRCC/
 - [`analysis/07_survival_tcga.R`](analysis/07_survival_tcga.R): adjusted Cox survival modeling.
 - [`analysis/10_candidate_table.R`](analysis/10_candidate_table.R): final joined evidence table.
 - [`analysis/11_hardening_outputs.R`](analysis/11_hardening_outputs.R): ranked shortlist, manuscript-prioritized candidate table, clinical/composition sensitivity checks, null checks, cell-type sanity table, literature-review seed table, dossiers, and evidence-funnel figure.
+- [`analysis/13_external_survival_gse29609.R`](analysis/13_external_survival_gse29609.R): small external survival-direction check for high-confidence candidates.
 - [`analysis/12_validate_outputs.R`](analysis/12_validate_outputs.R): final output validation step.
 - [`protocol.md`](protocol.md): locked research question, thresholds, and limitations.
 - [`paper/main.pdf`](paper/main.pdf): first IEEE-style manuscript draft.
@@ -162,6 +166,7 @@ Use scripted downloads only. Do not manually edit downloaded metadata in Excel.
 
 - TCGA-KIRC: downloaded from GDC using `TCGAbiolinks` with `workflow.type = "STAR - Counts"`.
 - GEO validation: `GSE40435` and `GSE53757` are downloaded as Series Matrix plus supplementary files.
+- GEO survival check: `GSE29609` is downloaded as a Series Matrix with platform annotation and clinical survival fields.
 - Raw FASTQ/BAM files are intentionally not downloaded for v1.
 - GEO2R result exports are not used as primary data.
 
@@ -171,6 +176,7 @@ Use scripted downloads only. Do not manually edit downloaded metadata in Excel.
 - Cox models use continuous expression and available clinical covariates.
 - High-confidence genes are candidate prognostic associations, not candidate biomarkers.
 - GEO expression validation is not survival validation.
+- GSE29609 is a small external survival check, not definitive validation or refutation for individual genes.
 - Clinical/composition sensitivity checks are confounding screens, not proof of tumor-cell-intrinsic biology.
 - Adjacent normal tissue is not treated as perfectly healthy tissue.
 - Bulk RNA-seq cannot resolve cell-type source.
@@ -189,9 +195,10 @@ The implemented v1 pipeline now includes the stress tests that were previously l
 5. Candidate tables include pathway-class annotations for hypoxia, angiogenesis, ECM/EMT, metabolism, immune programs, and unclassified genes.
 6. A manuscript-prioritized candidate table separates lead candidates, supporting candidates, composition flags, and genes that should not be highlighted.
 7. Clinical-only versus clinical-plus-gene and crude composition-score sensitivity outputs are generated for the high-confidence set.
-8. The manuscript has been updated to report the compressed candidate set without biomarker overclaiming.
-9. The pipeline generates evidence-funnel, directional discordance, candidate forest, threshold-sensitivity, null-overlap, DEG-versus-prognostic, literature-seed, cell-type sanity, survival-report, and dossier outputs.
+8. A GSE29609 external survival-direction check is generated and reported.
+9. The manuscript has been updated to report the compressed candidate set without biomarker overclaiming.
+10. The pipeline generates evidence-funnel, directional discordance, candidate forest, threshold-sensitivity, external survival-check, null-overlap, DEG-versus-prognostic, literature-seed, cell-type sanity, survival-report, and dossier outputs.
 
 ## Remaining Scientific Work
 
-The codebase is pipeline-complete, and a first manual candidate-level biological review has been added. The science is still not publication-final: before making strong gene-level claims, the review recommendations should be followed with independent survival validation and, where possible, proteomic, spatial, single-cell, or IHC/TMA validation.
+The codebase is pipeline-complete, and a first manual candidate-level biological review plus a small external survival check have been added. The science is still not publication-final: before making strong gene-level claims, the review recommendations should be followed with larger independent survival validation and, where possible, proteomic, spatial, single-cell, or IHC/TMA validation.
