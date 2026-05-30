@@ -218,18 +218,34 @@ fit_composition_sensitivity <- function(high_conf_symbols) {
     stromal = c("COL1A1", "COL1A2", "DCN", "LUM", "ACTA2")
   )
 
-  score_df <- tibble(sample_barcode = sample_barcodes)
+  build_marker_scores <- function(exclude_symbol = NA_character_) {
+    score_df <- tibble(sample_barcode = sample_barcodes)
+    for (score_name in names(marker_sets)) {
+      markers <- setdiff(marker_sets[[score_name]], exclude_symbol)
+      present <- intersect(markers, full_map$symbol)
+      gene_ids <- full_map$gene_id[match(present, full_map$symbol)]
+      gene_ids <- gene_ids[!is.na(gene_ids)]
+      if (length(gene_ids) == 0) {
+        score_df[[score_name]] <- NA_real_
+      } else {
+        mat <- vst_mat[gene_ids, sample_barcodes, drop = FALSE]
+        score_df[[score_name]] <- as.numeric(scale(colMeans(t(scale(t(mat))), na.rm = TRUE)))
+      }
+    }
+    score_df
+  }
+
   marker_availability <- bind_rows(lapply(names(marker_sets), function(score_name) {
     present <- intersect(marker_sets[[score_name]], full_map$symbol)
     gene_ids <- full_map$gene_id[match(present, full_map$symbol)]
     gene_ids <- gene_ids[!is.na(gene_ids)]
-    if (length(gene_ids) == 0) {
-      score_df[[score_name]] <<- NA_real_
-    } else {
-      mat <- vst_mat[gene_ids, sample_barcodes, drop = FALSE]
-      score_df[[score_name]] <<- as.numeric(scale(colMeans(t(scale(t(mat))), na.rm = TRUE)))
-    }
-    tibble(score = score_name, requested_markers = paste(marker_sets[[score_name]], collapse = ";"), used_markers = paste(present, collapse = ";"), n_used = length(gene_ids))
+    tibble(
+      score = score_name,
+      requested_markers = paste(marker_sets[[score_name]], collapse = ";"),
+      used_markers = paste(present, collapse = ";"),
+      n_used = length(gene_ids),
+      model_use_note = "Candidate-specific models recompute scores after excluding the candidate symbol when it appears in a marker set."
+    )
   }))
 
   base_dat <- tumor_samples |>
@@ -245,14 +261,16 @@ fit_composition_sensitivity <- function(high_conf_symbols) {
         grade_clean %in% c("G3", "G4") ~ "High grade",
         TRUE ~ NA_character_
       ))
-    ) |>
-    left_join(score_df, by = "sample_barcode")
+    )
 
   fit_one <- function(symbol) {
     gene_id <- repro$tcga_gene_id[match(symbol, repro$symbol)]
     if (is.na(gene_id) || !gene_id %in% rownames(vst_mat)) return(NULL)
 
+    score_df <- build_marker_scores(exclude_symbol = symbol)
+
     dat <- base_dat |>
+      left_join(score_df, by = "sample_barcode") |>
       mutate(expr = as.numeric(scale(vst_mat[gene_id, sample_barcode]))) |>
       dplyr::select(os_time, os_event, expr, age, sex, stage, grade, proximal_tubule, endothelial, immune, stromal) |>
       filter(if_all(everything(), ~ !is.na(.x))) |>
@@ -280,6 +298,9 @@ fit_composition_sensitivity <- function(high_conf_symbols) {
       base_log_hr = gene_term$estimate,
       base_hr = exp(gene_term$estimate),
       base_p_value = gene_term$p.value,
+      gene_log_hr = gene_term$estimate,
+      gene_hr = exp(gene_term$estimate),
+      gene_p_value = gene_term$p.value,
       composition_adjusted_log_hr = comp_term$estimate,
       composition_adjusted_hr = exp(comp_term$estimate),
       composition_adjusted_p_value = comp_term$p.value,
@@ -290,6 +311,7 @@ fit_composition_sensitivity <- function(high_conf_symbols) {
   sensitivity <- bind_rows(lapply(high_conf_symbols, fit_one)) |>
     mutate(
       gene_lrt_fdr_vs_clinical = p.adjust(gene_lrt_p_vs_clinical, method = "BH"),
+      gene_fdr = p.adjust(gene_p_value, method = "BH"),
       composition_adjusted_fdr = p.adjust(composition_adjusted_p_value, method = "BH")
     ) |>
     arrange(gene_lrt_fdr_vs_clinical, composition_adjusted_fdr)
@@ -470,7 +492,6 @@ funnel <- tibble(
       "PH pass",
       "Sensitivity pass",
       "Strict candidate",
-      "Pathway-classified high confidence",
       "High-confidence candidate"
     ),
     levels = c(
@@ -480,7 +501,6 @@ funnel <- tibble(
       "PH pass",
       "Sensitivity pass",
       "Strict candidate",
-      "Pathway-classified high confidence",
       "High-confidence candidate"
     )
   ),
@@ -491,7 +511,6 @@ funnel <- tibble(
     summary_counts$value[match("ph_pass", summary_counts$metric)],
     summary_counts$value[match("sensitivity_pass", summary_counts$metric)],
     summary_counts$value[match("strict_candidate", summary_counts$metric)],
-    sum(candidates$high_confidence_candidate & candidates$pathway_class != "Unclassified", na.rm = TRUE),
     summary_counts$value[match("high_confidence_candidate", summary_counts$metric)]
   )
 )

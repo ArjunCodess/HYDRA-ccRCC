@@ -89,6 +89,9 @@ if (length(missing_survival_cols) > 0) {
 composition <- read_csv(file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"), show_col_types = FALSE)
 required_composition_cols <- c(
   "symbol",
+  "gene_log_hr",
+  "gene_p_value",
+  "gene_fdr",
   "gene_lrt_fdr_vs_clinical",
   "composition_adjusted_fdr",
   "same_direction_after_composition"
@@ -115,6 +118,15 @@ if (length(missing_external_cols) > 0) {
 external_summary <- read_csv(file.path(DIRS$tables, "external_survival_gse29609_summary.csv"), show_col_types = FALSE)
 if (!all(c("gse29609_samples", "gse29609_events") %in% external_summary$metric)) {
   stop("external_survival_gse29609_summary.csv is missing required metrics.")
+}
+
+funnel <- read_csv(file.path(DIRS$tables, "evidence_funnel.csv"), show_col_types = FALSE)
+if (any(diff(funnel$count) > 0, na.rm = TRUE)) {
+  stop("evidence_funnel.csv is not monotonic. Funnel counts must not increase across sequential hardening steps.")
+}
+
+if (file.exists(file.path(DIRS$tables, "high_confidence_gene_dossiers.md"))) {
+  stop("high_confidence_gene_dossiers.md must be written to results/, not results/tables/.")
 }
 
 message("Output validation complete.")
