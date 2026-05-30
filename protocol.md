@@ -6,7 +6,7 @@ Clear cell renal cell carcinoma is strongly shaped by VHL/HIF biology, hypoxia s
 
 ## Hypothesis
 
-The strongest tumor-normal transcriptional changes in ccRCC are not necessarily the strongest survival-associated changes. Survival will be associated with a narrower hypoxia-driven adaptation program rather than with every reproducible tumor-normal DEG.
+The strongest tumor-normal transcriptional changes in ccRCC are not necessarily the strongest survival-associated changes. Survival-associated signal will concentrate in a narrower set of reproducible genes, expected to include VHL/HIF-compatible renal metabolic state, immune composition, and vascular composition rather than every large tumor-normal DEG.
 
 ## Datasets
 
@@ -63,8 +63,8 @@ A gene is a reproducible DEG if it satisfies all of:
 
 - ORA for reproducible/prognostic DEG lists.
 - Hallmark class annotation for candidate genes when MSigDB access is available through `msigdbr`.
-- Primary interpretation anchor: hypoxia-driven adaptation.
-- Secondary categories: angiogenesis, metabolism, ECM remodeling, and immune microenvironment.
+- Primary interpretation anchor: renal epithelial metabolic differentiation/state.
+- Secondary categories: VHL/HIF compatibility, angiogenesis, metabolism, ECM remodeling, and immune microenvironment.
 
 ## Discordance Figure
 
@@ -79,6 +79,14 @@ A gene is a reproducible DEG if it satisfies all of:
 - Show gene-count compression from TCGA-significant genes to reproducible DEGs, main Cox survival genes, PH-pass genes, sensitivity-pass genes, strict candidates, pathway-classified high-confidence genes, and final high-confidence candidates.
 - Use this figure as the paper's main argument spine.
 
+## Clinical And Composition Sensitivity
+
+- For high-confidence candidates, compare a clinical-only Cox model with a clinical-plus-gene Cox model.
+- Report likelihood-ratio support and change in concordance for adding each gene to age, sex, stage, and grade.
+- Add crude expression-derived marker scores for proximal-tubule, endothelial, immune, and stromal composition.
+- Treat any candidate that loses direction or significance after composition adjustment as a tissue-composition hypothesis rather than a tumor-cell-intrinsic candidate.
+- These sensitivity analyses do not replace external validation; they exist to expose the main confounding risks in bulk RNA-seq.
+
 ## Known Limitations
 
 - Bulk RNA-seq cannot identify cell-type source of expression.
@@ -86,3 +94,6 @@ A gene is a reproducible DEG if it satisfies all of:
 - Retrospective cohorts can contain confounding.
 - Association does not prove causation.
 - No wet-lab validation in v1.
+- GEO expression cohorts validate tumor-normal expression direction, not survival.
+- TCGA-derived survival candidates require independent outcome validation before biomarker language.
+- Bulk candidate genes may mark retained renal epithelium, endothelial content, immune infiltration, stromal admixture, tumor purity, or necrosis rather than tumor-cell-intrinsic programs.
