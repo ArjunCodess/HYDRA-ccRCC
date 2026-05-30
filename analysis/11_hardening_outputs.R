@@ -459,7 +459,7 @@ for (i in seq_len(nrow(ranked_shortlist))) {
   )
 }
 
-writeLines(dossier_lines, file.path(DIRS$tables, "high_confidence_gene_dossiers.md"))
+writeLines(dossier_lines, file.path("results", "high_confidence_gene_dossiers.md"))
 
 funnel <- tibble(
   step = factor(

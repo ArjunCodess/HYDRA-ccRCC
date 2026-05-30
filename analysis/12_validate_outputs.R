@@ -8,6 +8,7 @@ required_files <- c(
   file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"),
   file.path(DIRS$tables, "gse40435_sample_summary.csv"),
   file.path(DIRS$tables, "gse53757_sample_summary.csv"),
+  file.path(DIRS$tables, "gse29609_sample_summary.csv"),
   FILES$tcga_deg,
   file.path(DIRS$tables, "gse40435_limma_tumor_vs_normal.csv"),
   file.path(DIRS$tables, "gse53757_limma_tumor_vs_normal.csv"),
@@ -27,7 +28,9 @@ required_files <- c(
   file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
   file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"),
   file.path(DIRS$tables, "composition_marker_score_availability.csv"),
-  file.path(DIRS$tables, "high_confidence_gene_dossiers.md"),
+  file.path(DIRS$tables, "external_survival_gse29609.csv"),
+  file.path(DIRS$tables, "external_survival_gse29609_summary.csv"),
+  file.path("results", "high_confidence_gene_dossiers.md"),
   file.path(DIRS$tables, "evidence_funnel.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_pathway_summary.csv"),
   file.path(DIRS$tables, "candidate_summary.csv"),
@@ -93,6 +96,25 @@ required_composition_cols <- c(
 missing_composition_cols <- setdiff(required_composition_cols, names(composition))
 if (length(missing_composition_cols) > 0) {
   stop("candidate_clinical_composition_sensitivity.csv is missing columns: ", paste(missing_composition_cols, collapse = ", "))
+}
+
+external <- read_csv(file.path(DIRS$tables, "external_survival_gse29609.csv"), show_col_types = FALSE)
+required_external_cols <- c(
+  "symbol",
+  "external_present",
+  "external_log_hr",
+  "external_p_value",
+  "external_same_direction",
+  "external_interpretation"
+)
+missing_external_cols <- setdiff(required_external_cols, names(external))
+if (length(missing_external_cols) > 0) {
+  stop("external_survival_gse29609.csv is missing columns: ", paste(missing_external_cols, collapse = ", "))
+}
+
+external_summary <- read_csv(file.path(DIRS$tables, "external_survival_gse29609_summary.csv"), show_col_types = FALSE)
+if (!all(c("gse29609_samples", "gse29609_events") %in% external_summary$metric)) {
+  stop("external_survival_gse29609_summary.csv is missing required metrics.")
 }
 
 message("Output validation complete.")
