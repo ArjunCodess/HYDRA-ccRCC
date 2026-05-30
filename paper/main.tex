@@ -1,0 +1,120 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{url}
+
+\title{Reproducible Tumor-Normal Dysregulation and Prognostic Discordance in Clear Cell Renal Cell Carcinoma}
+
+\author{
+\IEEEauthorblockN{Arjun}
+\IEEEauthorblockA{Independent Student Researcher\\
+Email: placeholder@example.com}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Clear cell renal cell carcinoma (ccRCC) is strongly shaped by VHL/HIF-associated hypoxia biology, but genes that distinguish tumor from normal kidney are not necessarily the same genes that carry prognostic information. This study builds a reproducible public-data pipeline to test whether tumor-normal differential expression magnitude aligns with survival-associated effect size in ccRCC. TCGA-KIRC STAR-count RNA-seq data were analyzed with DESeq2, and two independent GEO cohorts, GSE40435 and GSE53757, were analyzed with limma. Reproducibility was defined by TCGA significance, consistent direction across both GEO cohorts, and nominal validation support in at least one GEO cohort. Cox proportional hazards models were fit in TCGA primary tumors using continuous expression and available clinical covariates. The first pipeline run identified 3,304 reproducible differentially expressed genes and 1,389 genes that were both reproducible and associated with survival under the current broad Cox threshold. Enrichment results emphasized immune antigen presentation and extracellular/transport-related processes. These results are preliminary and should be interpreted as a pipeline-complete first pass rather than a final biomarker claim. The main contribution is a transparent framework for stress-testing the assumption that tumor identity genes are also prognostic genes.
+\end{abstract}
+
+\begin{IEEEkeywords}
+clear cell renal cell carcinoma, TCGA, GEO, differential expression, survival analysis, reproducibility, hypoxia, transcriptomics
+\end{IEEEkeywords}
+
+\section{Introduction}
+Clear cell renal cell carcinoma is the most common histologic subtype of kidney cancer and has a well-established molecular relationship with VHL loss, HIF stabilization, angiogenesis, metabolic rewiring, and microenvironmental adaptation \cite{tcga_kirc_2013,vhl_hif_review_2024}. Public transcriptomic resources make ccRCC attractive for student-scale computational biology, but they also make it easy to produce shallow ``hub gene'' analyses that overinterpret differential expression as clinical importance.
+
+The central premise of this project is deliberately narrower: tumor-normal dysregulation and prognostic relevance are related but not equivalent. A gene can be strongly differentially expressed because it marks kidney tissue identity, tumor composition, immune infiltration, or metabolic state, without independently explaining patient outcome. Conversely, a modest expression change may carry survival signal if it reflects aggressive adaptation.
+
+This work asks: in ccRCC, do the most reproducibly dysregulated tumor-normal genes also carry prognostic information, or is survival associated with a narrower hypoxia-linked adaptation program? The goal is not to claim therapeutic targets. The goal is to build a reproducible evidence funnel: differential expression, cross-cohort validation, adjusted survival modeling, enrichment, and a discordance figure comparing expression perturbation with survival effect.
+
+\section{Methods}
+\subsection{Datasets}
+TCGA-KIRC was used as the discovery cohort. RNA-seq data were downloaded from the Genomic Data Commons as STAR-count gene expression quantification using TCGAbiolinks \cite{colaprico_tcgabiolinks_2016}. The first run included 541 primary tumor samples and 72 solid tissue normal samples. Clinical metadata were downloaded from GDC and used to derive overall survival time and event status.
+
+Two GEO cohorts were used for first-pass expression validation \cite{barrett_geo_2013}. GSE40435 contained 101 adjacent non-tumor kidney samples and 101 ccRCC tumor samples. GSE53757 contained 72 matched normal kidney samples and 72 ccRCC tumor samples. GEO Series Matrix files and supplementary raw archives were downloaded by script; the current analysis uses the Series Matrix expression values for a fast validation pass.
+
+\subsection{Differential Expression}
+TCGA raw unstranded STAR counts were analyzed with DESeq2 \cite{love_deseq2_2014}. Genes were retained if at least 10 counts were observed in at least 10 samples. The design compared primary tumor against solid tissue normal. TCGA significance was defined as Benjamini-Hochberg adjusted $p < 0.05$ and absolute log$_2$ fold change at least 1.
+
+GEO cohorts were analyzed with limma \cite{ritchie_limma_2015}. For GSE40435, patient-pair identifiers were parsed from sample titles. For GSE53757, paired identifiers were assigned from the documented alternating tumor-normal sample order. Probe-level expression was collapsed to gene symbols by mean expression after parsing platform gene-symbol annotations.
+
+\subsection{Reproducibility Definition}
+A gene was considered reproducibly differentially expressed if it met the TCGA differential expression threshold, had the same tumor-normal direction in both GSE40435 and GSE53757, and had nominal validation support ($p < 0.05$) in at least one GEO cohort. This definition was chosen to reduce post-hoc threshold drift while keeping enough genes for downstream survival and enrichment analysis.
+
+\subsection{Survival Analysis}
+Survival analysis used TCGA primary tumor samples only. Cox proportional hazards models \cite{cox_1972} were fit using standardized continuous expression rather than median-split expression groups. Models used available clinical covariates: age, sex, stage, and grade. Complete-case models were fit per gene, and proportional hazards checks were saved using \texttt{cox.zph}. The current exploratory prognostic threshold is Cox FDR $<0.10$.
+
+\subsection{Enrichment and Visualization}
+GO Biological Process over-representation analysis was implemented directly with \texttt{org.Hs.eg.db} and \texttt{GO.db} to avoid fragile plotting dependencies. Hypergeometric tests were corrected with Benjamini-Hochberg adjustment. The signature visualization is a discordance plot with absolute tumor-normal log$_2$ fold change on the x-axis and absolute adjusted Cox log hazard ratio on the y-axis. Point size represents survival significance, and reproducible genes are emphasized.
+
+\section{Results}
+\subsection{TCGA and GEO Differential Expression}
+The TCGA-KIRC analysis identified 14,337 Ensembl-level genes passing the initial DESeq2 threshold. After mapping to symbols, 8,852 TCGA-significant genes were available for cross-cohort comparison. GSE40435 produced 1,076 significant genes under the same effect-size threshold, and GSE53757 produced 3,139 significant genes.
+
+The cross-cohort evidence funnel identified 3,304 reproducible differentially expressed genes. This reduction is important: the TCGA-only DEG count is large enough to be biologically diffuse, while the reproducibility filter begins to separate robust ccRCC expression programs from single-cohort findings.
+
+\begin{table}[htbp]
+\caption{First-pass evidence funnel}
+\centering
+\begin{tabular}{lr}
+\toprule
+Metric & Count \\
+\midrule
+TCGA primary tumor samples & 541 \\
+TCGA solid tissue normal samples & 72 \\
+GSE40435 tumor/normal samples & 101/101 \\
+GSE53757 tumor/normal samples & 72/72 \\
+TCGA significant genes after symbol mapping & 8,852 \\
+Same direction in both GEO cohorts & 9,149 \\
+Reproducible DEGs & 3,304 \\
+Reproducible and prognostic genes & 1,389 \\
+\bottomrule
+\end{tabular}
+\label{tab:funnel}
+\end{table}
+
+\subsection{Survival Association and Discordance}
+Among reproducible DEGs, 1,389 were associated with overall survival at the current exploratory Cox FDR threshold. The large number of survival-associated genes indicates that the first-pass model remains permissive and should not yet be interpreted as a final biomarker list. Instead, this result motivates the core discordance analysis: survival signal is widespread enough that final interpretation must prioritize effect size, proportional hazards behavior, clinical covariate robustness, and pathway coherence rather than FDR alone.
+
+Top reproducible survival-associated genes included CYFIP2, CRYL1, RBM47, IQGAP2, PANK1, CHDH, and ACADM, many of which were downregulated in tumor and associated with lower hazard when expression was higher. Some genes had strong TCGA effects but weaker GEO fold changes, emphasizing why the final project should rank genes by cross-cohort evidence rather than a single statistic.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../results/figures/tcga_kirc_discordance.png}
+\caption{First-pass discordance plot comparing absolute tumor-normal expression magnitude with absolute adjusted Cox log hazard ratio. Reproducible genes are emphasized. This figure is intended to test whether tumor-normal dysregulation magnitude aligns with prognostic effect size.}
+\label{fig:discordance}
+\end{figure}
+
+\subsection{Pathway Enrichment}
+GO Biological Process enrichment of the current reproducible prognostic set highlighted antigen processing and presentation, MHC class II-related processes, sodium ion transport, acute-phase response, and immune response regulation. These terms suggest a prominent immune and microenvironmental component in the first-pass candidate set. That finding is biologically plausible in ccRCC, but it should be interpreted cautiously because bulk RNA-seq cannot distinguish tumor-cell intrinsic programs from immune or stromal composition.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{../results/figures/tcga_kirc_volcano.png}
+\caption{TCGA-KIRC tumor-normal DESeq2 volcano plot. This plot shows the breadth of tumor-normal transcriptional disruption before cross-cohort validation and survival filtering.}
+\label{fig:volcano}
+\end{figure}
+
+\section{Discussion}
+This first implementation supports the feasibility of the project design. The analysis moves beyond a single-cohort DEG list by requiring independent GEO direction support and by comparing reproducible tumor-normal dysregulation against adjusted survival effect size. The current result also shows why restraint is necessary: thousands of genes pass early filters, and even the reproducible-plus-survival set remains too large for direct biological interpretation.
+
+The most important scientific next step is not to add machine learning. It is to sharpen the survival and reproducibility filters. Candidate genes should be re-ranked by a composite evidence score that includes cross-cohort direction, validation $p$-values, Cox effect size, proportional hazards behavior, and pathway membership. Survival models should be sensitivity-tested under stage-complete subsets, grade-complete subsets, and possibly stage-stratified models. Genes failing proportional hazards checks should be flagged rather than promoted.
+
+The enrichment results currently emphasize immune antigen presentation. That may reflect genuine ccRCC tumor microenvironment biology, but it may also reflect bulk tissue composition. This is precisely the kind of ambiguity the project should preserve rather than hide. If hypoxia-associated genes are not the top enriched category after reproducibility and survival filtering, the final paper should report that honestly and revise the hypothesis accordingly.
+
+\section{Limitations}
+This analysis is retrospective and uses public bulk transcriptomic data. Adjacent normal kidney is not identical to healthy kidney. Cox associations do not prove causality. GEO validation currently uses Series Matrix expression values rather than fully reprocessed raw arrays. Clinical covariate completeness varies across TCGA samples. No wet-lab validation is included. Therefore, all gene-level findings should be framed as candidate prognostic associations, not therapeutic targets.
+
+\section{Conclusion}
+HYDRA-ccRCC now has a complete reproducible first-pass pipeline for testing discordance between tumor-normal differential expression and prognostic survival signal in ccRCC. The current analysis identifies 3,304 reproducible DEGs and 1,389 reproducible genes with exploratory survival association. The main contribution at this stage is not a final biomarker list, but a transparent framework for deciding which findings deserve deeper biological interpretation.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
+
