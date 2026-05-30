@@ -1,0 +1,8 @@
+metric,value
+gse29609_samples,39
+gse29609_events,17
+tested_candidates,24
+platform_present_candidates,22
+same_direction_candidates,4
+same_direction_nominal_candidates,0
+opposite_direction_nominal_candidates,4
