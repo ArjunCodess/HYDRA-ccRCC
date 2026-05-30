@@ -4,11 +4,12 @@ tcga_patient_barcode <- function(barcodes) {
 
 normalize_stage <- function(stage) {
   stage <- toupper(trimws(as.character(stage)))
+  stage <- gsub("[ABC]$", "", stage)
   dplyr::case_when(
-    grepl("STAGE I[^V]|STAGE I$", stage) ~ "Stage I",
-    grepl("STAGE II[^I]|STAGE II$", stage) ~ "Stage II",
-    grepl("STAGE III", stage) ~ "Stage III",
     grepl("STAGE IV", stage) ~ "Stage IV",
+    grepl("STAGE III", stage) ~ "Stage III",
+    grepl("STAGE II", stage) ~ "Stage II",
+    grepl("STAGE I", stage) ~ "Stage I",
     TRUE ~ NA_character_
   )
 }
