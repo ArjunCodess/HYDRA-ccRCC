@@ -36,19 +36,22 @@ ggsave(file.path(DIRS$figures, "tcga_kirc_volcano.png"), p_volcano, width = 7, h
 
 if (!is.null(candidates)) {
   discordance <- candidates |>
-    filter(!is.na(log_hr), !is.na(fdr), !is.na(tcga_log2fc)) |>
+    filter(!is.na(main_log_hr), !is.na(main_fdr), !is.na(tcga_log2fc)) |>
     transmute(
       gene_id = tcga_gene_id,
       symbol = symbol,
       log2FoldChange = tcga_log2fc,
       padj = tcga_padj,
-      log_hr = log_hr,
-      fdr = fdr,
+      log_hr = main_log_hr,
+      fdr = main_fdr,
       abs_log2fc = abs(tcga_log2fc),
-      abs_log_hr = abs(log_hr),
-      neg_log10_cox_fdr = -log10(fdr),
+      abs_log_hr = abs(main_log_hr),
+      neg_log10_cox_fdr = -log10(main_fdr),
       prognostic = prognostic,
-      reproducible_deg = reproducible_deg
+      reproducible_deg = reproducible_deg,
+      strict_candidate = strict_candidate,
+      high_confidence_candidate = high_confidence_candidate,
+      pathway_class = pathway_class
     )
 } else {
   discordance <- deg |>
@@ -59,27 +62,41 @@ if (!is.null(candidates)) {
       abs_log2fc = abs(log2FoldChange),
       abs_log_hr = abs(log_hr),
       neg_log10_cox_fdr = -log10(fdr),
-      prognostic = fdr < THRESHOLDS$survival_fdr,
-      reproducible_deg = FALSE
+      prognostic = fdr < THRESHOLDS$strict_survival_fdr,
+      reproducible_deg = FALSE,
+      strict_candidate = FALSE,
+      high_confidence_candidate = FALSE,
+      pathway_class = "Unclassified"
     )
 }
 
 p_discordance <- ggplot(discordance, aes(abs_log2fc, abs_log_hr)) +
-  geom_point(aes(size = neg_log10_cox_fdr, fill = prognostic, alpha = reproducible_deg), shape = 21, color = "#222222") +
+  geom_point(aes(size = neg_log10_cox_fdr, fill = pathway_class, alpha = reproducible_deg, stroke = high_confidence_candidate), shape = 21, color = "#222222") +
   geom_text_repel(
-    data = discordance |> filter(prognostic, reproducible_deg) |> arrange(fdr) |> slice_head(n = 12),
+    data = discordance |> filter(high_confidence_candidate) |> arrange(fdr) |> slice_head(n = 12),
     aes(label = symbol),
     size = 3,
     max.overlaps = 20
   ) +
-  scale_fill_manual(values = c("TRUE" = "#B83232", "FALSE" = "#D9D9D9")) +
+  scale_fill_manual(values = c(
+    "Hypoxia" = "#7B3294",
+    "Angiogenesis" = "#008837",
+    "ECM/EMT" = "#A6611A",
+    "Metabolism" = "#0571B0",
+    "Immune" = "#C51B7D",
+    "Hypoxia;Metabolism" = "#5E3C99",
+    "ECM/EMT;Immune" = "#B35806",
+    "Immune;Metabolism" = "#E66101",
+    "Unclassified" = "#C9C9C9"
+  ), na.value = "#C9C9C9") +
   scale_alpha_manual(values = c("TRUE" = 0.85, "FALSE" = 0.22)) +
+  scale_discrete_manual(aesthetics = "stroke", values = c("TRUE" = 1.1, "FALSE" = 0.25), guide = "none") +
   labs(
-    title = "Differential Expression Magnitude vs Prognostic Effect",
+    title = "Reproducible Expression Magnitude vs Strict Prognostic Effect",
     x = "Absolute tumor-normal log2 fold change",
-    y = "Absolute adjusted Cox log(HR)",
-    size = "-log10 Cox FDR",
-    fill = "Prognostic",
+    y = "Absolute stage/grade-adjusted Cox log(HR)",
+    size = "-log10 main Cox FDR",
+    fill = "Pathway class",
     alpha = "Reproducible"
   ) +
   theme_hydra()

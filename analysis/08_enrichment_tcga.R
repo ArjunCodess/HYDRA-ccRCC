@@ -13,7 +13,7 @@ deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
 surv <- read_csv(FILES$tcga_survival, show_col_types = FALSE)
 
 gene_ensembl <- surv |>
-  filter(fdr < THRESHOLDS$survival_fdr) |>
+  filter(model_type == "stage_grade_complete", fdr < THRESHOLDS$strict_survival_fdr) |>
   mutate(ensembl = sub("\\..*$", "", gene_id)) |>
   pull(ensembl) |>
   unique()
@@ -21,6 +21,7 @@ gene_ensembl <- surv |>
 if (length(gene_ensembl) < 5) {
   warning("Fewer than 5 prognostic genes passed FDR threshold. Falling back to top 100 survival-ranked genes for exploratory enrichment.")
   gene_ensembl <- surv |>
+    filter(model_type == "stage_grade_complete") |>
     arrange(p_value) |>
     slice_head(n = min(100, n())) |>
     mutate(ensembl = sub("\\..*$", "", gene_id)) |>

@@ -33,7 +33,12 @@ FILES <- list(
 THRESHOLDS <- list(
   deg_fdr = 0.05,
   deg_abs_log2fc = 1,
-  survival_fdr = 0.10,
+  strict_survival_fdr = 0.05,
+  high_confidence_survival_fdr = 0.01,
+  ph_min_p = 0.05,
+  min_abs_log_hr = log(1.25),
+  high_confidence_abs_log_hr = log(1.5),
+  min_geo_abs_log2fc = 0.25,
   min_count = 10,
   min_samples = 10
 )
