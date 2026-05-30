@@ -91,13 +91,17 @@ fit_gene_model <- function(gene_id, model_type, covars) {
   ph <- tryCatch(cox.zph(fit), error = function(e) NULL)
   ph_p <- if (is.null(ph) || !"expr" %in% rownames(ph$table)) NA_real_ else ph$table["expr", "p"]
 
-  tidy(fit) |>
+  tidy(fit, conf.int = TRUE) |>
     filter(term == "expr") |>
     transmute(
       gene_id = gene_id,
       model_type = model_type,
       log_hr = estimate,
       hr = exp(estimate),
+      log_hr_ci_low = conf.low,
+      log_hr_ci_high = conf.high,
+      hr_ci_low = exp(conf.low),
+      hr_ci_high = exp(conf.high),
       std_error = std.error,
       statistic = statistic,
       p_value = p.value,

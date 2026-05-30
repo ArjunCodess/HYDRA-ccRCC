@@ -11,10 +11,44 @@ repro <- read_csv(file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse5375
 surv <- read_csv(FILES$tcga_survival, show_col_types = FALSE)
 
 model_wide <- surv |>
-  select(gene_id, model_type, log_hr, hr, p_value, fdr, ph_p_value, n, events, covariates) |>
+  select(
+    gene_id,
+    model_type,
+    log_hr,
+    hr,
+    log_hr_ci_low,
+    log_hr_ci_high,
+    hr_ci_low,
+    hr_ci_high,
+    std_error,
+    p_value,
+    fdr,
+    ph_p_value,
+    n,
+    events,
+    covariates,
+    warning_count,
+    warning_text
+  ) |>
   pivot_wider(
     names_from = model_type,
-    values_from = c(log_hr, hr, p_value, fdr, ph_p_value, n, events, covariates),
+    values_from = c(
+      log_hr,
+      hr,
+      log_hr_ci_low,
+      log_hr_ci_high,
+      hr_ci_low,
+      hr_ci_high,
+      std_error,
+      p_value,
+      fdr,
+      ph_p_value,
+      n,
+      events,
+      covariates,
+      warning_count,
+      warning_text
+    ),
     names_glue = "{model_type}_{.value}"
   )
 
@@ -80,11 +114,18 @@ candidates <- repro |>
   mutate(
     main_log_hr = stage_grade_complete_log_hr,
     main_hr = stage_grade_complete_hr,
+    main_hr_ci_low = stage_grade_complete_hr_ci_low,
+    main_hr_ci_high = stage_grade_complete_hr_ci_high,
+    main_log_hr_ci_low = stage_grade_complete_log_hr_ci_low,
+    main_log_hr_ci_high = stage_grade_complete_log_hr_ci_high,
+    main_std_error = stage_grade_complete_std_error,
     main_p_value = stage_grade_complete_p_value,
     main_fdr = stage_grade_complete_fdr,
     main_ph_p_value = stage_grade_complete_ph_p_value,
     main_n = stage_grade_complete_n,
     main_events = stage_grade_complete_events,
+    main_warning_count = stage_grade_complete_warning_count,
+    main_warning_text = stage_grade_complete_warning_text,
     stage_sensitivity_same_direction = !is.na(stage_complete_log_hr) & sign(stage_complete_log_hr) == sign(main_log_hr),
     grade_sensitivity_same_direction = !is.na(grade_complete_log_hr) & sign(grade_complete_log_hr) == sign(main_log_hr),
     stage_sensitivity_nominal = !is.na(stage_complete_p_value) & stage_complete_p_value < 0.05,
@@ -126,8 +167,11 @@ strict_candidates <- candidates |>
     gse53757_log2fc,
     main_log_hr,
     main_hr,
+    main_hr_ci_low,
+    main_hr_ci_high,
     main_fdr,
     main_ph_p_value,
+    main_warning_count,
     stage_complete_log_hr,
     stage_complete_p_value,
     grade_complete_log_hr,
@@ -149,8 +193,11 @@ high_confidence_candidates <- candidates |>
     gse53757_log2fc,
     main_log_hr,
     main_hr,
+    main_hr_ci_low,
+    main_hr_ci_high,
     main_fdr,
     main_ph_p_value,
+    main_warning_count,
     stage_complete_log_hr,
     stage_complete_p_value,
     grade_complete_log_hr,
