@@ -6,7 +6,7 @@ Clear cell renal cell carcinoma is strongly shaped by VHL/HIF biology, hypoxia s
 
 ## Hypothesis
 
-The strongest tumor-normal transcriptional changes in ccRCC are not necessarily the strongest survival-associated changes. Survival-associated signal will concentrate in a narrower set of reproducible genes, expected to include VHL/HIF-compatible renal metabolic state, immune composition, and vascular composition rather than every large tumor-normal DEG.
+The strongest tumor-normal transcriptional changes in ccRCC are not necessarily the strongest survival-associated changes. Survival-associated signal will concentrate in a narrower set of reproducible genes, expected to reflect loss or retention of renal epithelial metabolic differentiation together with immune and vascular composition rather than every large tumor-normal DEG.
 
 ## Datasets
 
