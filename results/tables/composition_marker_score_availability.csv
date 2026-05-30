@@ -1,5 +1,5 @@
-score,requested_markers,used_markers,n_used
-proximal_tubule,AQP1;LRP2;CUBN;SLC5A2;ALDOB,AQP1;LRP2;CUBN;SLC5A2;ALDOB,5
-endothelial,PECAM1;VWF;KDR;EMCN;TEK,PECAM1;VWF;KDR;EMCN;TEK,5
-immune,PTPRC;CD3D;CD8A;MS4A1;CD68,PTPRC;CD3D;CD8A;MS4A1;CD68,5
-stromal,COL1A1;COL1A2;DCN;LUM;ACTA2,COL1A1;COL1A2;DCN;LUM;ACTA2,5
+score,requested_markers,used_markers,n_used,model_use_note
+proximal_tubule,AQP1;LRP2;CUBN;SLC5A2;ALDOB,AQP1;LRP2;CUBN;SLC5A2;ALDOB,5,Candidate-specific models recompute scores after excluding the candidate symbol when it appears in a marker set.
+endothelial,PECAM1;VWF;KDR;EMCN;TEK,PECAM1;VWF;KDR;EMCN;TEK,5,Candidate-specific models recompute scores after excluding the candidate symbol when it appears in a marker set.
+immune,PTPRC;CD3D;CD8A;MS4A1;CD68,PTPRC;CD3D;CD8A;MS4A1;CD68,5,Candidate-specific models recompute scores after excluding the candidate symbol when it appears in a marker set.
+stromal,COL1A1;COL1A2;DCN;LUM;ACTA2,COL1A1;COL1A2;DCN;LUM;ACTA2,5,Candidate-specific models recompute scores after excluding the candidate symbol when it appears in a marker set.
