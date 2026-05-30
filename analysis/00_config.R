@@ -1,0 +1,70 @@
+set.seed(20260530)
+
+PROJECT_ID <- "TCGA-KIRC"
+
+LOCAL_R_LIB <- file.path("environment", "R-library")
+if (!dir.exists(LOCAL_R_LIB)) dir.create(LOCAL_R_LIB, recursive = TRUE, showWarnings = FALSE)
+.libPaths(c(normalizePath(LOCAL_R_LIB, winslash = "/", mustWork = TRUE), .libPaths()))
+
+DIRS <- list(
+  raw = file.path("data", "raw"),
+  processed = file.path("data", "processed"),
+  metadata = file.path("data", "metadata"),
+  tables = file.path("results", "tables"),
+  figures = file.path("results", "figures")
+)
+
+for (path in DIRS) {
+  if (!dir.exists(path)) dir.create(path, recursive = TRUE, showWarnings = FALSE)
+}
+
+FILES <- list(
+  tcga_se = file.path(DIRS$processed, "tcga_kirc_star_counts_se.rds"),
+  tcga_counts = file.path(DIRS$processed, "tcga_kirc_counts.rds"),
+  tcga_coldata = file.path(DIRS$metadata, "tcga_kirc_coldata.csv"),
+  tcga_clinical = file.path(DIRS$metadata, "tcga_kirc_clinical.csv"),
+  tcga_vst = file.path(DIRS$processed, "tcga_kirc_vst.rds"),
+  tcga_deg = file.path(DIRS$tables, "tcga_kirc_deseq2_tumor_vs_normal.csv"),
+  tcga_survival = file.path(DIRS$tables, "tcga_kirc_cox_models.csv"),
+  tcga_enrichment = file.path(DIRS$tables, "tcga_kirc_enrichment_go_bp.csv"),
+  tcga_session = file.path("environment", "sessionInfo.txt")
+)
+
+THRESHOLDS <- list(
+  deg_fdr = 0.05,
+  deg_abs_log2fc = 1,
+  survival_fdr = 0.10,
+  min_count = 10,
+  min_samples = 10
+)
+
+BIOC_PACKAGES <- c(
+  "TCGAbiolinks",
+  "SummarizedExperiment",
+  "DESeq2",
+  "edgeR",
+  "limma",
+  "GEOquery",
+  "Biobase",
+  "AnnotationDbi",
+  "org.Hs.eg.db",
+  "msigdbr",
+  "fgsea",
+  "ComplexHeatmap",
+  "EnhancedVolcano"
+)
+
+CRAN_PACKAGES <- c(
+  "tidyverse",
+  "janitor",
+  "here",
+  "survival",
+  "survminer",
+  "broom",
+  "ggrepel",
+  "patchwork",
+  "pheatmap",
+  "UpSetR"
+)
+
+TCGA_SAMPLE_TYPES <- c("Primary Tumor", "Solid Tissue Normal")
