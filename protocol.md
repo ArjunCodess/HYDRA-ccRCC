@@ -11,9 +11,8 @@ The strongest tumor-normal transcriptional changes in ccRCC are not necessarily 
 ## Datasets
 
 - Discovery: TCGA-KIRC RNA-seq STAR raw counts and clinical data from GDC.
-- Main GEO validation: GSE40435 and GSE53757.
-- Secondary GEO validation: GSE46699 and GSE36895.
-- Grade biology support: GSE68417.
+- GEO validation for v1: GSE40435 and GSE53757.
+- Secondary datasets are deferred until after the v1 candidate set is manually reviewed.
 
 ## Inclusion And Exclusion Criteria
 
@@ -21,7 +20,7 @@ The strongest tumor-normal transcriptional changes in ccRCC are not necessarily 
 - TCGA survival: include primary tumor samples with usable overall survival time/status.
 - GEO validation: include human ccRCC tumor and matched/adjacent normal kidney samples.
 - Exclude xenograft/tumorgraft samples from main validation.
-- Exclude documented technical duplicates from GSE46699 after raw-array normalization.
+- Defer additional validation cohorts until after candidate-level interpretation.
 
 ## DEG Method
 
@@ -35,7 +34,7 @@ A gene is a reproducible DEG if it satisfies all of:
 
 1. TCGA-KIRC FDR < 0.05.
 2. TCGA-KIRC absolute log2 fold change >= 1.
-3. Same direction of effect in at least two GEO validation cohorts.
+3. Same direction of effect in both v1 GEO validation cohorts.
 4. Nominal p < 0.05 in at least one GEO validation cohort.
 5. Clean gene identifier mapping across datasets.
 
@@ -45,13 +44,15 @@ A gene is a reproducible DEG if it satisfies all of:
 - Model: Cox proportional hazards regression.
 - Expression: continuous standardized tumor expression, not median split for primary testing.
 - Covariates: age, sex, stage, and grade when usable.
-- Prognostic threshold: adjusted Cox FDR < 0.10.
+- Main prognostic threshold: stage/grade-complete adjusted Cox FDR < 0.05.
+- High-confidence threshold: stage/grade-complete adjusted Cox FDR < 0.01, absolute log hazard ratio at least log(1.5), proportional-hazards p >= 0.05, non-trivial GEO effect support, and same-direction nominal support in both sensitivity models.
 - Diagnostics: check proportional hazards assumption with `cox.zph`.
+- Sensitivity: fit separate stage-complete and grade-complete models in addition to the main stage/grade-complete model.
 
 ## Enrichment Method
 
 - ORA for reproducible/prognostic DEG lists.
-- GSEA on ranked full gene lists, not only significant genes.
+- Hallmark class annotation for candidate genes when MSigDB access is available through `msigdbr`.
 - Primary interpretation anchor: hypoxia-driven adaptation.
 - Secondary categories: angiogenesis, metabolism, ECM remodeling, and immune microenvironment.
 
@@ -70,4 +71,3 @@ A gene is a reproducible DEG if it satisfies all of:
 - Retrospective cohorts can contain confounding.
 - Association does not prove causation.
 - No wet-lab validation in v1.
-

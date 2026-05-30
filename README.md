@@ -4,7 +4,7 @@
 
 **TL;DR:** HYDRA-ccRCC is a reproducible transcriptomics pipeline for testing whether the genes most consistently dysregulated between ccRCC tumor and normal kidney are also the genes that carry prognostic survival signal. It downloads TCGA-KIRC STAR-count RNA-seq data and two GEO validation cohorts, runs DESeq2/limma differential expression, builds a cross-cohort reproducible DEG table, fits adjusted Cox survival models, performs GO enrichment, and generates the central discordance plot. The IEEE-style paper is built separately from the analysis pipeline.
 
-HYDRA-ccRCC asks a narrow question: can we move from "this gene is differentially expressed in ccRCC" to "this gene is reproducibly dysregulated and has evidence of survival relevance"? The current answer is useful but disciplined: the first complete run identifies `3,304` reproducible DEGs and `1,389` reproducible genes with exploratory prognostic association, but that candidate set is still too broad for final biomarker claims.
+HYDRA-ccRCC asks a narrow question: can we move from "this gene is differentially expressed in ccRCC" to "this gene is reproducibly dysregulated and has evidence of survival relevance"? The current answer is useful but disciplined: the first complete run identifies `3,304` reproducible DEGs, `519` strict candidate genes, and `24` high-confidence candidates. The high-confidence set is small enough for focused review, but still requires literature and biological validation before any final biomarker claim.
 
 The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [`paper/main.tex`](paper/main.tex) and references in [`paper/references.bib`](paper/references.bib).
 
@@ -15,7 +15,7 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 - **Independent GEO validation:** The current validation pass includes `GSE40435` with `101` tumor and `101` adjacent non-tumor samples, plus `GSE53757` with `72` tumor and `72` normal samples.
 - **Cross-cohort DEG filtering:** TCGA-only tumor-normal differential expression is narrowed into a reproducible evidence table requiring TCGA significance, same-direction GEO support, and nominal validation evidence.
 - **Discordance framing:** The central plot compares absolute tumor-normal log2 fold change against absolute adjusted Cox log hazard ratio, directly testing whether tumor-normal magnitude aligns with survival effect.
-- **Transparent outputs:** Major result tables and figures are written under `results/`, while large generated data artifacts are ignored by git.
+- **Transparent outputs:** Major result tables and figures are written under `results/`, while large downloaded and processed data artifacts are ignored by git.
 - **Cautious scientific interpretation:** The current run is pipeline-complete but not publication-final. The broad survival signal is treated as a reason to tighten modeling, not as a finished biomarker list.
 
 ## Overview
@@ -65,9 +65,10 @@ The novelty is not a new algorithm. The contribution is the analysis discipline:
 | TCGA significant genes after symbol mapping | 8,852 |
 | Same-direction genes in both GEO cohorts | 9,149 |
 | Reproducible DEGs | 3,304 |
-| Reproducible + exploratory prognostic genes | 1,389 |
+| Strict reproducible prognostic candidates | 519 |
+| High-confidence candidates | 24 |
 
-The candidate count is intentionally described as exploratory. It is too broad for final biological claims and should be narrowed with stricter survival sensitivity checks, pathway coherence, proportional hazards review, and effect-size prioritization.
+The high-confidence count is intentionally conservative: it requires reproducibility, stage/grade-complete Cox significance, proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction stage/grade sensitivity checks.
 
 ## How To Run
 
@@ -103,7 +104,7 @@ HYDRA-ccRCC/
   data/                  generated raw/processed/metadata files, ignored by git
   environment/           sessionInfo.txt plus ignored local R package library
   paper/                 IEEE manuscript source, references, and PDF
-  results/               generated tables and figures, ignored by git
+  results/               generated tables and figures
   protocol.md            pre-analysis scientific protocol
   run_pipeline.ps1       one-command analysis pipeline entrypoint
   README.md              project overview
@@ -140,11 +141,18 @@ Use scripted downloads only. Do not manually edit downloaded metadata in Excel.
 - No random forest, pan-cancer expansion, or large black-box signature in v1.
 - Gene findings should be described as candidate prognostic associations, not therapeutic targets.
 
-## Next Priorities
+## Completion State
 
-1. Tighten survival modeling around reproducible DEGs only.
-2. Review Cox warnings and proportional hazards failures explicitly.
-3. Add stage-complete and grade-complete sensitivity analyses.
-4. Add pathway-category annotation for hypoxia, angiogenesis, ECM, metabolism, and immune programs.
-5. Update the manuscript after stricter modeling reduces the candidate set.
+The implemented v1 pipeline now includes the stress tests that were previously listed as next priorities:
+
+1. Survival modeling is restricted to reproducible DEGs when the reproducibility table exists.
+2. Cox warnings are captured in the survival output table instead of being hidden in console output.
+3. The main model uses stage/grade-complete cases, with separate stage-complete and grade-complete sensitivity models.
+4. Candidate filtering requires proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction sensitivity evidence.
+5. Candidate tables include pathway-class annotations for hypoxia, angiogenesis, ECM/EMT, metabolism, immune programs, and unclassified genes.
+6. The manuscript has been updated to report the compressed candidate set.
+
+## Remaining Scientific Work
+
+The codebase is pipeline-complete, but the science is not publication-final. The next work is candidate-level interpretation: manually review the 24 high-confidence genes against ccRCC literature, kidney cell-type expression, and independent validation options before making any gene-level claims.
 
