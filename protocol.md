@@ -48,6 +48,16 @@ A gene is a reproducible DEG if it satisfies all of:
 - High-confidence threshold: stage/grade-complete adjusted Cox FDR < 0.01, absolute log hazard ratio at least log(1.5), proportional-hazards p >= 0.05, non-trivial GEO effect support, and same-direction nominal support in both sensitivity models.
 - Diagnostics: check proportional hazards assumption with `cox.zph`.
 - Sensitivity: fit separate stage-complete and grade-complete models in addition to the main stage/grade-complete model.
+- Reporting: survival tables include hazard ratio, confidence interval, adjusted p value, proportional-hazards result, warning count, and sensitivity-model direction.
+
+## Candidate Hardening
+
+- Rank high-confidence genes with a transparent score combining reproducibility, survival strength, proportional-hazards support, sensitivity support, pathway annotation, and seeded literature/biology prior.
+- Generate a threshold-sensitivity table across stricter survival, effect-size, and GEO-effect thresholds.
+- Generate a null-overlap check by permuting reproducible-DEG labels among genes with Cox results.
+- Generate a comparison between the largest tumor-normal changes and the largest adjusted survival effects.
+- Generate cell-type sanity and literature-review seed tables for the 24 high-confidence genes.
+- Generate one dossier section per high-confidence gene as interpretation scaffolding.
 
 ## Enrichment Method
 
@@ -63,6 +73,11 @@ A gene is a reproducible DEG if it satisfies all of:
 - point size: Cox adjusted significance.
 - color: pathway category.
 - outline/shape: prognostic threshold pass/fail.
+
+## Evidence Funnel Figure
+
+- Show gene-count compression from TCGA-significant genes to reproducible DEGs, main Cox survival genes, PH-pass genes, sensitivity-pass genes, strict candidates, pathway-classified high-confidence genes, and final high-confidence candidates.
+- Use this figure as the paper's main argument spine.
 
 ## Known Limitations
 

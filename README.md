@@ -2,9 +2,9 @@
 
 **Hypoxia-Driven Reproducible Analysis of Clear Cell Renal Cell Carcinoma**
 
-**TL;DR:** HYDRA-ccRCC is a reproducible transcriptomics pipeline for testing whether the genes most consistently dysregulated between ccRCC tumor and normal kidney are also the genes that carry prognostic survival signal. It downloads TCGA-KIRC STAR-count RNA-seq data and two GEO validation cohorts, runs DESeq2/limma differential expression, builds a cross-cohort reproducible DEG table, fits adjusted Cox survival models, performs GO enrichment, and generates the central discordance plot. The IEEE-style paper is built separately from the analysis pipeline.
+**TL;DR:** HYDRA-ccRCC is a reproducible transcriptomics pipeline for testing whether the genes most consistently dysregulated between ccRCC tumor and normal kidney are also the genes that carry prognostic survival signal. It downloads TCGA-KIRC STAR-count RNA-seq data and two GEO validation cohorts, runs DESeq2/limma differential expression, builds a cross-cohort reproducible DEG table, fits adjusted Cox survival models, performs GO enrichment, and generates discordance, evidence-funnel, sensitivity, null-check, and interpretation outputs. The IEEE-style paper is built separately from the analysis pipeline.
 
-HYDRA-ccRCC asks a narrow question: can we move from "this gene is differentially expressed in ccRCC" to "this gene is reproducibly dysregulated and has evidence of survival relevance"? The current answer is useful but disciplined: the first complete run identifies `3,304` reproducible DEGs, `519` strict candidate genes, and `24` high-confidence candidates. The high-confidence set is small enough for focused review, but still requires literature and biological validation before any final biomarker claim.
+HYDRA-ccRCC asks a narrow question: can we move from "this gene is differentially expressed in ccRCC" to "this gene is reproducibly dysregulated and has evidence of survival relevance"? The current answer is useful but disciplined: the first complete run identifies `3,304` reproducible DEGs, `519` strict candidate genes, and `24` high-confidence candidate prognostic associations. The high-confidence set is small enough for focused review, but still requires literature and biological validation before any final gene-level claim.
 
 The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [`paper/main.tex`](paper/main.tex) and references in [`paper/references.bib`](paper/references.bib).
 
@@ -15,6 +15,8 @@ The research paper lives in [`paper/main.pdf`](paper/main.pdf), with source in [
 - **Independent GEO validation:** The current validation pass includes `GSE40435` with `101` tumor and `101` adjacent non-tumor samples, plus `GSE53757` with `72` tumor and `72` normal samples.
 - **Cross-cohort DEG filtering:** TCGA-only tumor-normal differential expression is narrowed into a reproducible evidence table requiring TCGA significance, same-direction GEO support, and nominal validation evidence.
 - **Discordance framing:** The central plot compares absolute tumor-normal log2 fold change against absolute adjusted Cox log hazard ratio, directly testing whether tumor-normal magnitude aligns with survival effect.
+- **Evidence-funnel framing:** A generated funnel figure shows compression from TCGA DEG to reproducible DEG to survival-associated genes to strict and high-confidence candidates.
+- **Interpretation scaffolding:** The pipeline generates a ranked shortlist, survival report, literature-review seed table, cell-type sanity table, threshold sensitivity table, null-overlap check, DEG-versus-prognostic comparison, and generated gene dossiers.
 - **Transparent outputs:** Major result tables and figures are written under `results/`, while large downloaded and processed data artifacts are ignored by git.
 - **Cautious scientific interpretation:** The current run is pipeline-complete but not publication-final. The broad survival signal is treated as a reason to tighten modeling, not as a finished biomarker list.
 
@@ -34,11 +36,19 @@ The pipeline produces:
 - adjusted Cox survival table
 - GO Biological Process enrichment table
 - candidate evidence table
+- ranked high-confidence shortlist
+- threshold sensitivity table
+- null-overlap check
+- DEG-versus-prognostic comparison table
+- cell-type sanity table
+- literature-review seed table
+- generated high-confidence gene dossiers
 - volcano and discordance figures
+- evidence-funnel figure
 
 ### Why it matters
 
-Many beginner cancer transcriptomics projects assume that the largest tumor-normal DEGs are automatically the best biomarkers. HYDRA-ccRCC is built to stress-test that assumption. The project’s core scientific idea is:
+Many beginner cancer transcriptomics projects assume that the largest tumor-normal DEGs are automatically the best findings. HYDRA-ccRCC is built to stress-test that assumption. The project's core scientific idea is:
 
 > Tumor-normal difference is not the same thing as prognostic importance.
 
@@ -69,6 +79,8 @@ The novelty is not a new algorithm. The contribution is the analysis discipline:
 | High-confidence candidates | 24 |
 
 The high-confidence count is intentionally conservative: it requires reproducibility, stage/grade-complete Cox significance, proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction stage/grade sensitivity checks.
+
+The generated shortlist is still not a final biological truth table. It is an auditable worklist for deciding which candidate prognostic associations deserve deeper manual review.
 
 ## How To Run
 
@@ -119,6 +131,8 @@ HYDRA-ccRCC/
 - [`analysis/06_reproducibility.R`](analysis/06_reproducibility.R): cross-cohort reproducible DEG scoring.
 - [`analysis/07_survival_tcga.R`](analysis/07_survival_tcga.R): adjusted Cox survival modeling.
 - [`analysis/10_candidate_table.R`](analysis/10_candidate_table.R): final joined evidence table.
+- [`analysis/11_hardening_outputs.R`](analysis/11_hardening_outputs.R): ranked shortlist, sensitivity/null checks, cell-type sanity table, literature-review seed table, dossiers, and evidence-funnel figure.
+- [`analysis/12_validate_outputs.R`](analysis/12_validate_outputs.R): final output validation step.
 - [`protocol.md`](protocol.md): locked research question, thresholds, and limitations.
 - [`paper/main.pdf`](paper/main.pdf): first IEEE-style manuscript draft.
 
@@ -135,6 +149,7 @@ Use scripted downloads only. Do not manually edit downloaded metadata in Excel.
 
 - Kaplan-Meier plots are secondary visualization only, not the main survival test.
 - Cox models use continuous expression and available clinical covariates.
+- High-confidence genes are candidate prognostic associations, not candidate biomarkers.
 - Adjacent normal tissue is not treated as perfectly healthy tissue.
 - Bulk RNA-seq cannot resolve cell-type source.
 - Association is not causation.
@@ -151,8 +166,9 @@ The implemented v1 pipeline now includes the stress tests that were previously l
 4. Candidate filtering requires proportional-hazards support, meaningful survival effect size, GEO effect support, and same-direction sensitivity evidence.
 5. Candidate tables include pathway-class annotations for hypoxia, angiogenesis, ECM/EMT, metabolism, immune programs, and unclassified genes.
 6. The manuscript has been updated to report the compressed candidate set.
+7. The pipeline generates evidence-funnel, threshold-sensitivity, null-overlap, DEG-versus-prognostic, literature-seed, cell-type sanity, survival-report, and dossier outputs.
 
 ## Remaining Scientific Work
 
-The codebase is pipeline-complete, but the science is not publication-final. The next work is candidate-level interpretation: manually review the 24 high-confidence genes against ccRCC literature, kidney cell-type expression, and independent validation options before making any gene-level claims.
+The codebase is pipeline-complete, but the science is not publication-final. The next work is manual candidate-level interpretation: use the generated 24-gene dossiers and literature table to review ccRCC literature, kidney cell-type expression, and independent validation options before making any gene-level claims.
 
