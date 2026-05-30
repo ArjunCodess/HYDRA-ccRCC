@@ -1,0 +1,29 @@
+# Local data
+data/
+MANIFEST.txt
+
+# R session and package state
+.Rhistory
+.RData
+.Rproj.user/
+environment/R-library/
+renv/library/
+renv/staging/
+
+# Large downloaded archives
+*.tar
+*.tar.gz
+*.zip
+*.gz
+*.RData
+
+# LaTeX intermediates
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+
+# OS/editor
+.DS_Store
+Thumbs.db
