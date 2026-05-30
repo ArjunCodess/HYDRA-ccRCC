@@ -1,0 +1,25 @@
+symbol,pathway_class,kidney_cell_type_sanity,bulk_rna_seq_risk,manual_review_note
+DDC,Metabolism,Metabolic/decarboxylase signal compatible with epithelial metabolic rewiring.,moderate_contextual_risk,"Check whether expression is kidney-lineage, neuroendocrine-like, or stromal."
+CYFIP2,Metabolism,Broad cytoskeletal/regulatory signal; not kidney-cell-type specific from this pipeline alone.,unresolved_cell_source,Prioritize whether the survival signal reflects tumor biology or tissue composition.
+KL,Unclassified,Kidney-enriched aging/mineral-axis gene; plausible renal epithelial context.,moderate_contextual_risk,A lower tumor expression signal may reflect loss of normal kidney program.
+ACADM,Metabolism,Mitochondrial fatty-acid metabolism; plausible renal epithelial metabolism.,moderate_contextual_risk,Strong candidate for metabolic-adaptation interpretation.
+CRYL1,Unclassified,Metabolic enzyme signal compatible with renal epithelial biology.,moderate_contextual_risk,Check whether downregulation is a renal identity/metabolic-loss signal.
+CLCN5,Unclassified,Renal proximal tubule/endocytic biology prior.,moderate_contextual_risk,May mark retained normal tubule differentiation rather than aggressive tumor biology.
+HIBCH,Metabolism,Mitochondrial branched-chain amino-acid metabolism.,unresolved_cell_source,Candidate metabolic-adaptation gene.
+HHLA2,Unclassified,Immune-checkpoint-like signal; may reflect tumor-immune interaction.,high_cell_composition_risk,Interpret as immune/microenvironmental until cell source is resolved.
+TCIRG1,Metabolism,Immune/lysosomal/proton-pump-associated signal; cell type unresolved.,high_cell_composition_risk,Check immune-cell composition before tumor-cell interpretation.
+PANK1,Unclassified,Metabolism/coenzyme A pathway signal; plausible metabolic adaptation.,moderate_contextual_risk,Review whether signal is tumor-intrinsic metabolism or normal-tissue retention.
+ACAT1,Metabolism,Mitochondrial acetyl-CoA/ketone and amino-acid metabolism.,unresolved_cell_source,Strong candidate for metabolic-adaptation interpretation.
+FUT6,Unclassified,Glycosylation signal; cell type unresolved.,unresolved_cell_source,Treat as pathway hypothesis until kidney/cancer literature is checked.
+TEK,Unclassified,Endothelial/angiogenesis-associated signal.,high_cell_composition_risk,"Interpret as vascular composition or angiogenic state, not necessarily tumor-cell intrinsic."
+IQGAP2,Unclassified,Scaffold/cytoskeletal signaling; not cell-type-resolved here.,unresolved_cell_source,Check direction against tumor suppressor versus composition explanations.
+TNFAIP2,Immune,TNF/inflammatory-response signal.,unresolved_cell_source,Interpret as immune/inflammatory until cell source is resolved.
+CADPS2,Unclassified,Vesicle/secretion-related signal; not kidney-cell-type specific here.,unresolved_cell_source,Lower-confidence biology unless supported externally.
+EMCN,Unclassified,Endothelial marker-like signal.,high_cell_composition_risk,Cell-type sanity flag: likely vascular composition.
+C1QTNF6,Unclassified,Secreted/metabolic-inflammatory signal; cell type unresolved.,moderate_contextual_risk,"Check immune, adipokine, and tumor-cell sources."
+PODXL,Unclassified,Podocyte/endothelial/cell-adhesion signal.,high_cell_composition_risk,Cell-type sanity flag: glomerular/endothelial biology may confound bulk signal.
+DBT,Metabolism,Branched-chain amino-acid metabolism.,unresolved_cell_source,Strong candidate for metabolic-adaptation interpretation.
+LRBA,Unclassified,Immune-regulatory signal.,high_cell_composition_risk,Likely immune-composition sensitivity.
+GRAMD1A,Unclassified,Cholesterol transport/contact-site biology; cell type unresolved.,unresolved_cell_source,Review with lipid/metabolic adaptation lens.
+IFFO1,Unclassified,Poorly resolved structural/nuclear signal.,unresolved_cell_source,Keep as computational association unless external evidence appears.
+FHOD1,Unclassified,Actin/cytoskeletal remodeling signal.,unresolved_cell_source,Check whether survival signal reflects invasion biology or stromal composition.
