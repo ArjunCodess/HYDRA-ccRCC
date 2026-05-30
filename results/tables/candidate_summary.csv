@@ -1,3 +1,7 @@
 metric,value
 reproducible_deg,3304
-prognostic_reproducible_deg,1389
+main_stage_grade_complete_prognostic,1176
+ph_pass,1122
+sensitivity_pass,1063
+strict_candidate,519
+high_confidence_candidate,24
