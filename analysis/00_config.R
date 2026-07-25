@@ -43,6 +43,23 @@ THRESHOLDS <- list(
   min_samples = 10
 )
 
+V2_RESAMPLING <- list(
+  seed = 20260725,
+  stability_repeats = 20,
+  stability_fraction = 0.80,
+  cv_repeats = 20,
+  cv_folds = 5
+)
+
+SOURCE_URLS <- list(
+  tcga_gdc = "https://portal.gdc.cancer.gov/projects/TCGA-KIRC",
+  geo_gse40435 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE40435",
+  geo_gse53757 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE53757",
+  geo_gse29609 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29609",
+  emtab1980 = "https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-1980",
+  hpa_single_cell = "https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip"
+)
+
 BIOC_PACKAGES <- c(
   "TCGAbiolinks",
   "SummarizedExperiment",
@@ -53,6 +70,7 @@ BIOC_PACKAGES <- c(
   "Biobase",
   "AnnotationDbi",
   "org.Hs.eg.db",
+  "GO.db",
   "msigdbr",
   "fgsea",
   "ComplexHeatmap",
@@ -63,6 +81,7 @@ CRAN_PACKAGES <- c(
   "tidyverse",
   "janitor",
   "here",
+  "readxl",
   "survival",
   "survminer",
   "broom",

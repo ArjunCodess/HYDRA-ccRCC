@@ -73,7 +73,12 @@ $steps += @(
   "analysis/10_candidate_table.R",
   "analysis/11_hardening_outputs.R",
   "analysis/13_external_survival_gse29609.R",
+  "analysis/14_external_survival_emtab1980.R",
+  "analysis/15_selection_stability_tcga.R",
+  "analysis/16_cv_clinical_increment.R",
+  "analysis/17_hpa_cell_source.R",
   "analysis/09_figures_tcga.R",
+  "analysis/18_write_manifest.R",
   "analysis/12_validate_outputs.R"
 )
 

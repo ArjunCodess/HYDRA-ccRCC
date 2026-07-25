@@ -19,5 +19,5 @@ install_if_missing(BIOC_PACKAGES, function(pkgs) {
   BiocManager::install(pkgs, ask = FALSE, update = FALSE)
 })
 
-writeLines(capture.output(sessionInfo()), FILES$tcga_session)
+writeLines(sub("[[:space:]]+$", "", capture.output(sessionInfo())), FILES$tcga_session)
 

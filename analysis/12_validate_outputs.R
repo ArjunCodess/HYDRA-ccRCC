@@ -30,6 +30,17 @@ required_files <- c(
   file.path(DIRS$tables, "composition_marker_score_availability.csv"),
   file.path(DIRS$tables, "external_survival_gse29609.csv"),
   file.path(DIRS$tables, "external_survival_gse29609_summary.csv"),
+  file.path(DIRS$tables, "external_survival_emtab1980.csv"),
+  file.path(DIRS$tables, "external_survival_emtab1980_summary.csv"),
+  file.path(DIRS$tables, "selection_stability_all_genes.csv"),
+  file.path(DIRS$tables, "selection_stability_frozen_candidates.csv"),
+  file.path(DIRS$tables, "selection_stability_repeats.csv"),
+  file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"),
+  file.path(DIRS$tables, "candidate_cv_clinical_increment_repeats.csv"),
+  file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
+  file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
+  file.path(DIRS$tables, "source_provenance.csv"),
+  file.path(DIRS$tables, "run_manifest.csv"),
   file.path("results", "high_confidence_gene_dossiers.md"),
   file.path(DIRS$tables, "evidence_funnel.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_pathway_summary.csv"),
@@ -118,6 +129,81 @@ if (length(missing_external_cols) > 0) {
 external_summary <- read_csv(file.path(DIRS$tables, "external_survival_gse29609_summary.csv"), show_col_types = FALSE)
 if (!all(c("gse29609_samples", "gse29609_events") %in% external_summary$metric)) {
   stop("external_survival_gse29609_summary.csv is missing required metrics.")
+}
+
+emtab_external <- read_csv(file.path(DIRS$tables, "external_survival_emtab1980.csv"), show_col_types = FALSE)
+required_emtab_external_cols <- c(
+  "symbol",
+  "external_present",
+  "external_log_hr",
+  "external_p_value",
+  "external_ph_p_value",
+  "external_adjusted_log_hr",
+  "external_adjusted_p_value",
+  "external_adjusted_ph_p_value",
+  "external_same_direction",
+  "external_strict_support",
+  "external_interpretation"
+)
+missing_emtab_external_cols <- setdiff(required_emtab_external_cols, names(emtab_external))
+if (length(missing_emtab_external_cols) > 0) {
+  stop(
+    "external_survival_emtab1980.csv is missing columns: ",
+    paste(missing_emtab_external_cols, collapse = ", ")
+  )
+}
+
+emtab_summary <- read_csv(
+  file.path(DIRS$tables, "external_survival_emtab1980_summary.csv"),
+  show_col_types = FALSE
+)
+if (!all(c("emtab1980_samples", "emtab1980_events") %in% emtab_summary$metric)) {
+  stop("external_survival_emtab1980_summary.csv is missing required metrics.")
+}
+emtab_values <- setNames(emtab_summary$value, emtab_summary$metric)
+if (emtab_values[["emtab1980_samples"]] != 101) {
+  stop("E-MTAB-1980 sample count must be 101.")
+}
+if (emtab_values[["emtab1980_events"]] != 23) {
+  stop("E-MTAB-1980 event count must be 23.")
+}
+
+stability <- read_csv(file.path(DIRS$tables, "selection_stability_frozen_candidates.csv"), show_col_types = FALSE)
+if (nrow(stability) != values[["high_confidence_candidate"]]) {
+  stop("Selection-stability frozen-candidate count does not match high-confidence candidate count.")
+}
+if (any(stability$selection_frequency < 0 | stability$selection_frequency > 1, na.rm = TRUE)) {
+  stop("Selection frequencies must be between zero and one.")
+}
+
+stability_repeats <- read_csv(file.path(DIRS$tables, "selection_stability_repeats.csv"), show_col_types = FALSE)
+if (nrow(stability_repeats) != V2_RESAMPLING$stability_repeats) {
+  stop("Selection-stability repeat count does not match configuration.")
+}
+
+cv <- read_csv(file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"), show_col_types = FALSE)
+if (nrow(cv) != values[["high_confidence_candidate"]]) {
+  stop("Clinical-increment candidate count does not match high-confidence candidate count.")
+}
+if (any(cv$mean_clinical_c_index < 0 | cv$mean_clinical_c_index > 1 |
+        cv$mean_clinical_gene_c_index < 0 | cv$mean_clinical_gene_c_index > 1, na.rm = TRUE)) {
+  stop("Cross-validated concordance values must be between zero and one.")
+}
+
+hpa <- read_csv(file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"), show_col_types = FALSE)
+if (length(unique(hpa$symbol)) != values[["high_confidence_candidate"]]) {
+  stop("HPA cell-source output does not cover every high-confidence candidate.")
+}
+
+provenance <- read_csv(file.path(DIRS$tables, "source_provenance.csv"), show_col_types = FALSE)
+if (!all(c("TCGA-KIRC", "GSE40435", "GSE53757", "GSE29609", "E-MTAB-1980", "HPA-v25.1") %in%
+         provenance$source_id)) {
+  stop("Source provenance is incomplete.")
+}
+
+manifest <- read_csv(file.path(DIRS$tables, "run_manifest.csv"), show_col_types = FALSE)
+if (any(is.na(manifest$md5) | manifest$md5 == "")) {
+  stop("Run manifest contains missing checksums.")
 }
 
 funnel <- read_csv(file.path(DIRS$tables, "evidence_funnel.csv"), show_col_types = FALSE)
