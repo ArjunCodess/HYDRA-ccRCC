@@ -1,5 +1,5 @@
 path,bytes,modified_utc,md5
-README.md,17066,2026-07-25T15:12:29Z,8f8e39de5ab74140123d271cf099e854
+README.md,10513,2026-07-25T15:31:39Z,fa5f3e4c5c9fe6913cbd2f26c7f483ad
 analysis/00_config.R,2712,2026-07-25T14:38:07Z,7375f298073d311eb7e6687a37438d43
 analysis/00_install_packages.R,695,2026-07-25T15:13:37Z,5b0cf5d27bd6147bb7f73a0422c1971b
 analysis/01_download_tcga.R,2257,2026-07-25T14:18:25Z,7da19c31c05c757f335961780e1630b4
@@ -25,7 +25,7 @@ analysis/18_write_manifest.R,2001,2026-07-25T15:13:37Z,83622803e389aa4c3dbf32d23
 analysis/functions/io.R,1124,2026-07-24T15:04:15Z,cb1b7932896e8fb3bbf4903e44233c52
 analysis/functions/plotting.R,331,2026-07-24T15:04:15Z,be9c9c9d232e37812ecf25fdad7b91fa
 analysis/functions/tcga_metadata.R,1984,2026-07-24T15:04:15Z,689b222a637ee88e8f8fa83d774dc716
-environment/sessionInfo.txt,853,2026-07-25T15:13:04Z,6fdcfcbf65d1b83b0cd97ac3d2fe021c
+environment/sessionInfo.txt,821,2026-07-25T15:13:42Z,ef15f18f1a61d70a1b81d22fb84574f7
 protocol.md,6964,2026-07-25T14:44:29Z,53f1db98207ae4d6774a65ec30bd25ac
 results/figures/candidate_forest_plot.png,245987,2026-07-25T15:11:43Z,bd65f1e3d16bf05c1948a33149d2edbe
 results/figures/evidence_funnel.png,81591,2026-07-25T14:56:11Z,d4111485573127bd5fe52caee9c40bd7
@@ -65,7 +65,7 @@ results/tables/reproducible_deg_tcga_gse40435_gse53757.csv,4641907,2026-07-25T14
 results/tables/selection_stability_all_genes.csv,343642,2026-07-25T15:11:19Z,39d54a2d9387f86bca6a58861986b884
 results/tables/selection_stability_frozen_candidates.csv,2739,2026-07-25T15:11:19Z,eb162808cb45323785ab0eda8dca1b82
 results/tables/selection_stability_repeats.csv,430,2026-07-25T15:11:19Z,567e2cd8476e0fbfaa973fb03c06edd5
-results/tables/source_provenance.csv,1213,2026-07-25T15:13:42Z,8d53c3e02ad360f9eacba52ed8ac9be7
+results/tables/source_provenance.csv,1213,2026-07-25T15:31:46Z,8d53c3e02ad360f9eacba52ed8ac9be7
 results/tables/strict_candidate_genes.csv,162957,2026-07-25T14:56:04Z,62a2cb84f894a94897ad1fcc70125342
 results/tables/tcga_kirc_cox_models.csv,2808151,2026-07-25T14:55:58Z,781b74c12b49a35e84e0eb2a53f318ab
 results/tables/tcga_kirc_deseq2_tumor_vs_normal.csv,4712028,2026-07-25T14:50:01Z,583086084bdbd90720fc568f677c96f4
