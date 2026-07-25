@@ -89,14 +89,19 @@ fit_external_gene <- function(symbol, gene_expr, clinical, tcga_direction, manua
   )
 }
 
-gse <- GEOquery::getGEO(
-  "GSE29609",
-  GSEMatrix = TRUE,
-  AnnotGPL = TRUE,
-  destdir = file.path(DIRS$raw, "geo")
-)[[1]]
+gse_path <- file.path(DIRS$processed, "gse29609_series_matrix.rds")
+gse <- if (file.exists(gse_path)) {
+  readRDS(gse_path)
+} else {
+  GEOquery::getGEO(
+    "GSE29609",
+    GSEMatrix = TRUE,
+    AnnotGPL = TRUE,
+    destdir = file.path(DIRS$raw, "geo")
+  )[[1]]
+}
 
-write_rds_atomic(gse, file.path(DIRS$processed, "gse29609_series_matrix.rds"))
+write_rds_atomic(gse, gse_path)
 
 expr <- Biobase::exprs(gse)
 pdata <- Biobase::pData(gse)

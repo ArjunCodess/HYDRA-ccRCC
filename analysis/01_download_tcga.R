@@ -11,6 +11,12 @@ suppressPackageStartupMessages({
 
 force_download <- identical(Sys.getenv("HYDRA_FORCE_DOWNLOAD"), "1")
 if (!force_download && all(file.exists(c(FILES$tcga_se, FILES$tcga_counts, FILES$tcga_coldata, FILES$tcga_clinical)))) {
+  clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
+  if (!"gender" %in% names(clinical) && "sex_at_birth" %in% names(clinical)) {
+    clinical <- clinical |> mutate(gender = sex_at_birth)
+    write_csv(clinical, FILES$tcga_clinical)
+    message("Normalized current GDC sex_at_birth field to legacy gender contract.")
+  }
   message("TCGA-KIRC processed files already exist. Set HYDRA_FORCE_DOWNLOAD=1 to redownload.")
   quit(save = "no", status = 0)
 }
@@ -41,6 +47,9 @@ clinical <- GDCquery_clinic(project = PROJECT_ID, type = "clinical") |>
   derive_os() |>
   add_clean_stage_grade() |>
   mutate(submitter_id = as.character(.data$submitter_id))
+if (!"gender" %in% names(clinical) && "sex_at_birth" %in% names(clinical)) {
+  clinical <- clinical |> mutate(gender = sex_at_birth)
+}
 
 write_csv(clinical, FILES$tcga_clinical)
 writeLines(capture.output(sessionInfo()), FILES$tcga_session)
