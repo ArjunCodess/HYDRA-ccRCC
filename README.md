@@ -201,3 +201,14 @@ The implemented v1 pipeline now includes the stress tests that were previously l
 ## Remaining Scientific Work
 
 The codebase is pipeline-complete, and a first manual candidate-level biological review plus a small external survival check have been added. The science is still not publication-final: before making strong gene-level claims, the review recommendations should be followed with larger independent survival validation and, where possible, proteomic, spatial, single-cell, or IHC/TMA validation.
+
+## V2 Results
+
+V2 keeps the 24-candidate set frozen and tests it without feeding later evidence back into TCGA/GEO selection. The final end-to-end run completed output validation and recorded file checksums plus source provenance.
+
+- **External survival:** E-MTAB-1980 included 101 patients and 23 deaths. Of 24 frozen candidates, 23 mapped, 20 preserved TCGA hazard direction, and eight met unadjusted/adjusted FDR plus proportional-hazards gates: `DDC`, `CRYL1`, `ACADM`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`.
+- **Selection stability:** Twenty stratified 80% subsamples reran the survival-selection screen across all 3,304 eligible genes. `PANK1`, `ACADM`, `DDC`, `CLCN5`, `CRYL1`, and `CYFIP2` were selected in at least 85% of repeats; all 24 retained the full-fit hazard direction.
+- **Held-out clinical increment:** Repeated 5-fold cross-validation gave positive mean concordance change for all 24 candidates. Twenty-three had a positive empirical 2.5th percentile across repeats; `FHOD1` crossed zero. These are single-gene incremental estimates, not a validated multigene clinical model.
+- **Independent cell-source check:** Human Protein Atlas single-cell data mapped all 24 genes. `TEK` and `EMCN` were vascular-dominant, while `CYFIP2`, `GRAMD1A`, and `TCIRG1` were immune-dominant under the prespecified compartment mapping; this reinforces composition cautions.
+
+Machine-readable v2 outputs are in `results/tables/selection_stability_*`, `candidate_cv_clinical_increment*`, `external_survival_emtab1980*`, `hpa_candidate_*`, `source_provenance.csv`, and `run_manifest.csv`. AI/tool assistance is disclosed in [`docs/AI_USE_LOG.md`](docs/AI_USE_LOG.md).
