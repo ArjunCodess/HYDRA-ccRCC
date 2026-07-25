@@ -1,3 +1,6 @@
+% DEVELOPMENT MANUSCRIPT: AI-assisted internal draft.
+% Not for direct IRIS/ISEF submission. The student must independently verify,
+% rewrite, and cite every claim used in a final submission.
 \documentclass[conference]{IEEEtran}
 
 \usepackage{cite}
@@ -10,148 +13,175 @@
 
 \author{
 \IEEEauthorblockN{Arjun}
-\IEEEauthorblockA{Independent Student Researcher\\
-Email: placeholder@example.com}
+\IEEEauthorblockA{Independent Student Researcher}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Clear cell renal cell carcinoma (ccRCC) is characterized by VHL/HIF biology, angiogenesis, metabolic rewiring, and a complex tumor microenvironment. Public transcriptomic analyses often assume that the largest tumor-normal expression changes are the most clinically relevant findings. We built HYDRA-ccRCC, a reproducible public-data workflow designed to test that assumption rather than to produce an unvalidated biomarker list. TCGA-KIRC STAR-count RNA-seq data were analyzed with DESeq2, and two independent GEO tumor-normal cohorts, GSE40435 and GSE53757, were analyzed with limma. Reproducible differential expression required TCGA significance, same-direction GEO support in both cohorts, and nominal validation evidence in at least one GEO cohort. Overall survival associations were modeled in TCGA primary tumors using continuous standardized expression with age, sex, stage, and grade adjustment. The current full pipeline run identified 3,304 reproducible differentially expressed genes, 519 strict reproducible prognostic candidates, and 24 high-confidence candidate prognostic associations after proportional-hazards, effect-size, GEO-effect, and sensitivity filtering. Manual review prioritized KL, ACADM, CRYL1, ACAT1, and DDC as TCGA-derived lead hypothesis genes, while vascular, stromal, immune, and weakly supported genes were kept out of the core biomarker narrative. Composition-aware hardening left 16 of 24 candidates significant after crude marker-score adjustment. A small external survival check in GSE29609 tested 22 platform-present candidates but found no same-direction nominal survival support. HYDRA-ccRCC therefore supports a disciplined conclusion: reproducible tumor-normal dysregulation is not equivalent to prognostic validation, and the most defensible biological signal is loss or retention of renal epithelial metabolic differentiation with composition-sensitive immune and vascular associations.
+Public transcriptomic studies often treat large tumor--normal expression changes as candidate prognostic biomarkers without testing whether the associations are stable, externally reproducible, or driven by tissue composition. We developed HYDRA-ccRCC, a reproducible evidence-hardening workflow for clear cell renal cell carcinoma. TCGA-KIRC STAR-count RNA sequencing was used for discovery; GSE40435 and GSE53757 tested tumor--normal replication; GSE29609 and E-MTAB-1980 provided independent survival checks. Continuous-expression Cox models adjusted for available clinical covariates. The analysis identified 3,304 reproducible differentially expressed genes, 519 strict TCGA-derived prognostic candidates, and a frozen 24-candidate high-confidence set. In E-MTAB-1980, 23 candidates mapped, 20 retained the TCGA hazard direction, and eight passed prespecified direction, unadjusted and adjusted false-discovery-rate, and proportional-hazards gates: DDC, CRYL1, ACADM, TEK, EMCN, PODXL, FUT6, and HIBCH. GSE29609 was not broadly supportive. Twenty stratified 80\% TCGA resamples identified six candidates selected in at least 80\% of repeats, while repeated five-fold testing found positive mean out-of-fold concordance increments for all 24 single-gene models. Normal-tissue single-cell data identified vascular-dominant and immune-dominant candidates, reinforcing composition cautions. The most convergent metabolic hypotheses were ACADM, CRYL1, and DDC, whereas several externally supported genes remained likely compartment markers. HYDRA-ccRCC prioritizes candidate prognostic associations while exposing instability, cohort disagreement, and composition dependence; it does not establish a validated biomarker panel.
 \end{abstract}
 
 \begin{IEEEkeywords}
-clear cell renal cell carcinoma, TCGA, GEO, differential expression, survival analysis, reproducibility, metabolism, transcriptomics
+clear cell renal cell carcinoma, TCGA, GEO, transcriptomics, survival analysis, external validation, selection stability
 \end{IEEEkeywords}
 
 \section{Introduction}
-Clear cell renal cell carcinoma is the most common histologic subtype of kidney cancer and has a well-established relationship with VHL loss, HIF stabilization, angiogenesis, altered nutrient handling, and immune-microenvironmental remodeling \cite{tcga_kirc_2013,vhl_hif_review_2024}. These features make ccRCC attractive for public-data transcriptomics. They also make it vulnerable to overinterpretation: thousands of genes distinguish tumor from adjacent kidney, but that does not make those genes independent prognostic markers, mechanisms, or therapeutic targets.
+Clear cell renal cell carcinoma (ccRCC) is shaped by VHL loss, hypoxia-inducible signaling, angiogenesis, altered metabolism, and a heterogeneous tumor microenvironment \cite{tcga_kirc_2013,vhl_hif_review_2024}. These processes produce broad transcriptomic differences between tumor and normal kidney. A large differential-expression effect, however, can reflect tumor identity, loss of normal nephron compartments, immune or vascular admixture, or technical context rather than stable prognostic information.
 
-This project asks a deliberately narrow question: among reproducibly dysregulated tumor-normal genes in ccRCC, how much overlap exists with adjusted survival-associated genes? The premise is that tumor identity, retained kidney epithelial differentiation, vascular content, immune infiltration, stromal admixture, and aggressive tumor state can all produce strong expression differences. A credible analysis should therefore preserve discordance between differential expression and prognosis instead of flattening every signal into a ``hub gene'' narrative.
-
-The central hypothesis is partly statistical and partly biological. Statistically, the largest tumor-normal expression changes should not be assumed to have the largest survival effects. Biologically, the high-priority survival-associated subset should be interpreted as a set of candidate tissue-state associations, expected to reflect loss or retention of renal epithelial metabolic differentiation together with immune or vascular composition effects. This framing is compatible with VHL/HIF-shaped ccRCC biology, but it does not assume that the retained candidates are canonical HIF targets.
+HYDRA-ccRCC tests a narrow question: among genes reproducibly dysregulated across independent ccRCC expression cohorts, which have survival associations that remain credible after clinical adjustment, proportional-hazards testing, sensitivity analysis, resampling, independent outcome testing, and cell-source triangulation? The contribution is an auditable evidence funnel rather than a new prediction algorithm or a fixed multigene panel.
 
 \section{Methods}
-\subsection{Datasets}
-TCGA-KIRC was used as the discovery and survival-modeling cohort. RNA-seq data were downloaded from the Genomic Data Commons as STAR-count gene expression quantification using TCGAbiolinks \cite{colaprico_tcgabiolinks_2016}. The current run included 541 primary tumor samples and 72 solid tissue normal samples. Clinical metadata were downloaded from GDC and used to derive overall survival time and event status.
+\subsection{Cohorts and Frozen Analysis Design}
+TCGA-KIRC public, de-identified data were obtained from the Genomic Data Commons through TCGAbiolinks \cite{colaprico_tcgabiolinks_2016}. Discovery used 541 primary tumors and 72 solid-tissue normal samples. GSE40435 (101 tumor and 101 normal samples) and GSE53757 (72 tumor and 72 normal samples) were obtained from the Gene Expression Omnibus \cite{barrett_geo_2013} for tumor--normal replication.
 
-Two GEO cohorts were used for expression-direction validation \cite{barrett_geo_2013}. GSE40435 contained 101 adjacent non-tumor kidney samples and 101 ccRCC tumor samples. GSE53757 contained 72 matched normal kidney samples and 72 ccRCC tumor samples. GEO Series Matrix files and supplementary archives were downloaded by script; this version uses Series Matrix expression values for fast cross-platform validation. GEO expression validation in this study validates tumor-normal expression direction, not survival association. GSE29609, containing 39 ccRCC tumors with overall-survival information, was used as a small external survival-direction check.
+The 24 high-confidence candidates were frozen before v2 external testing. GSE29609, with 39 tumors and 17 deaths, was retained as a small exploratory survival-direction check. E-MTAB-1980, with 101 patients and 23 deaths, was the primary frozen external survival test. No external result changed the TCGA candidate definition or ranking.
 
-\subsection{Differential Expression}
-TCGA raw unstranded STAR counts were analyzed with DESeq2 \cite{love_deseq2_2014}. Genes were retained if at least 10 counts were observed in at least 10 samples. The design compared primary tumor against solid tissue normal. TCGA significance was defined as Benjamini-Hochberg adjusted $p < 0.05$ and absolute log$_2$ fold change at least 1.
+\subsection{Differential Expression and Reproducibility}
+TCGA raw unstranded STAR counts were analyzed with DESeq2 \cite{love_deseq2_2014}. Genes required at least 10 counts in at least 10 samples. Significance required Benjamini--Hochberg adjusted $p<0.05$ and absolute log$_2$ fold change of at least 1.
 
-GEO cohorts were analyzed with limma \cite{ritchie_limma_2015}. For GSE40435, patient-pair identifiers were parsed from sample titles. For GSE53757, paired identifiers were assigned from the documented alternating tumor-normal sample order. Probe-level expression was collapsed to gene symbols by mean expression after parsing platform gene-symbol annotations.
+The GEO cohorts were analyzed with limma \cite{ritchie_limma_2015}. GSE40435 used parsed patient-pair identifiers; GSE53757 used the documented alternating tumor--normal sample order. Probe expression was collapsed to gene symbols by mean expression. A reproducible DEG required TCGA significance, the same tumor--normal direction in both GEO cohorts, and nominal $p<0.05$ in at least one GEO cohort.
 
-\subsection{Reproducibility Definition}
-A gene was considered reproducibly differentially expressed if it met the TCGA differential-expression threshold, had the same tumor-normal direction in both GEO cohorts, and had nominal validation support ($p < 0.05$) in at least one GEO cohort. This definition was chosen before candidate ranking to reduce post-hoc threshold drift while retaining enough genes for downstream survival and enrichment analysis.
+\subsection{TCGA Survival Selection}
+Overall survival models used TCGA primary tumors and standardized continuous expression. The main Cox model \cite{cox_1972} adjusted for age, sex, pathologic stage, and collapsed grade among complete cases. Stage-complete and grade-complete sensitivity models were fit separately. High-confidence candidates required main-model FDR $<0.01$, proportional-hazards $p\geq0.05$, absolute log hazard ratio at least $\log(1.5)$, non-trivial GEO effect support, and concordant nominal support in both sensitivity models.
 
-\subsection{Survival Analysis}
-Survival analysis used TCGA primary tumor samples only. Cox proportional hazards models \cite{cox_1972} were fit using standardized continuous expression rather than median-split expression groups. The main model used complete cases for age, sex, pathologic stage, and collapsed grade (G1/G2 versus G3/G4). Two sensitivity models separately required stage-complete and grade-complete covariates. High-confidence candidates were required to pass main-model FDR $<0.01$, proportional-hazards $p \geq 0.05$, absolute log hazard ratio at least $\log(1.5)$, non-trivial GEO effect support, and same-direction nominal support in both sensitivity models.
+\subsection{External Survival Testing}
+External expression values were standardized within cohort. GSE29609 tested unadjusted continuous-expression Cox associations and retained missing and contradictory results. E-MTAB-1980 tested all frozen candidates with an unadjusted primary model and a limited secondary model adjusting for age, high T stage, and metastatic status. Candidate-wise multiplicity was controlled with Benjamini--Hochberg FDR. Strict external support required TCGA-concordant direction, FDR support in both external models, and proportional-hazards support in both models.
 
-\subsection{Candidate Hardening}
-The pipeline generated several hardening outputs: threshold sensitivity, a null-overlap check, DEG-versus-prognostic comparison, cell-type sanity flags, literature-review seed tables, and generated gene dossiers. A manual biological review then assigned manuscript roles to the 24 high-confidence candidates. Lead candidates were separated from supporting candidates, composition flags, and genes that should not be highlighted without independent validation.
+\subsection{Selection Stability and Held-Out Clinical Increment}
+Selection stability used 20 event-stratified 80\% TCGA subsamples. Each repeat reran the complete survival-selection screen across all 3,304 eligible reproducible DEGs, rather than refitting only the frozen candidates. We recorded candidate selection frequency, median effect, direction agreement, and the number selected per repeat.
 
-To address confounding within the available TCGA data, the pipeline also compares clinical-only Cox models against clinical-plus-gene models for each high-confidence candidate. A second sensitivity model adds crude expression-derived marker scores for proximal-tubule, endothelial, immune, and stromal composition. These sensitivity checks do not establish tumor-cell-intrinsic biology; they are screens for whether a candidate remains directionally stable after simple clinical and composition adjustment.
+Predictive increment used 20 repeats of five-fold event-stratified cross-validation. For each candidate, a clinical-only Cox model and a clinical-plus-one-gene model were trained within each fold and evaluated on held-out patients. Out-of-fold predictions were pooled within each repeat, and the concordance difference was summarized across repeats. These repeated-split distributions are internal uncertainty summaries, not independent confidence intervals or evidence of clinical utility.
 
-External survival checking used GSE29609 as an explicitly limited validation cohort. Because this cohort contains only 39 tumors and 17 overall-survival events, it was used to test hazard-ratio direction and nominal support rather than to make definitive validation claims. Candidate genes absent from the platform annotation were recorded as not testable.
+\subsection{Composition and Cell-Source Checks}
+Clinical-plus-gene models were compared with models that additionally included proximal-tubule, endothelial, immune, and stromal expression-derived marker scores. Candidate-specific leave-one-out scores reduced direct circularity when a candidate overlapped a marker set. These scores are composition screens, not direct tumor-purity estimates.
+
+Human Protein Atlas v25.1 normal-tissue single-cell expression was mapped to renal epithelial, vascular, immune, stromal, and other compartments using a prespecified rule set. The analysis recorded the dominant mapped compartment and top cell types for every frozen candidate. Because the source contains normal tissues rather than ccRCC tumor cells, it supports cell-source triangulation but cannot establish tumor-cell expression or mechanism.
+
+\subsection{Reproducibility and Validation}
+The scripted pipeline records public source URLs, access dates, input checksums, random seeds, package versions, and output checksums. Automated tests check required columns, expected candidate coverage, cohort counts, monotonic funnel behavior, and impossible values. The manuscript is compiled separately from the analysis pipeline.
 
 \section{Results}
-\subsection{The Evidence Funnel Compresses Broad Tumor-Normal Dysregulation}
-The TCGA-KIRC analysis identified 14,337 Ensembl-level genes passing the initial DESeq2 threshold. After mapping to symbols, 8,852 TCGA-significant genes were available for cross-cohort comparison. GSE40435 produced 1,076 significant genes under the same effect-size threshold, and GSE53757 produced 3,139 significant genes.
-
-The cross-cohort reproducibility filter identified 3,304 reproducible differentially expressed genes. This reduction is biologically important: TCGA-only tumor-normal differential expression is broad enough to include tumor identity, kidney compartment differences, immune and stromal composition, and platform-specific effects. Reproducibility is therefore a necessary first filter, but not sufficient evidence of prognostic relevance.
+\subsection{The Evidence Funnel Compresses Broad Dysregulation}
+TCGA analysis identified 14,337 significant Ensembl-level genes and 8,852 genes after symbol mapping. GSE40435 and GSE53757 identified 1,076 and 3,139 significant genes, respectively. Cross-cohort filtering retained 3,304 reproducible DEGs. Of these, 1,176 passed main Cox FDR, 1,122 passed proportional-hazards testing, 1,063 passed sensitivity requirements, 519 met the strict definition, and 24 met the high-confidence definition.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../results/figures/evidence_funnel.png}
-\caption{Evidence funnel showing compression from broad tumor-normal differential expression to reproducible, survival-associated, sensitivity-supported, strict, and high-confidence candidate prognostic associations.}
+\caption{Evidence funnel from TCGA tumor--normal differential expression to the frozen high-confidence candidate set.}
 \label{fig:funnel}
 \end{figure}
 
 \begin{table}[htbp]
-\caption{First-pass evidence funnel}
+\caption{Discovery evidence funnel}
 \centering
 \begin{tabular}{lr}
 \toprule
 Metric & Count \\
 \midrule
-TCGA primary tumor samples & 541 \\
-TCGA solid tissue normal samples & 72 \\
-GSE40435 tumor/normal samples & 101/101 \\
-GSE53757 tumor/normal samples & 72/72 \\
-TCGA significant genes after symbol mapping & 8,852 \\
+TCGA tumor / normal samples & 541 / 72 \\
+TCGA significant mapped genes & 8,852 \\
 Reproducible DEGs & 3,304 \\
-Strict reproducible prognostic candidates & 519 \\
+Main Cox FDR pass & 1,176 \\
+Proportional-hazards pass & 1,122 \\
+Sensitivity pass & 1,063 \\
+Strict candidates & 519 \\
 High-confidence candidates & 24 \\
 \bottomrule
 \end{tabular}
 \label{tab:funnel}
 \end{table}
 
-\subsection{Differential-Expression Magnitude and Survival Effect Are Discordant}
-Among reproducible DEGs, 1,176 were associated with overall survival in the main stage/grade-complete Cox model at FDR $<0.05$. Proportional-hazards, effect-size, GEO-effect, and sensitivity filters reduced this to 519 strict candidates and 24 high-confidence candidate prognostic associations. This supports the central premise that the largest tumor-normal changes are not automatically the most prognostically informative changes.
-
-The discordance analysis is most useful when direction is preserved. Many lead candidates are lower in tumor and protective when expression is higher, consistent with retained renal epithelial or metabolic differentiation. In contrast, selected non-lead risk-direction candidates such as TCIRG1, C1QTNF6, GRAMD1A, and FHOD1 are higher in tumor and associated with higher hazard, a pattern more compatible with immune, lysosomal, inflammatory, vascular, or stromal state than with a simple renal metabolic-protection story. HHLA2 is a special case: it is higher in tumor but associated with lower hazard in this analysis, matching a compartment- and immune-state-dependent interpretation rather than a simple oncogenic model.
+Differential-expression magnitude and adjusted survival effect were not equivalent. Many protective candidates were lower in tumor, consistent with retained renal epithelial or metabolic differentiation, while several risk-direction genes were compatible with immune, inflammatory, vascular, or stromal states.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../results/figures/tcga_kirc_directional_discordance.png}
-\caption{Directional discordance between tumor-normal expression change and adjusted survival effect. This view preserves whether genes are higher or lower in tumor and whether higher expression is associated with increased or decreased hazard.}
+\caption{Directional relationship between tumor--normal expression change and adjusted TCGA survival effect.}
 \label{fig:directional}
 \end{figure}
 
-\subsection{Manual Review Narrows the Manuscript Candidate Set}
-The 24 high-confidence genes should not be presented as an equivalent biomarker panel. Manual biological review prioritized KL, ACADM, CRYL1, ACAT1, and DDC as TCGA-derived lead manuscript hypotheses because they combine coherent internal direction, renal or metabolic plausibility, and ccRCC-focused support. This lead status is not external validation. PANK1, DBT, CLCN5, and TCIRG1 are supporting candidates. HHLA2, GRAMD1A, C1QTNF6, CYFIP2, and IQGAP2 are biologically interesting but require cautious interpretation. TEK, EMCN, PODXL, and FHOD1 are best treated as vascular, renal-compartment, or stromal/EMT composition flags. IFFO1, CADPS2, LRBA, FUT6, HIBCH, and TNFAIP2 are retained in the auditable output tables but should be omitted from the main biological story unless independent validation changes their status.
+\subsection{Independent Survival Cohorts Give Unequal Support}
+GSE29609 tested 22 platform-present candidates. Four retained the TCGA hazard direction, none had same-direction nominal support, and DDC, ACAT1, CLCN5, and TCIRG1 had nominal opposite-direction associations. Its 17 events and distinct measurement platform limit gene-specific inference, but the result rejects a claim of universal cross-platform validation.
 
-Clinical and composition sensitivity analyses supported caution rather than biomarker certainty. All 24 high-confidence candidates improved a clinical-only model at FDR $<0.05$, and all 24 retained the same hazard-ratio direction after adding crude proximal-tubule, endothelial, immune, and stromal marker scores. However, only 16 of 24 remained significant at FDR $<0.05$ after marker-score adjustment. Several renal epithelial candidates, including KL and DDC, were attenuated by this screen. That attenuation is not a failure of the biological story; it is evidence that part of the signal may reflect retained renal epithelial composition or differentiation state rather than a simple tumor-cell-intrinsic mechanism.
-
-\subsection{External Survival Checking Does Not Validate the TCGA Shortlist}
-GSE29609 provided a deliberately stringent reality check. Of the 24 high-confidence candidates, 22 were present on the GSE29609 platform annotation. Only 4 of 22 testable genes had the same hazard-ratio direction as TCGA, and none had same-direction nominal support at $p < 0.05$. Four genes had nominal survival associations in the opposite direction, including two TCGA-derived lead hypotheses, DDC and ACAT1, plus CLCN5 and TCIRG1. Because GSE29609 is small and technically distinct from TCGA, this result should not be treated as definitive refutation of any individual gene. It does, however, refute any claim that the current 24-gene set is externally validated as a prognostic panel.
+E-MTAB-1980 mapped 23 candidates. Twenty retained the TCGA direction, 14 had same-direction unadjusted FDR support, 12 had adjusted FDR support, and eight passed the complete external gate. No candidate had a nominally significant opposite-direction association.
 
 \begin{table}[htbp]
-\caption{GSE29609 external survival-direction check}
+\caption{External survival evidence}
 \centering
-\begin{tabular}{lr}
+\begin{tabular}{lrr}
 \toprule
-Metric & Count \\
+Metric & GSE29609 & E-MTAB-1980 \\
 \midrule
-Samples & 39 \\
-Overall-survival events & 17 \\
-High-confidence candidates tested & 24 \\
-Present on platform annotation & 22 \\
-Same TCGA hazard direction & 4 \\
-Same-direction nominal support & 0 \\
-Opposite-direction nominal signal & 4 \\
+Samples / events & 39 / 17 & 101 / 23 \\
+Candidates mapped & 22 & 23 \\
+Same TCGA direction & 4 & 20 \\
+Same-direction nominal & 0 & 14 \\
+Strict external support & --- & 8 \\
+Opposite-direction nominal & 4 & 0 \\
 \bottomrule
 \end{tabular}
-\label{tab:gse29609}
+\label{tab:external}
 \end{table}
+
+The strict E-MTAB-1980 set was DDC, CRYL1, ACADM, TEK, EMCN, PODXL, FUT6, and HIBCH. Statistical replication alone did not make these genes biologically equivalent: TEK and EMCN were vascular signals, PODXL was compartment-sensitive, and FUT6 and HIBCH had limited candidate-specific biological support.
+
+\subsection{Top Candidates Are Stable but the Threshold-Defined Set Varies}
+The complete selection screen chose between 3 and 129 genes per resample, with a mean of 46.9. Six frozen candidates were selected in at least 80\% of repeats: PANK1 (100\%), ACADM (95\%), DDC (90\%), CLCN5 (85\%), CRYL1 (85\%), and CYFIP2 (85\%). Eighteen of 24 were selected in at least half of repeats, and all 24 retained their full-fit hazard direction by median resampled effect. Thus, several leading associations were stable, but the total count passing hard thresholds was sensitive to sampling variation.
+
+\subsection{Single Genes Add Small Internal Discrimination}
+Across repeated held-out splits, the clinical-only model had mean concordance 0.745. All 24 candidates produced a positive mean concordance change when added individually; 23 had a positive empirical 2.5th percentile, while FHOD1 crossed zero. The largest mean increments were CYFIP2 ($+0.0220$), PANK1 ($+0.0218$), CRYL1 ($+0.0206$), ACADM ($+0.0181$), HHLA2 ($+0.0176$), and CLCN5 ($+0.0175$). These small internal gains do not define a multigene model or show clinical usefulness.
+
+\subsection{Cell Source Changes the Candidate Hierarchy}
+All 24 candidates retained TCGA hazard direction after bulk marker-score adjustment, but only 16 remained significant at FDR $<0.05$. KL and DDC attenuated, suggesting sensitivity to renal epithelial differentiation or composition.
+
+Human Protein Atlas data mapped all 24 genes. TEK and EMCN were vascular-dominant; CYFIP2, GRAMD1A, and TCIRG1 were immune-dominant. Several remaining genes had renal epithelial expression even when their global maximum occurred in another normal-tissue cell type. These observations support compartment-aware interpretation but do not establish ccRCC tumor-cell origin.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{../results/figures/candidate_forest_plot.png}
-\caption{Forest plot of the 24 high-confidence candidate prognostic associations, grouped by manuscript priority rather than by pipeline rank alone. Error bars show 95\% confidence intervals for the stage/grade-adjusted Cox log hazard ratio.}
+\caption{Adjusted TCGA associations for the frozen 24-candidate set, grouped by manuscript role.}
 \label{fig:forest}
 \end{figure}
 
-\subsection{Biological Interpretation}
-The strongest biological story is not a generic hypoxia-only program. Most lead candidates are lower in tumor and protective when expression is higher, pointing toward loss or retention of renal epithelial metabolic differentiation. This core signal includes fatty-acid oxidation and mitochondrial metabolism (ACADM), ketone and acetyl-CoA metabolism (ACAT1), renal metabolic differentiation (CRYL1), kidney-enriched epithelial biology (KL), and amino-acid or biogenic-amine metabolism with ccRCC literature support (DDC). PANK1, DBT, and CLCN5 support the same broad interpretation but should be treated as secondary rather than as the center of the claim.
+\subsection{Integrated Interpretation Prioritizes Three Metabolic Hypotheses}
+ACADM, CRYL1, and DDC had the strongest convergence of TCGA association, selection stability, positive held-out increment, and strict E-MTAB-1980 support. Their direction is consistent with loss or retention of renal epithelial metabolic differentiation. PANK1, CLCN5, and CYFIP2 were internally stable but did not pass the strict external gate. KL and ACAT1 remained biologically plausible TCGA hypotheses without strict E-MTAB-1980 support.
 
-This interpretation is compatible with VHL/HIF-shaped ccRCC, because hypoxia signaling and pseudohypoxic adaptation reshape oxidative metabolism and lipid handling. However, most top candidates are not direct evidence of a canonical HIF target-gene program. Immune and vascular candidates should be interpreted as tissue-state or composition-sensitive associations unless cell-source validation is added.
+The findings do not support a generic hypoxia-only explanation. VHL/HIF biology can reshape oxidative metabolism and tissue state, but the candidate evidence more directly reflects metabolic differentiation plus immune and vascular composition. The results prioritize experiments and literature review; they do not establish a mechanism or therapeutic target.
 
 \section{Discussion}
-HYDRA-ccRCC provides a reproducible framework for testing the relationship between tumor-normal differential expression and survival association in ccRCC. The central result is conceptual rather than biomarker-definitive: reproducible differential expression is not equivalent to prognostic importance. The evidence funnel compresses thousands of broad tumor-normal changes into a small, auditable set of candidate prognostic associations, and manual review further separates credible lead candidates from composition-sensitive or weakly supported genes.
+HYDRA-ccRCC shows why prognostic transcriptomic claims need several distinct tests. Expression replication reduced broad TCGA dysregulation, survival selection reduced it further, and external testing separated a supported subset from candidates that remained cohort-dependent. Full-screen resampling showed that the strongest candidates were reproducible even though the number crossing hard thresholds varied substantially.
 
-The most defensible TCGA-derived biological framing is renal metabolic differentiation rather than generic hypoxia. The lead candidates suggest that preserved renal epithelial and mitochondrial metabolic programs are associated with lower hazard in TCGA, whereas selected immune, lysosomal, inflammatory, vascular, and stromal signals may reflect aggressive or compositionally distinct tumor states. GSE29609 did not broadly validate these survival directions, so this story should be treated as a prioritized hypothesis rather than a validated prognostic model.
+The two external survival cohorts should be interpreted together. GSE29609 supplied a useful contradictory result, but its small event count and microarray coverage limit power. E-MTAB-1980 provided stronger directional and multiplicity-controlled support, but its 23 deaths still constrain adjustment and precision. Eight strict external hits are evidence for candidate-level replication, not evidence for a deployable panel.
 
-The main weakness is external survival validation. TCGA is used for survival discovery, filtering, and ranking, while GSE40435 and GSE53757 validate only tumor-normal expression direction. The small GSE29609 survival check was not broadly supportive. Therefore, the current manuscript should not claim validated biomarkers. The correct claim is that HYDRA-ccRCC prioritizes and stress-tests candidate prognostic associations, exposing which claims remain fragile.
+The convergent metabolic trio---ACADM, CRYL1, and DDC---is the most defensible next-stage focus. DDC's opposite nominal direction in GSE29609 prevents a simple replication narrative, while its strong E-MTAB-1980 result and resampling stability justify further study. Vascular and immune candidates demonstrate why statistical validation must be paired with cell-source analysis.
 
 \section{Limitations}
-This retrospective analysis uses public bulk transcriptomic data. TCGA provides both survival discovery and candidate selection, so prognostic associations require independent outcome validation. GSE40435 and GSE53757 validate tumor-normal direction but do not validate survival effects. GSE29609 provides only a small external survival check with limited power, different measurement technology, and incomplete platform coverage. Adjacent normal kidney is not identical to healthy kidney. Complete-case clinical modeling can introduce selection effects, and overall survival is influenced by treatment, comorbidity, and follow-up differences. Bulk RNA-seq cannot distinguish tumor-cell-intrinsic expression from retained renal epithelium, immune infiltration, endothelial content, stromal admixture, necrosis, or tumor purity. RNA abundance also does not guarantee protein-level effect. For these reasons, all gene-level findings should be described as candidate prognostic associations, not biomarkers, therapeutic targets, or mechanisms.
+This retrospective study uses public bulk transcriptomic data. TCGA supplies discovery, selection, and repeated internal evaluation, so cross-validation gains may remain optimistic. E-MTAB-1980 has only 23 deaths and permits limited covariate adjustment; GSE29609 has 17 deaths, different technology, and incomplete candidate coverage. Overall survival is affected by treatment, comorbidity, and follow-up differences.
+
+Adjacent normal kidney is not equivalent to healthy kidney. Expression-derived marker scores do not directly measure tumor purity, and HPA v25.1 contains normal-tissue rather than ccRCC tumor single-cell data. Bulk RNA cannot separate tumor-cell-intrinsic expression from nephron retention, immune infiltration, endothelial content, stromal admixture, or necrosis. RNA abundance also does not demonstrate protein effect, causation, mechanism, or therapeutic relevance.
 
 \section{Conclusion}
-HYDRA-ccRCC shows that in ccRCC, the most reproducible tumor-normal expression changes are not automatically the most prognostically informative genes. The current high-confidence set is best interpreted as a TCGA-derived hypothesis set centered on renal epithelial metabolic differentiation, with additional immune and vascular composition-sensitive signals. The GSE29609 check shows that these associations are not yet externally validated. The lasting contribution is not a final 24-gene biomarker panel, but a transparent evidence funnel for deciding which public-data findings survive increasingly skeptical validation.
+The completed v2 workflow narrows thousands of reproducible tumor--normal changes to a frozen candidate set, tests that set in two external survival cohorts, quantifies full-screen selection stability, evaluates held-out clinical increment, and triangulates normal-tissue cell source. ACADM, CRYL1, and DDC emerge as the strongest integrated metabolic hypotheses, while several externally supported genes remain composition-sensitive. The appropriate output is a prioritized set of candidate prognostic associations and a transparent record of where the evidence remains fragile, not a validated 24-gene biomarker panel.
+
+\section*{Data Availability}
+All source data are public and identified by TCGA-KIRC, GSE40435, GSE53757, GSE29609, E-MTAB-1980, and Human Protein Atlas v25.1 accession or release identifiers. Download URLs, access dates, and checksums are recorded in \url{../results/tables/source_provenance.csv}; generated tables and figures are stored under \url{../results/}; and the one-command entry point is \url{../run_pipeline.ps1}.
+
+\section*{Ethics Declaration}
+This secondary analysis used public, de-identified datasets and involved no new recruitment, intervention, or access to identifiable private information. Final competition or publication requirements should be confirmed with the relevant review body.
+
+\section*{Author Contributions}
+The student researcher is responsible for the project question, methodological decisions, verification of the analysis, interpretation, and final writing. Contributions must be reviewed and updated before submission to match the student's documented work.
+
+\section*{Funding}
+No external funding was reported for this development-stage project.
+
+\section*{Conflict of Interest}
+The author reports no conflict of interest.
+
+\section*{AI Assistance Disclosure}
+OpenAI Codex assisted with code auditing, implementation support, debugging, reproducibility checks, and revision of this internal development manuscript. The student remains responsible for understanding and independently verifying the code, statistical decisions, citations, and scientific claims. AI-generated prose must not be copied directly into IRIS or ISEF submission materials.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
