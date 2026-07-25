@@ -1,0 +1,241 @@
+symbol,cell_type,expression,compartment,cell_type_rank,main_log_hr
+ACADM,esophageal apical cells,740,other,1,-0.44954477780770535
+ACADM,hepatocytes,338,other,2,-0.44954477780770535
+ACADM,parietal cells,316.5,other,3,-0.44954477780770535
+ACADM,myonuclei,247.2,other,4,-0.44954477780770535
+ACADM,proximal tubule cells,108,renal_epithelial,5,-0.44954477780770535
+ACADM,enterocytes,107.9,other,6,-0.44954477780770535
+ACADM,thymic myoid cells,107.4,other,7,-0.44954477780770535
+ACADM,lactotrophs,103.5,other,8,-0.44954477780770535
+ACADM,gonadotrophs,101.4,other,9,-0.44954477780770535
+ACADM,salivary duct cells,100.5,other,10,-0.44954477780770535
+ACAT1,hepatocytes,804.5,other,1,-0.4087572707425221
+ACAT1,parietal cells,484.4,other,2,-0.4087572707425221
+ACAT1,early spermatids,444.2,other,3,-0.4087572707425221
+ACAT1,late primary spermatocytes,403.6,other,4,-0.4087572707425221
+ACAT1,myonuclei,274.8,other,5,-0.4087572707425221
+ACAT1,epididymal clear cells,263.3,other,6,-0.4087572707425221
+ACAT1,oocytes,179.6,other,7,-0.4087572707425221
+ACAT1,renal collecting duct intercalated cells,165.5,renal_epithelial,8,-0.4087572707425221
+ACAT1,colonocytes,149,other,9,-0.4087572707425221
+ACAT1,epididymal efferent duct ciliated cells,142.7,other,10,-0.4087572707425221
+C1QTNF6,extravillous trophoblasts,598.7,other,1,0.4485051545354674
+C1QTNF6,migrating cytotrophoblasts,56.4,other,2,0.4485051545354674
+C1QTNF6,syncytiotrophoblasts,32.6,other,3,0.4485051545354674
+C1QTNF6,breast hormone-responsive cells,31,other,4,0.4485051545354674
+C1QTNF6,decidual stromal cells,30,stromal,5,0.4485051545354674
+C1QTNF6,endometrial stromal cells,26.5,stromal,6,0.4485051545354674
+C1QTNF6,epididymal efferent duct absorptive cells,23.3,other,7,0.4485051545354674
+C1QTNF6,endometrial luminal cells,18.5,other,8,0.4485051545354674
+C1QTNF6,late spermatids,16.3,other,9,0.4485051545354674
+C1QTNF6,astrocytes,15.4,other,10,0.4485051545354674
+CADPS2,renal connecting tubule cells,2383,other,1,-0.4246365505457781
+CADPS2,brain excitatory neurons,1289.5,other,2,-0.4246365505457781
+CADPS2,salivary acinar cells,1009.2,other,3,-0.4246365505457781
+CADPS2,renal collecting duct principal cells,946.8,renal_epithelial,4,-0.4246365505457781
+CADPS2,somatotrophs,774.7,other,5,-0.4246365505457781
+CADPS2,lactotrophs,723.5,other,6,-0.4246365505457781
+CADPS2,lacrimal acinar cells,664.9,other,7,-0.4246365505457781
+CADPS2,distal convoluted tubule cells,636.4,other,8,-0.4246365505457781
+CADPS2,pituicytes/fscs,613.2,other,9,-0.4246365505457781
+CADPS2,alveolar cells type 2,580,other,10,-0.4246365505457781
+CLCN5,myosatellite cells,714.4,other,1,-0.4179705520742072
+CLCN5,distal convoluted tubule cells,453.3,other,2,-0.4179705520742072
+CLCN5,loop of henle epithelial cells,447.2,other,3,-0.4179705520742072
+CLCN5,renal connecting tubule cells,218,other,4,-0.4179705520742072
+CLCN5,proximal tubule cells,173.6,renal_epithelial,5,-0.4179705520742072
+CLCN5,pdcs,146.4,other,6,-0.4179705520742072
+CLCN5,microglia,133.2,other,7,-0.4179705520742072
+CLCN5,renal collecting duct intercalated cells,127.3,renal_epithelial,8,-0.4179705520742072
+CLCN5,retinal pigment epithelial cells,123.6,other,9,-0.4179705520742072
+CLCN5,myonuclei,120.7,other,10,-0.4179705520742072
+CRYL1,enterocytes,574.8,other,1,-0.4532002843034422
+CRYL1,proximal tubule cells,573,renal_epithelial,2,-0.4532002843034422
+CRYL1,hepatocytes,448.7,other,3,-0.4532002843034422
+CRYL1,renal collecting duct intercalated cells,237.7,renal_epithelial,4,-0.4532002843034422
+CRYL1,epididymal efferent duct absorptive cells,215.4,other,5,-0.4532002843034422
+CRYL1,kupffer cells,214.2,other,6,-0.4532002843034422
+CRYL1,platelets,207.1,other,7,-0.4532002843034422
+CRYL1,loop of henle epithelial cells,183.3,other,8,-0.4532002843034422
+CRYL1,esophageal apical cells,166.8,other,9,-0.4532002843034422
+CRYL1,colonocytes,166.1,other,10,-0.4532002843034422
+CYFIP2,neutrophils,606.9,immune,1,-0.44123008987349144
+CYFIP2,loop of henle epithelial cells,519.8,other,2,-0.44123008987349144
+CYFIP2,neutrophil progenitors,422.9,immune,3,-0.44123008987349144
+CYFIP2,distal convoluted tubule cells,404.4,other,4,-0.44123008987349144
+CYFIP2,renal collecting duct principal cells,363.8,renal_epithelial,5,-0.44123008987349144
+CYFIP2,thymocytes,272.7,other,6,-0.44123008987349144
+CYFIP2,corticotrophs,260.5,other,7,-0.44123008987349144
+CYFIP2,somatotrophs,252.6,other,8,-0.44123008987349144
+CYFIP2,renal collecting duct intercalated cells,251.6,renal_epithelial,9,-0.44123008987349144
+CYFIP2,b-cells,232.4,immune,10,-0.44123008987349144
+DBT,parietal cells,141.4,other,1,-0.4166457711143031
+DBT,prostatic glandular cells,104.4,other,2,-0.4166457711143031
+DBT,hepatocytes,68.7,other,3,-0.4166457711143031
+DBT,thymic myoid cells,59.8,other,4,-0.4166457711143031
+DBT,distal convoluted tubule cells,58.2,other,5,-0.4166457711143031
+DBT,bergmann glia,57.6,other,6,-0.4166457711143031
+DBT,myonuclei,55.7,other,7,-0.4166457711143031
+DBT,pituitary stem cells,48.6,other,8,-0.4166457711143031
+DBT,ependymal cells,45.7,other,9,-0.4166457711143031
+DBT,myosatellite cells,42.7,other,10,-0.4166457711143031
+DDC,rod photoreceptor cells,108.9,other,1,-0.4168067446963606
+DDC,adrenal medulla cells,63.8,other,2,-0.4168067446963606
+DDC,neuroendocrine cells,32.9,other,3,-0.4168067446963606
+DDC,enterocytes,32.7,other,4,-0.4168067446963606
+DDC,proximal tubule cells,16.3,renal_epithelial,5,-0.4168067446963606
+DDC,retinal horizontal cells,14,other,6,-0.4168067446963606
+DDC,retinal ganglion cells,11.6,other,7,-0.4168067446963606
+DDC,retinal bipolar cells,10.7,other,8,-0.4168067446963606
+DDC,enteric transient amplifying cells,9.2,other,9,-0.4168067446963606
+DDC,hepatocytes,7.4,other,10,-0.4168067446963606
+EMCN,vascular endothelial cells,971,vascular,1,-0.40596911923027346
+EMCN,lymphatic endothelial cells,251.1,vascular,2,-0.40596911923027346
+EMCN,oocytes,244.1,other,3,-0.40596911923027346
+EMCN,tuft cells,172.9,other,4,-0.40596911923027346
+EMCN,hematopoietic stem cells,128.6,other,5,-0.40596911923027346
+EMCN,thymic myoid cells,57.1,other,6,-0.40596911923027346
+EMCN,pericytes,51.3,vascular,7,-0.40596911923027346
+EMCN,epididymal efferent duct ciliated cells,49.9,other,8,-0.40596911923027346
+EMCN,respiratory ionocytes,43.2,other,9,-0.40596911923027346
+EMCN,fibroblasts,27.1,stromal,10,-0.40596911923027346
+FHOD1,megakaryocytes,74.2,other,1,0.41652762820698513
+FHOD1,myonuclei,69.9,other,2,0.41652762820698513
+FHOD1,breast lactating cells,66.4,other,3,0.41652762820698513
+FHOD1,platelets,40.9,other,4,0.41652762820698513
+FHOD1,mast cells,37.7,immune,5,0.41652762820698513
+FHOD1,early primary spermatocytes,34.3,other,6,0.41652762820698513
+FHOD1,pericytes,30.1,vascular,7,0.41652762820698513
+FHOD1,neutrophils,29.9,immune,8,0.41652762820698513
+FHOD1,megakaryocyte progenitors,27.7,other,9,0.41652762820698513
+FHOD1,monocytes,26.3,immune,10,0.41652762820698513
+FUT6,esophageal apical cells,517.5,other,1,-0.4058860669942024
+FUT6,enterocytes,131,other,2,-0.4058860669942024
+FUT6,proximal tubule cells,129.1,renal_epithelial,3,-0.4058860669942024
+FUT6,goblet cells,89.4,other,4,-0.4058860669942024
+FUT6,colonocytes,56.7,other,5,-0.4058860669942024
+FUT6,paneth cells,54.1,other,6,-0.4058860669942024
+FUT6,respiratory secretory cells,52.9,other,7,-0.4058860669942024
+FUT6,esophageal suprabasal cells,48.8,other,8,-0.4058860669942024
+FUT6,enteric transient amplifying cells,47.1,other,9,-0.4058860669942024
+FUT6,enteric stem cells,40.9,other,10,-0.4058860669942024
+GRAMD1A,neutrophils,679.5,immune,1,0.43806916847653543
+GRAMD1A,pancreatic acinar cells,166.8,other,2,0.43806916847653543
+GRAMD1A,monocytes,121.5,immune,3,0.43806916847653543
+GRAMD1A,alveolar cells type 1,116.2,other,4,0.43806916847653543
+GRAMD1A,hofbauer cells,111.8,other,5,0.43806916847653543
+GRAMD1A,vascular endothelial cells,97.8,vascular,6,0.43806916847653543
+GRAMD1A,salivary acinar cells,90.6,other,7,0.43806916847653543
+GRAMD1A,innate lymphoid cells,86.5,other,8,0.43806916847653543
+GRAMD1A,alveolar cells type 2,77.1,other,9,0.43806916847653543
+GRAMD1A,ovarian stromal cells,74.2,stromal,10,0.43806916847653543
+HHLA2,enterocytes,691.1,other,1,-0.46871237804694216
+HHLA2,colonocytes,491.1,other,2,-0.46871237804694216
+HHLA2,respiratory ciliated cells,234.1,other,3,-0.46871237804694216
+HHLA2,foveolar cells,109.1,other,4,-0.46871237804694216
+HHLA2,enteric transient amplifying cells,45.5,other,5,-0.46871237804694216
+HHLA2,proximal tubule cells,45,renal_epithelial,6,-0.46871237804694216
+HHLA2,gastric progenitor cells,35.9,other,7,-0.46871237804694216
+HHLA2,goblet cells,34.7,other,8,-0.46871237804694216
+HHLA2,endometrial ciliated cells,32.1,other,9,-0.46871237804694216
+HHLA2,pancreatic acinar cells,28.6,other,10,-0.46871237804694216
+HIBCH,sertoli cells,572.8,other,1,-0.4145921448859503
+HIBCH,pituitary stem cells,444.9,other,2,-0.4145921448859503
+HIBCH,breast lactating cells,369.2,other,3,-0.4145921448859503
+HIBCH,adrenal cortex cells,350.6,other,4,-0.4145921448859503
+HIBCH,cone photoreceptor cells,335.4,other,5,-0.4145921448859503
+HIBCH,adipocytes,321.9,other,6,-0.4145921448859503
+HIBCH,corticotrophs,320.6,other,7,-0.4145921448859503
+HIBCH,early spermatids,309.7,other,8,-0.4145921448859503
+HIBCH,proximal tubule cells,309.6,renal_epithelial,9,-0.4145921448859503
+HIBCH,esophageal suprabasal cells,308.2,other,10,-0.4145921448859503
+IFFO1,microglia,43.8,other,1,0.4205016741985371
+IFFO1,sertoli cells,34.8,other,2,0.4205016741985371
+IFFO1,fibro-adipogenic progenitors,30.6,other,3,0.4205016741985371
+IFFO1,hofbauer cells,30.2,other,4,0.4205016741985371
+IFFO1,macrophages,27.8,immune,5,0.4205016741985371
+IFFO1,leydig cells,26,other,6,0.4205016741985371
+IFFO1,myosatellite cells,25.8,other,7,0.4205016741985371
+IFFO1,kupffer cells,25.6,other,8,0.4205016741985371
+IFFO1,brain excitatory neurons,24.3,other,9,0.4205016741985371
+IFFO1,melanocytes,24,other,10,0.4205016741985371
+IQGAP2,podocytes,1896,other,1,-0.4156362728911144
+IQGAP2,thymocytes,1528.7,other,2,-0.4156362728911144
+IQGAP2,hematopoietic stem cells,1342.6,other,3,-0.4156362728911144
+IQGAP2,early spermatids,1327.8,other,4,-0.4156362728911144
+IQGAP2,neutrophils,1152.9,immune,5,-0.4156362728911144
+IQGAP2,nk-cells,960.4,other,6,-0.4156362728911144
+IQGAP2,neutrophil progenitors,821.6,immune,7,-0.4156362728911144
+IQGAP2,salivary ionocytes,816.4,other,8,-0.4156362728911144
+IQGAP2,cone photoreceptor cells,784.6,other,9,-0.4156362728911144
+IQGAP2,rod photoreceptor cells,777.8,other,10,-0.4156362728911144
+KL,distal convoluted tubule cells,308.7,other,1,-0.4133638758779611
+KL,choroid plexus epithelial cells,276.1,other,2,-0.4133638758779611
+KL,renal connecting tubule cells,99.5,other,3,-0.4133638758779611
+KL,proximal tubule cells,98.5,renal_epithelial,4,-0.4133638758779611
+KL,prostatic glandular cells,69.5,other,5,-0.4133638758779611
+KL,pancreatic islet cells,32.1,other,6,-0.4133638758779611
+KL,vascular endothelial cells,29.7,vascular,7,-0.4133638758779611
+KL,renal collecting duct principal cells,23.6,renal_epithelial,8,-0.4133638758779611
+KL,epididymal principal cells,22.3,other,9,-0.4133638758779611
+KL,gastric chief cells,20.7,other,10,-0.4133638758779611
+LRBA,hematopoietic stem cells,1843.4,other,1,-0.4531098301322976
+LRBA,renal collecting duct principal cells,1611.7,renal_epithelial,2,-0.4531098301322976
+LRBA,distal convoluted tubule cells,1526.5,other,3,-0.4531098301322976
+LRBA,choroid plexus epithelial cells,1222,other,4,-0.4531098301322976
+LRBA,loop of henle epithelial cells,1055.9,other,5,-0.4531098301322976
+LRBA,megakaryocyte-erythroid progenitors,1008.6,other,6,-0.4531098301322976
+LRBA,renal connecting tubule cells,981.8,other,7,-0.4531098301322976
+LRBA,lactotrophs,973.4,other,8,-0.4531098301322976
+LRBA,endometrial glandular cells,955.5,other,9,-0.4531098301322976
+LRBA,thyrotrophs,939.6,other,10,-0.4531098301322976
+PANK1,hepatocytes,251.4,other,1,-0.4768214482591282
+PANK1,myonuclei,131.1,other,2,-0.4768214482591282
+PANK1,choroid plexus epithelial cells,126.6,other,3,-0.4768214482591282
+PANK1,proximal tubule cells,96.4,renal_epithelial,4,-0.4768214482591282
+PANK1,cardiomyocytes,95.7,other,5,-0.4768214482591282
+PANK1,distal convoluted tubule cells,61.7,other,6,-0.4768214482591282
+PANK1,loop of henle epithelial cells,54.9,other,7,-0.4768214482591282
+PANK1,enterocytes,52.3,other,8,-0.4768214482591282
+PANK1,colonocytes,50.8,other,9,-0.4768214482591282
+PANK1,thymic myoid cells,36.7,other,10,-0.4768214482591282
+PODXL,podocytes,2497.9,other,1,-0.40933662500657014
+PODXL,rod photoreceptor cells,377.1,other,2,-0.40933662500657014
+PODXL,vascular endothelial cells,298.4,vascular,3,-0.40933662500657014
+PODXL,pancreatic acinar cells,290,other,4,-0.40933662500657014
+PODXL,cone photoreceptor cells,192.5,other,5,-0.40933662500657014
+PODXL,endometrial luminal cells,180.9,other,6,-0.40933662500657014
+PODXL,lymphatic endothelial cells,135.9,vascular,7,-0.40933662500657014
+PODXL,endometrial glandular cells,130.7,other,8,-0.40933662500657014
+PODXL,fallopian secretory cells,92.5,other,9,-0.40933662500657014
+PODXL,thymic myoid cells,91.1,other,10,-0.40933662500657014
+TCIRG1,neutrophils,169,immune,1,0.4294557278534527
+TCIRG1,monocytes,135.2,immune,2,0.4294557278534527
+TCIRG1,foveolar cells,116.7,other,3,0.4294557278534527
+TCIRG1,kupffer cells,113.8,other,4,0.4294557278534527
+TCIRG1,pancreatic acinar cells,81,other,5,0.4294557278534527
+TCIRG1,extravillous trophoblasts,77.1,other,6,0.4294557278534527
+TCIRG1,epididymal principal cells,74.7,other,7,0.4294557278534527
+TCIRG1,macrophages,62.6,immune,8,0.4294557278534527
+TCIRG1,hofbauer cells,60.4,other,9,0.4294557278534527
+TCIRG1,colonocytes,59.9,other,10,0.4294557278534527
+TEK,vascular endothelial cells,321.2,vascular,1,-0.4058770649337851
+TEK,oligodendrocyte progenitor cells,141.9,other,2,-0.4058770649337851
+TEK,lymphatic endothelial cells,124,vascular,3,-0.4058770649337851
+TEK,megakaryocyte-erythroid progenitors,28.9,other,4,-0.4058770649337851
+TEK,hepatic stellate cells,19.4,other,5,-0.4058770649337851
+TEK,epicardial cells,13.6,other,6,-0.4058770649337851
+TEK,brain inhibitory neurons,12,other,7,-0.4058770649337851
+TEK,other brain neurons,11.8,other,8,-0.4058770649337851
+TEK,megakaryocyte progenitors,11.7,other,9,-0.4058770649337851
+TEK,hematopoietic stem cells,11.6,other,10,-0.4058770649337851
+TNFAIP2,endometrial secretory cells,657.3,other,1,0.4305901648197023
+TNFAIP2,neutrophils,442.2,immune,2,0.4305901648197023
+TNFAIP2,fallopian secretory cells,420.9,other,3,0.4305901648197023
+TNFAIP2,monocytes,297.7,immune,4,0.4305901648197023
+TNFAIP2,prostatic club cells,230.3,other,5,0.4305901648197023
+TNFAIP2,endometrial glandular cells,229.5,other,6,0.4305901648197023
+TNFAIP2,pancreatic duct cells,224.9,other,7,0.4305901648197023
+TNFAIP2,macrophages,220.1,immune,8,0.4305901648197023
+TNFAIP2,urothelial cells,217.7,renal_epithelial,9,0.4305901648197023
+TNFAIP2,epicardial cells,188.8,other,10,0.4305901648197023

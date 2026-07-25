@@ -1,0 +1,121 @@
+symbol,compartment,max_expression,mean_expression,top_cell_type,compartment_rank,dominant_compartment,main_log_hr
+ACADM,other,740,70.5719696969697,esophageal apical cells,1,other,-0.44954477780770535
+ACADM,renal_epithelial,108,70.54,proximal tubule cells,2,other,-0.44954477780770535
+ACADM,stromal,76.6,52.125,ovarian stromal cells,3,other,-0.44954477780770535
+ACADM,vascular,76.3,55.62,smooth muscle cells,4,other,-0.44954477780770535
+ACADM,immune,69.5,49.2625,neutrophil progenitors,5,other,-0.44954477780770535
+ACAT1,other,804.5,74.12121212121212,hepatocytes,1,other,-0.4087572707425221
+ACAT1,renal_epithelial,165.5,78.98,renal collecting duct intercalated cells,2,other,-0.4087572707425221
+ACAT1,stromal,140.4,87.45,decidual stromal cells,3,other,-0.4087572707425221
+ACAT1,vascular,103.1,76.4,smooth muscle cells,4,other,-0.4087572707425221
+ACAT1,immune,55.1,42.125,t-cells,5,other,-0.4087572707425221
+C1QTNF6,other,598.7,9.93560606060606,extravillous trophoblasts,1,other,0.4485051545354674
+C1QTNF6,stromal,30,17.075,decidual stromal cells,2,other,0.4485051545354674
+C1QTNF6,renal_epithelial,10,4.56,proximal tubule cells,3,other,0.4485051545354674
+C1QTNF6,vascular,7.7,5.28,vascular endothelial cells,4,other,0.4485051545354674
+C1QTNF6,immune,7.1,3.35,neutrophils,5,other,0.4485051545354674
+CADPS2,other,2383,182.3121212121212,renal connecting tubule cells,1,other,-0.4246365505457781
+CADPS2,renal_epithelial,946.8,319.96,renal collecting duct principal cells,2,other,-0.4246365505457781
+CADPS2,vascular,478.7,170.6,vascular endothelial cells,3,other,-0.4246365505457781
+CADPS2,stromal,339.9,162.39999999999998,decidual stromal cells,4,other,-0.4246365505457781
+CADPS2,immune,18.7,6.8,macrophages,5,other,-0.4246365505457781
+CLCN5,other,714.4,40.96060606060606,myosatellite cells,1,other,-0.4179705520742072
+CLCN5,renal_epithelial,173.6,94.38,proximal tubule cells,2,other,-0.4179705520742072
+CLCN5,immune,61.5,24.3875,macrophages,3,other,-0.4179705520742072
+CLCN5,stromal,25.9,17.875,endometrial stromal cells,4,other,-0.4179705520742072
+CLCN5,vascular,20.2,12.959999999999999,vascular endothelial cells,5,other,-0.4179705520742072
+CRYL1,other,574.8,55.415151515151514,enterocytes,1,other,-0.4532002843034422
+CRYL1,renal_epithelial,573,191.94,proximal tubule cells,2,other,-0.4532002843034422
+CRYL1,immune,87.6,38.8375,macrophages,3,other,-0.4532002843034422
+CRYL1,vascular,40.2,27.2,vascular endothelial cells,4,other,-0.4532002843034422
+CRYL1,stromal,34.9,25,fibroblasts,5,other,-0.4532002843034422
+CYFIP2,immune,606.9,189.75,neutrophils,1,immune,-0.44123008987349144
+CYFIP2,other,519.8,56.054545454545455,loop of henle epithelial cells,2,immune,-0.44123008987349144
+CYFIP2,renal_epithelial,363.8,173.84,renal collecting duct principal cells,3,immune,-0.44123008987349144
+CYFIP2,vascular,46.2,22.98,smooth muscle cells,4,immune,-0.44123008987349144
+CYFIP2,stromal,7.6,5.3,fibroblasts,5,immune,-0.44123008987349144
+DBT,other,141.4,25.626515151515154,parietal cells,1,other,-0.4166457711143031
+DBT,renal_epithelial,35.9,31.38,renal collecting duct intercalated cells,2,other,-0.4166457711143031
+DBT,stromal,26.5,20.975,fibroblasts,3,other,-0.4166457711143031
+DBT,vascular,22.9,19.46,vascular smooth muscle cells,4,other,-0.4166457711143031
+DBT,immune,21.2,16.5,b-cells,5,other,-0.4166457711143031
+DDC,other,108.9,2.6833333333333336,rod photoreceptor cells,1,other,-0.4168067446963606
+DDC,renal_epithelial,16.3,3.3200000000000003,proximal tubule cells,2,other,-0.4168067446963606
+DDC,immune,0.2,0.1,b-cells,3,other,-0.4168067446963606
+DDC,vascular,0.2,0.1,vascular endothelial cells,3,other,-0.4168067446963606
+DDC,stromal,0.1,0.07500000000000001,endometrial stromal cells,5,other,-0.4168067446963606
+EMCN,vascular,971,257.98,vascular endothelial cells,1,vascular,-0.40596911923027346
+EMCN,other,244.1,8.136363636363637,oocytes,2,vascular,-0.40596911923027346
+EMCN,stromal,27.1,9.025,fibroblasts,3,vascular,-0.40596911923027346
+EMCN,renal_epithelial,10.1,5.6,proximal tubule cells,4,vascular,-0.40596911923027346
+EMCN,immune,6.3,2.1125,macrophages,5,vascular,-0.40596911923027346
+FHOD1,other,74.2,9.367424242424242,megakaryocytes,1,other,0.41652762820698513
+FHOD1,immune,37.7,19.8625,mast cells,2,other,0.41652762820698513
+FHOD1,vascular,30.1,17.16,pericytes,3,other,0.41652762820698513
+FHOD1,renal_epithelial,15.2,6.72,peritubular myoid cells,4,other,0.41652762820698513
+FHOD1,stromal,13.3,9.375,fibroblasts,5,other,0.41652762820698513
+FUT6,other,517.5,11.401515151515152,esophageal apical cells,1,other,-0.4058860669942024
+FUT6,renal_epithelial,129.1,26.36,proximal tubule cells,2,other,-0.4058860669942024
+FUT6,immune,1,0.45,mast cells,3,other,-0.4058860669942024
+FUT6,stromal,1,0.55,endometrial stromal cells,3,other,-0.4058860669942024
+FUT6,vascular,0.4,0.24,vascular smooth muscle cells,5,other,-0.4058860669942024
+GRAMD1A,immune,679.5,132.5,neutrophils,1,immune,0.43806916847653543
+GRAMD1A,other,166.8,31.810606060606062,pancreatic acinar cells,2,immune,0.43806916847653543
+GRAMD1A,vascular,97.8,51.16,vascular endothelial cells,3,immune,0.43806916847653543
+GRAMD1A,stromal,74.2,43.35,ovarian stromal cells,4,immune,0.43806916847653543
+GRAMD1A,renal_epithelial,40.7,25.220000000000002,peritubular myoid cells,5,immune,0.43806916847653543
+HHLA2,other,691.1,14.84621212121212,enterocytes,1,other,-0.46871237804694216
+HHLA2,renal_epithelial,45,9.34,proximal tubule cells,2,other,-0.46871237804694216
+HHLA2,immune,7.7,1.8875,monocyte progenitors,3,other,-0.46871237804694216
+HHLA2,vascular,1.1,0.32,vascular smooth muscle cells,4,other,-0.46871237804694216
+HHLA2,stromal,0.5,0.225,fibroblasts,5,other,-0.46871237804694216
+HIBCH,other,572.8,140.4348484848485,sertoli cells,1,other,-0.4145921448859503
+HIBCH,renal_epithelial,309.6,179.86,proximal tubule cells,2,other,-0.4145921448859503
+HIBCH,vascular,200.2,106.52,vascular endothelial cells,3,other,-0.4145921448859503
+HIBCH,immune,115.4,78.2125,b-cells,4,other,-0.4145921448859503
+HIBCH,stromal,111.2,83.525,ovarian stromal cells,5,other,-0.4145921448859503
+IFFO1,other,43.8,7.362878787878788,microglia,1,other,0.4205016741985371
+IFFO1,immune,27.8,12.325,macrophages,2,other,0.4205016741985371
+IFFO1,vascular,16.5,13.3,pericytes,3,other,0.4205016741985371
+IFFO1,stromal,14.9,12.45,fibroblasts,4,other,0.4205016741985371
+IFFO1,renal_epithelial,14.7,5.58,peritubular myoid cells,5,other,0.4205016741985371
+IQGAP2,other,1896,188.9719696969697,podocytes,1,other,-0.4156362728911144
+IQGAP2,immune,1152.9,642.7875,neutrophils,2,other,-0.4156362728911144
+IQGAP2,renal_epithelial,337.4,155.32,renal collecting duct intercalated cells,3,other,-0.4156362728911144
+IQGAP2,stromal,52.6,22.05,fibroblasts,4,other,-0.4156362728911144
+IQGAP2,vascular,20.5,11.040000000000001,vascular endothelial cells,5,other,-0.4156362728911144
+KL,other,308.7,8.05378787878788,distal convoluted tubule cells,1,other,-0.4133638758779611
+KL,renal_epithelial,98.5,26.84,proximal tubule cells,2,other,-0.4133638758779611
+KL,vascular,29.7,8,vascular endothelial cells,3,other,-0.4133638758779611
+KL,immune,10.5,3.775,neutrophils,4,other,-0.4133638758779611
+KL,stromal,6.9,2.875,endometrial stromal cells,5,other,-0.4133638758779611
+LRBA,other,1843.4,386.1931818181818,hematopoietic stem cells,1,other,-0.4531098301322976
+LRBA,renal_epithelial,1611.7,738.5,renal collecting duct principal cells,2,other,-0.4531098301322976
+LRBA,immune,548,258.725,b-cells,3,other,-0.4531098301322976
+LRBA,vascular,203.7,142.98,vascular endothelial cells,4,other,-0.4531098301322976
+LRBA,stromal,130.7,95.425,fibroblasts,5,other,-0.4531098301322976
+PANK1,other,251.4,15.05151515151515,hepatocytes,1,other,-0.4768214482591282
+PANK1,renal_epithelial,96.4,28.36,proximal tubule cells,2,other,-0.4768214482591282
+PANK1,vascular,15.5,6.12,vascular smooth muscle cells,3,other,-0.4768214482591282
+PANK1,immune,9.1,4.425,monocyte progenitors,4,other,-0.4768214482591282
+PANK1,stromal,5,3.175,endometrial stromal cells,5,other,-0.4768214482591282
+PODXL,other,2497.9,39.74545454545455,podocytes,1,other,-0.40933662500657014
+PODXL,vascular,298.4,93.02,vascular endothelial cells,2,other,-0.40933662500657014
+PODXL,stromal,16.3,9.325,endometrial stromal cells,3,other,-0.40933662500657014
+PODXL,renal_epithelial,12.7,7.06,proximal tubule cells,4,other,-0.40933662500657014
+PODXL,immune,4.9,3.175,macrophages,5,other,-0.40933662500657014
+TCIRG1,immune,169,68.775,neutrophils,1,immune,0.4294557278534527
+TCIRG1,other,116.7,17.761363636363637,foveolar cells,2,immune,0.4294557278534527
+TCIRG1,stromal,34,20.175,decidual stromal cells,3,immune,0.4294557278534527
+TCIRG1,renal_epithelial,26.7,12.58,urothelial cells,4,immune,0.4294557278534527
+TCIRG1,vascular,22.9,18.22,vascular endothelial cells,5,immune,0.4294557278534527
+TEK,vascular,321.2,91.22,vascular endothelial cells,1,vascular,-0.4058770649337851
+TEK,other,141.9,3.506818181818182,oligodendrocyte progenitor cells,2,vascular,-0.4058770649337851
+TEK,stromal,11,5.5,decidual stromal cells,3,vascular,-0.4058770649337851
+TEK,renal_epithelial,9.3,3.5,renal collecting duct principal cells,4,vascular,-0.4058770649337851
+TEK,immune,4.6,1.45,neutrophils,5,vascular,-0.4058770649337851
+TNFAIP2,other,657.3,38.50606060606061,endometrial secretory cells,1,other,0.4305901648197023
+TNFAIP2,immune,442.2,136.2,neutrophils,2,other,0.4305901648197023
+TNFAIP2,renal_epithelial,217.7,64.03999999999999,urothelial cells,3,other,0.4305901648197023
+TNFAIP2,stromal,109.8,68.55,endometrial stromal cells,4,other,0.4305901648197023
+TNFAIP2,vascular,59,35.6,pericytes,5,other,0.4305901648197023
