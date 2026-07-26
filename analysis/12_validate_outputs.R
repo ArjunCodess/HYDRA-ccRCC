@@ -44,6 +44,8 @@ required_files <- c(
   file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
   file.path(DIRS$tables, "pipeline_bootstrap_oob_repeats.csv"),
   file.path(DIRS$tables, "pipeline_bootstrap_oob_summary.csv"),
+  file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
+  file.path(DIRS$tables, "tumor_purity_coverage.csv"),
   file.path(DIRS$tables, "source_provenance.csv"),
   file.path(DIRS$tables, "run_manifest.csv"),
   file.path("results", "high_confidence_gene_dossiers.md"),
@@ -244,8 +246,45 @@ if (any(
   stop("Pipeline-bootstrap OOB selection frequencies must be between zero and one.")
 }
 
+purity <- read_csv(
+  file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
+  show_col_types = FALSE
+)
+required_purity_columns <- c(
+  "symbol",
+  "gene_log_hr",
+  "gene_p_value",
+  "gene_fdr",
+  "gene_ph_p_value",
+  "same_direction_after_purity",
+  "relative_log_hr_attenuation",
+  "n",
+  "events"
+)
+missing_purity_columns <- setdiff(required_purity_columns, names(purity))
+if (length(missing_purity_columns) > 0) {
+  stop(
+    "Direct tumor-purity output is missing columns: ",
+    paste(missing_purity_columns, collapse = ", ")
+  )
+}
+if (nrow(purity) != values[["high_confidence_candidate"]]) {
+  stop("Direct tumor-purity sensitivity must include every frozen candidate.")
+}
+if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
+  stop("Direct tumor-purity output contains non-finite gene estimates.")
+}
+
 provenance <- read_csv(file.path(DIRS$tables, "source_provenance.csv"), show_col_types = FALSE)
-if (!all(c("TCGA-KIRC", "GSE40435", "GSE53757", "GSE29609", "E-MTAB-1980", "HPA-v25.1") %in%
+if (!all(c(
+  "TCGA-KIRC",
+  "GSE40435",
+  "GSE53757",
+  "GSE29609",
+  "E-MTAB-1980",
+  "HPA-v25.1",
+  "Aran-2015-CPE"
+) %in%
          provenance$source_id)) {
   stop("Source provenance is incomplete.")
 }

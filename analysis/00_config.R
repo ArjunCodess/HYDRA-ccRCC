@@ -58,7 +58,12 @@ SOURCE_URLS <- list(
   geo_gse53757 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE53757",
   geo_gse29609 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29609",
   emtab1980 = "https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-1980",
-  hpa_single_cell = "https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip"
+  hpa_single_cell = "https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip",
+  aran2015_purity_study = "https://doi.org/10.1038/ncomms9971",
+  aran2015_purity_data = paste0(
+    "https://static-content.springer.com/esm/art%3A10.1038%2F",
+    "ncomms9971/MediaObjects/41467_2015_BFncomms9971_MOESM1236_ESM.xlsx"
+  )
 )
 
 BIOC_PACKAGES <- c(

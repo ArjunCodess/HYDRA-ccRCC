@@ -14,13 +14,14 @@ source_rows <- tribble(
   "GSE53757", "tumor-normal expression validation", SOURCE_URLS$geo_gse53757,
   "GSE29609", "small external survival direction check", SOURCE_URLS$geo_gse29609,
   "E-MTAB-1980", "independent external survival validation", SOURCE_URLS$emtab1980,
-  "HPA-v25.1", "independent single-cell type expression", SOURCE_URLS$hpa_single_cell
+  "HPA-v25.1", "independent single-cell type expression", SOURCE_URLS$hpa_single_cell,
+  "Aran-2015-CPE", "published consensus TCGA tumor-purity sensitivity", SOURCE_URLS$aran2015_purity_study
 ) |>
   mutate(
     access_date = format(Sys.Date(), "%Y-%m-%d"),
     retrieval = "scripted public download",
     frozen_candidate_feedback = if_else(
-      source_id %in% c("E-MTAB-1980", "HPA-v25.1"),
+      source_id %in% c("E-MTAB-1980", "HPA-v25.1", "Aran-2015-CPE"),
       "none; used only after TCGA/GEO candidate freezing",
       "part of discovery or prespecified validation"
     )
