@@ -160,6 +160,43 @@ repeat_results <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
 repeat_summary <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
 oob_results <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
 
+detected_cores <- parallel::detectCores(logical = FALSE)
+if (!is.finite(detected_cores)) detected_cores <- 2L
+bootstrap_workers <- max(1L, min(4L, detected_cores - 1L))
+bootstrap_cluster <- NULL
+if (bootstrap_workers > 1L) {
+  bootstrap_cluster <- parallel::makeCluster(bootstrap_workers)
+  parallel::clusterEvalQ(bootstrap_cluster, {
+    suppressPackageStartupMessages({
+      library(dplyr)
+      library(survival)
+      library(broom)
+    })
+  })
+  parallel::clusterExport(
+    bootstrap_cluster,
+    c("vst_mat", "sample_data", "fit_expr"),
+    envir = environment()
+  )
+}
+
+fit_main_screen <- function(gene_ids, indices) {
+  worker <- function(gene_id, sampled_indices) {
+    out <- fit_expr(gene_id, sampled_indices, c("age", "sex", "stage", "grade"))
+    if (is.null(out)) return(NULL)
+    mutate(out, tcga_gene_id = gene_id)
+  }
+  if (is.null(bootstrap_cluster)) {
+    return(bind_rows(lapply(gene_ids, worker, sampled_indices = indices)))
+  }
+  bind_rows(parallel::parLapply(
+    bootstrap_cluster,
+    gene_ids,
+    worker,
+    sampled_indices = indices
+  ))
+}
+
 for (repeat_id in seq_len(V2_RESAMPLING$pipeline_bootstrap_repeats)) {
   inbag_indices <- draw_stratified_bootstrap(sample_data$os_event)
   oob_indices <- setdiff(seq_len(nrow(sample_data)), unique(inbag_indices))
@@ -170,11 +207,7 @@ for (repeat_id in seq_len(V2_RESAMPLING$pipeline_bootstrap_repeats)) {
     V2_RESAMPLING$pipeline_bootstrap_repeats
   )
 
-  main <- bind_rows(lapply(gene_table$tcga_gene_id, function(gene_id) {
-    out <- fit_expr(gene_id, inbag_indices, c("age", "sex", "stage", "grade"))
-    if (is.null(out)) return(NULL)
-    mutate(out, tcga_gene_id = gene_id)
-  })) |>
+  main <- fit_main_screen(gene_table$tcga_gene_id, inbag_indices) |>
     select(-ph_p_value) |>
     mutate(main_fdr = p.adjust(p_value, method = "BH"))
 
@@ -273,6 +306,8 @@ for (repeat_id in seq_len(V2_RESAMPLING$pipeline_bootstrap_repeats)) {
     )
   )
 }
+
+if (!is.null(bootstrap_cluster)) parallel::stopCluster(bootstrap_cluster)
 
 all_repeats <- bind_rows(repeat_results)
 all_oob <- bind_rows(oob_results)
