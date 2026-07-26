@@ -2,7 +2,7 @@
 
 **High-Discipline Reproducible Analysis of Clear Cell Renal Cell Carcinoma**
 
-HYDRA-ccRCC is a reproducible public-data pipeline that tests whether genes consistently dysregulated between clear cell renal cell carcinoma (ccRCC) and normal kidney also carry stable, externally supported prognostic signal. The v2 pipeline uses TCGA-KIRC for discovery, GSE40435 and GSE53757 for tumor-normal replication, GSE29609 and E-MTAB-1980 for independent survival checks, repeated resampling for selection stability, repeated held-out testing for clinical increment, and Human Protein Atlas single-cell data for cell-source triangulation.
+HYDRA-ccRCC is a reproducible public-data pipeline that tests whether genes consistently dysregulated between clear cell renal cell carcinoma (ccRCC) and normal kidney also carry stable, externally supported prognostic signal. The v2 pipeline uses TCGA-KIRC for discovery, GSE40435 and GSE53757 for tumor-normal replication, GSE29609 and E-MTAB-1980 for independent survival checks, patient-level resampling for selection stability and out-of-bag performance, published consensus tumor-purity estimates, and Human Protein Atlas single-cell data for cell-source triangulation.
 
 The completed run identified 3,304 reproducible differentially expressed genes, 519 strict TCGA-derived prognostic candidates, and a frozen 24-candidate high-confidence set. In E-MTAB-1980, 23 candidates mapped, 20 retained the TCGA hazard direction, and eight passed the prespecified external direction, FDR, adjusted-model, and proportional-hazards gates: `DDC`, `CRYL1`, `ACADM`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`.
 
@@ -15,6 +15,8 @@ The development manuscript is in [`paper/main.pdf`](paper/main.pdf), with source
 - **Frozen independent survival validation:** E-MTAB-1980 tests all 24 candidates without feeding its results back into discovery or ranking.
 - **Selection-stability analysis:** Twenty stratified 80% TCGA resamples rerun the complete 3,304-gene survival-selection screen.
 - **Held-out clinical increment:** Twenty repeats of five-fold cross-validation compare clinical-only models with clinical-plus-one-gene models using out-of-fold concordance.
+- **Patient-level pipeline bootstrap:** One hundred event-stratified bootstraps rerun the 3,304-gene survival-selection screen and evaluate selected frozen candidates only in out-of-bag patients.
+- **Direct tumor-purity sensitivity:** Published TCGA consensus purity estimates are added to the age-, sex-, stage-, and grade-adjusted candidate models.
 - **Cell-source triangulation:** Human Protein Atlas v25.1 normal-tissue single-cell data test whether candidate expression is vascular-, immune-, renal epithelial-, stromal-, or other-compartment dominant.
 - **Reproducibility controls:** The pipeline records source URLs, access dates, file checksums, random seeds, package versions, and output-manifest checksums.
 - **Automated validation:** Required columns, cohort sizes, funnel monotonicity, candidate coverage, and impossible values are checked before a run can finish.
@@ -50,11 +52,15 @@ The stability analysis reran the full eligible-gene screen rather than refitting
 
 The repeated five-fold analysis produced a mean clinical-only concordance of 0.745. Adding each candidate individually gave a positive mean change for all 24; 23 had a positive empirical 2.5th percentile, while `FHOD1` crossed zero. The largest mean increments were for `CYFIP2`, `PANK1`, `CRYL1`, `ACADM`, `HHLA2`, and `CLCN5`. These estimates come from repeated splits of TCGA and do not establish clinical utility or validate a multigene model.
 
+The stricter patient-level bootstrap gave a more conservative result. Across 100 repeats, the complete survival-selection screen chose 4 to 207 genes, with a mean of 65.4. Eight frozen candidates were selected in at least half of repeats: `PANK1`, `CLCN5`, `ACADM`, `CRYL1`, `TCIRG1`, `GRAMD1A`, `LRBA`, and `HIBCH`; none reached 80%. All 24 retained their full-fit hazard direction, and their percentile intervals for the adjusted log hazard ratio excluded zero. Conditional out-of-bag C-index changes were positive on average for 22 of 24 candidates, but every 95% percentile interval crossed zero; `DBT` and `FHOD1` were negative on average. The bootstrap therefore supports association stability more strongly than incremental prediction.
+
 ### Composition and interpretation
 
 Bulk marker-score adjustment retained the TCGA hazard direction for all 24 candidates, but only 16 remained significant at FDR below 0.05. `KL` and `DDC` attenuated, which is consistent with part of their signal reflecting retained renal epithelial differentiation or tissue composition.
 
-Human Protein Atlas normal-tissue single-cell data mapped all 24 candidates. `TEK` and `EMCN` were vascular-dominant; `CYFIP2`, `GRAMD1A`, and `TCIRG1` were immune-dominant under the prespecified mapping. These results reinforce composition cautions, but they do not replace tumor single-cell data or a direct tumor-purity estimate.
+Published consensus purity estimates matched 516 complete-case TCGA tumors with 170 deaths. After adding purity to the clinical Cox models, all 24 candidates retained their original hazard direction and remained significant at FDR below 0.05. The largest relative attenuation in absolute log hazard ratio was 8.9%, for `GRAMD1A`. This argues against measured bulk tumor purity explaining the TCGA associations, although the consensus estimate is still an inferred quantity rather than direct histopathology.
+
+Human Protein Atlas normal-tissue single-cell data mapped all 24 candidates. `TEK` and `EMCN` were vascular-dominant; `CYFIP2`, `GRAMD1A`, and `TCIRG1` were immune-dominant under the prespecified mapping. These results reinforce composition cautions, but they do not replace tumor single-cell data.
 
 The combined v2 evidence changes the lead hierarchy:
 
@@ -98,6 +104,8 @@ The pipeline generates:
 - GSE29609 and E-MTAB-1980 external survival results
 - full-screen selection-stability results
 - repeated held-out clinical-increment results
+- patient-level bootstrap selection and out-of-bag performance results
+- direct consensus tumor-purity sensitivity results
 - bulk composition-sensitivity and HPA cell-source results
 - GO enrichment, null checks, threshold sensitivity, and discordance analyses
 - PCA, volcano, funnel, forest, and directional-discordance figures
@@ -109,12 +117,16 @@ Key v2 files:
 - [`analysis/15_selection_stability_tcga.R`](analysis/15_selection_stability_tcga.R)
 - [`analysis/16_cv_clinical_increment.R`](analysis/16_cv_clinical_increment.R)
 - [`analysis/17_hpa_cell_source.R`](analysis/17_hpa_cell_source.R)
+- [`analysis/18_pipeline_bootstrap_tcga.R`](analysis/18_pipeline_bootstrap_tcga.R)
+- [`analysis/19_direct_tumor_purity.R`](analysis/19_direct_tumor_purity.R)
 - [`analysis/18_write_manifest.R`](analysis/18_write_manifest.R)
 - [`analysis/12_validate_outputs.R`](analysis/12_validate_outputs.R)
 - [`results/tables/external_survival_emtab1980.csv`](results/tables/external_survival_emtab1980.csv)
 - [`results/tables/selection_stability_frozen_candidates.csv`](results/tables/selection_stability_frozen_candidates.csv)
 - [`results/tables/candidate_cv_clinical_increment.csv`](results/tables/candidate_cv_clinical_increment.csv)
 - [`results/tables/hpa_candidate_cell_source_summary.csv`](results/tables/hpa_candidate_cell_source_summary.csv)
+- [`results/tables/pipeline_bootstrap_oob_summary.csv`](results/tables/pipeline_bootstrap_oob_summary.csv)
+- [`results/tables/candidate_direct_tumor_purity_sensitivity.csv`](results/tables/candidate_direct_tumor_purity_sensitivity.csv)
 - [`results/tables/source_provenance.csv`](results/tables/source_provenance.csv)
 - [`results/tables/run_manifest.csv`](results/tables/run_manifest.csv)
 
@@ -127,6 +139,7 @@ All inputs are downloaded programmatically from public accession identifiers.
 - GSE29609 provides a small exploratory survival-direction check.
 - E-MTAB-1980 provides the frozen primary external survival test.
 - Human Protein Atlas v25.1 provides normal-tissue single-cell expression for cell-source triangulation.
+- Aran et al. provide published consensus TCGA tumor-purity estimates for direct purity sensitivity.
 - Raw FASTQ and BAM files are outside the project scope.
 - GEO2R exports and manually edited metadata are not used.
 
@@ -136,13 +149,14 @@ All inputs are downloaded programmatically from public accession identifiers.
 - The 24 candidates are frozen before E-MTAB-1980 testing.
 - External null, missing, and contradictory results are retained.
 - Repeated TCGA cross-validation estimates internal incremental discrimination, not clinical utility.
-- Bulk marker scores are composition screens, not direct tumor-purity estimates.
+- Bootstrap out-of-bag performance is conditional on candidate selection and remains internal validation.
+- Published consensus purity estimates are inferred tumor-purity measures, not direct histopathology.
 - HPA data come from normal tissues, not ccRCC tumor single-cell samples.
 - RNA associations do not establish protein effects, mechanisms, therapeutic targets, or causation.
 - The strongest permitted label is **candidate prognostic association**.
 
 ## Completion state
 
-The v2 computational pipeline and its prespecified analysis outputs are complete and pass automated validation. Direct tumor-purity estimation was not implemented, so composition conclusions remain limited to bulk marker scores and HPA triangulation.
+The v2 computational pipeline and its prespecified analysis outputs are complete and pass automated validation. Direct consensus tumor-purity sensitivity, full-screen patient bootstrapping, external survival testing, bulk marker-score adjustment, and HPA cell-source triangulation are implemented. Tumor single-cell or spatial validation remains outside the current pipeline.
 
 Mentor review, student-authored IRIS materials, citation verification, source-data eligibility confirmation, and final submission are separate next-stage tasks. Internal mentor briefs and readiness checklists are intentionally kept out of version control.
