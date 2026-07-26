@@ -39,6 +39,11 @@ required_files <- c(
   file.path(DIRS$tables, "candidate_cv_clinical_increment_repeats.csv"),
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
+  file.path(DIRS$tables, "pipeline_bootstrap_all_genes.csv"),
+  file.path(DIRS$tables, "pipeline_bootstrap_frozen_candidates.csv"),
+  file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
+  file.path(DIRS$tables, "pipeline_bootstrap_oob_repeats.csv"),
+  file.path(DIRS$tables, "pipeline_bootstrap_oob_summary.csv"),
   file.path(DIRS$tables, "source_provenance.csv"),
   file.path(DIRS$tables, "run_manifest.csv"),
   file.path("results", "high_confidence_gene_dossiers.md"),
@@ -193,6 +198,50 @@ if (any(cv$mean_clinical_c_index < 0 | cv$mean_clinical_c_index > 1 |
 hpa <- read_csv(file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"), show_col_types = FALSE)
 if (length(unique(hpa$symbol)) != values[["high_confidence_candidate"]]) {
   stop("HPA cell-source output does not cover every high-confidence candidate.")
+}
+
+pipeline_bootstrap <- read_csv(
+  file.path(DIRS$tables, "pipeline_bootstrap_frozen_candidates.csv"),
+  show_col_types = FALSE
+)
+if (nrow(pipeline_bootstrap) != values[["high_confidence_candidate"]]) {
+  stop("Pipeline-bootstrap frozen-candidate count does not match high-confidence candidate count.")
+}
+if (any(
+  pipeline_bootstrap$selection_frequency < 0 |
+    pipeline_bootstrap$selection_frequency > 1,
+  na.rm = TRUE
+)) {
+  stop("Pipeline-bootstrap selection frequencies must be between zero and one.")
+}
+
+pipeline_bootstrap_repeats <- read_csv(
+  file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
+  show_col_types = FALSE
+)
+if (nrow(pipeline_bootstrap_repeats) != V2_RESAMPLING$pipeline_bootstrap_repeats) {
+  stop("Pipeline-bootstrap repeat count does not match configuration.")
+}
+if (any(
+  pipeline_bootstrap_repeats$oob_patients <= 0 |
+    pipeline_bootstrap_repeats$oob_events <= 0
+)) {
+  stop("Every pipeline-bootstrap repeat must have an evaluable out-of-bag set.")
+}
+
+pipeline_bootstrap_oob <- read_csv(
+  file.path(DIRS$tables, "pipeline_bootstrap_oob_summary.csv"),
+  show_col_types = FALSE
+)
+if (nrow(pipeline_bootstrap_oob) != values[["high_confidence_candidate"]]) {
+  stop("Pipeline-bootstrap OOB summary must include every frozen candidate.")
+}
+if (any(
+  pipeline_bootstrap_oob$selection_frequency < 0 |
+    pipeline_bootstrap_oob$selection_frequency > 1,
+  na.rm = TRUE
+)) {
+  stop("Pipeline-bootstrap OOB selection frequencies must be between zero and one.")
 }
 
 provenance <- read_csv(file.path(DIRS$tables, "source_provenance.csv"), show_col_types = FALSE)

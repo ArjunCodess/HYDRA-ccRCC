@@ -48,7 +48,8 @@ V2_RESAMPLING <- list(
   stability_repeats = 20,
   stability_fraction = 0.80,
   cv_repeats = 20,
-  cv_folds = 5
+  cv_folds = 5,
+  pipeline_bootstrap_repeats = 100
 )
 
 SOURCE_URLS <- list(
