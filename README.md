@@ -146,5 +146,3 @@ All inputs are downloaded programmatically from public accession identifiers.
 The v2 computational pipeline and its prespecified analysis outputs are complete and pass automated validation. Direct tumor-purity estimation was not implemented, so composition conclusions remain limited to bulk marker scores and HPA triangulation.
 
 Mentor review, student-authored IRIS materials, citation verification, source-data eligibility confirmation, and final submission are separate next-stage tasks. Internal mentor briefs and readiness checklists are intentionally kept out of version control.
-
-AI/tool assistance is recorded in [`docs/AI_USE_LOG.md`](docs/AI_USE_LOG.md).
