@@ -166,7 +166,14 @@ bootstrap_workers <- max(1L, min(4L, detected_cores - 1L))
 bootstrap_cluster <- NULL
 if (bootstrap_workers > 1L) {
   bootstrap_cluster <- parallel::makeCluster(bootstrap_workers)
+  local_lib_path <- normalizePath(LOCAL_R_LIB, winslash = "/", mustWork = TRUE)
+  parallel::clusterExport(
+    bootstrap_cluster,
+    "local_lib_path",
+    envir = environment()
+  )
   parallel::clusterEvalQ(bootstrap_cluster, {
+    .libPaths(c(local_lib_path, .libPaths()))
     suppressPackageStartupMessages({
       library(dplyr)
       library(survival)
