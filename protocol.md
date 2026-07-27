@@ -42,6 +42,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - E-MTAB-1980 uses an unadjusted primary model and a limited secondary model adjusting for age, high T stage, and metastatic status.
 - Revised strict external support requires TCGA-concordant direction and FDR below 0.05 in both E-MTAB-1980 models.
 - External PH tests remain visible diagnostics but are not pass/fail gates.
+- Changes in support status caused by removing a PH gate are identified explicitly and are not described as new data or stronger replication.
 - Every revised candidate is reported, including missing, unsupported, and contradictory results.
 
 ## Composition and interpretation
@@ -50,6 +51,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Published consensus tumor purity is added directly to the clinical Cox model.
 - HPA normal-tissue single-cell expression is mapped to renal epithelial, vascular, immune, stromal, and other compartments.
 - Composition attenuation is evidence about interpretation, not a reason to discard a result.
+- Integrated interpretation weighs external agreement, cohort contradiction, coefficient uncertainty, held-out concordance, and composition together rather than treating the external-support flag as a biological ranking.
 - RNA-only associations are not described as mechanisms, therapeutic targets, or validated biomarkers.
 
 ## Reproducibility and acceptance

@@ -6,7 +6,7 @@ HYDRA-ccRCC is a reproducible public-data pipeline that asks whether genes consi
 
 Following external statistical review, the analysis was revised to use surrogate-variable analysis (SVA) within the paired GEO models, report proportional-hazards tests as diagnostics rather than exclusion criteria, and use patient bootstrapping to estimate Cox coefficient uncertainty rather than repeated threshold-selection frequency. The resulting 27-candidate set is a reviewer-driven reanalysis. External outcomes were not used in its selection rule, but earlier versions of the project had already inspected those cohorts, so this repository does not describe the revised set as prospectively frozen or blindly validated.
 
-The completed run identified 3,304 reproducible differentially expressed genes, 536 strict TCGA-derived prognostic candidates, and 27 high-confidence candidates. E-MTAB-1980 mapped 26 candidates and supported 13 under the revised same-direction, unadjusted-FDR, and adjusted-FDR rule: `DDC`, `CRYL1`, `ACADM`, `KL`, `ACAT1`, `CLCN5`, `TCIRG1`, `GJB1`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`.
+The completed run identified 3,304 reproducible differentially expressed genes, 536 strict TCGA-derived prognostic candidates, and 27 high-confidence candidates. E-MTAB-1980 mapped 26 candidates and supported 13 under the revised same-direction, unadjusted-FDR, and adjusted-FDR rule: `DDC`, `CRYL1`, `ACADM`, `KL`, `ACAT1`, `CLCN5`, `TCIRG1`, `GJB1`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`. The increase from the previously reported eight externally supported genes to 13 reflects removal of the PH exclusion gate, not five new experiments or uniformly stronger replication.
 
 This is an evidence-hardening study, not a validated biomarker panel. The development manuscript is in [`paper/main.pdf`](paper/main.pdf), with source in [`paper/main.tex`](paper/main.tex).
 
@@ -36,13 +36,13 @@ This is an evidence-hardening study, not a validated biomarker panel. The develo
 | Strict candidates | 536 |
 | High-confidence candidates | 27 |
 
-`RBM47`, `GJB1`, and `LTB4R` are the three high-confidence additions created by removing PH-based exclusion. Their PH diagnostic p-values are below 0.05, so their Cox coefficients are interpreted as average hazard effects and the non-proportionality signal remains visible in the result tables.
+`RBM47`, `GJB1`, and `LTB4R` are the three high-confidence additions created by removing PH-based exclusion. Their PH diagnostic p-values are below 0.05, so their Cox coefficients are interpreted as average hazard effects and the non-proportionality signal remains visible in the result tables. This correction broadens the set but does not make the three genes new primary leads: `RBM47` has an opposite-direction nominal result in GSE29609 and an immune-dominant normal-tissue profile, `GJB1` is composition-sensitive despite strict E-MTAB-1980 support, and `LTB4R` lacks strict external support.
 
 ### External survival checks
 
 GSE29609 contains 39 samples and 17 deaths. Twenty-five of 27 candidates mapped, six retained the TCGA direction, none had same-direction nominal support, and five had nominal opposite-direction associations: `DDC`, `ACAT1`, `CLCN5`, `TCIRG1`, and `RBM47`. Its small event count and different platform make it an exploratory contradiction check rather than definitive gene-level validation.
 
-E-MTAB-1980 contains 101 patients and 23 deaths. Twenty-six candidates mapped, 23 retained the TCGA direction, 15 had same-direction unadjusted FDR support, and 13 retained adjusted FDR support and met the revised external rule. No candidate had a nominally significant opposite-direction association. PH diagnostics are reported for both external models but are not support gates.
+E-MTAB-1980 contains 101 patients and 23 deaths. Twenty-six candidates mapped, 23 retained the TCGA direction, 15 had same-direction unadjusted FDR support, and 13 retained adjusted FDR support and met the revised external rule. No candidate had a nominally significant opposite-direction association. Eight of the 13 also had PH diagnostic p-values of at least 0.05 in both external models. The other five—`KL`, `ACAT1`, `CLCN5`, `TCIRG1`, and `GJB1`—enter the revised support set because PH diagnostics no longer act as gates; their average hazard effects require that qualification.
 
 ### Bootstrap uncertainty and held-out prediction
 
@@ -56,7 +56,7 @@ Bulk marker-score adjustment retained the TCGA hazard direction for all 27 candi
 
 HPA normal-tissue single-cell data mapped all 27 candidates. `TEK` and `EMCN` were vascular-dominant, while `CYFIP2`, `GRAMD1A`, `TCIRG1`, and the newly retained `RBM47` were immune-dominant under the prespecified mapping. These observations reinforce composition cautions but do not replace tumor single-cell data.
 
-The strongest integrated metabolic hypotheses remain `ACADM`, `CRYL1`, and `DDC`. Vascular, immune, inflammatory, and renal-compartment candidates require cell-source-aware interpretation even when their external statistics are supportive.
+`ACADM` and `CRYL1` provide the cleanest cross-cohort metabolic convergence among the highlighted genes. `DDC` remains a high-priority but mixed hypothesis because its strong TCGA and E-MTAB-1980 results coexist with an opposite-direction nominal result in GSE29609 and loss of marker-score-adjusted FDR support. `KL`, `ACAT1`, and `CLCN5` meet the revised external rule, but each has a nominal PH diagnostic in the unadjusted E-MTAB-1980 model, and `ACAT1` and `CLCN5` are also contradicted in GSE29609. These distinctions prevent the broader revised support set from being interpreted as a uniformly replicated panel.
 
 ## Run the pipeline
 
