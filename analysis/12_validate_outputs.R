@@ -32,18 +32,12 @@ required_files <- c(
   file.path(DIRS$tables, "external_survival_gse29609_summary.csv"),
   file.path(DIRS$tables, "external_survival_emtab1980.csv"),
   file.path(DIRS$tables, "external_survival_emtab1980_summary.csv"),
-  file.path(DIRS$tables, "selection_stability_all_genes.csv"),
-  file.path(DIRS$tables, "selection_stability_frozen_candidates.csv"),
-  file.path(DIRS$tables, "selection_stability_repeats.csv"),
+  file.path(DIRS$tables, "candidate_cox_bootstrap_repeats.csv"),
+  file.path(DIRS$tables, "candidate_cox_bootstrap_summary.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment_repeats.csv"),
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
-  file.path(DIRS$tables, "pipeline_bootstrap_all_genes.csv"),
-  file.path(DIRS$tables, "pipeline_bootstrap_frozen_candidates.csv"),
-  file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
-  file.path(DIRS$tables, "pipeline_bootstrap_oob_repeats.csv"),
-  file.path(DIRS$tables, "pipeline_bootstrap_oob_summary.csv"),
   file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
   file.path(DIRS$tables, "tumor_purity_coverage.csv"),
   file.path(DIRS$tables, "source_provenance.csv"),
@@ -73,7 +67,6 @@ summary <- read_csv(file.path(DIRS$tables, "candidate_summary.csv"), show_col_ty
 required_metrics <- c(
   "reproducible_deg",
   "main_stage_grade_complete_prognostic",
-  "ph_pass",
   "sensitivity_pass",
   "strict_candidate",
   "high_confidence_candidate"
@@ -90,6 +83,35 @@ if (values[["high_confidence_candidate"]] > values[["strict_candidate"]]) {
 }
 if (values[["strict_candidate"]] > values[["sensitivity_pass"]]) {
   stop("Strict candidate count exceeds sensitivity-pass count.")
+}
+
+for (accession in c("gse40435", "gse53757")) {
+  geo_result <- read_csv(
+    file.path(DIRS$tables, paste0(accession, "_limma_tumor_vs_normal.csv")),
+    show_col_types = FALSE
+  )
+  required_geo_columns <- c("log2fc_ci_low", "log2fc_ci_high")
+  if (!all(required_geo_columns %in% names(geo_result))) {
+    stop(accession, " differential-expression output is missing confidence intervals.")
+  }
+
+  geo_summary <- read_csv(
+    file.path(DIRS$tables, paste0(accession, "_sample_summary.csv")),
+    show_col_types = FALSE
+  )
+  required_sva_columns <- c(
+    "n_patients",
+    "n_surrogate_variables",
+    "full_design_rank",
+    "adjusted_design_rank"
+  )
+  if (!all(required_sva_columns %in% names(geo_summary))) {
+    stop(accession, " sample summary is missing SVA design diagnostics.")
+  }
+  if (any(geo_summary$n_surrogate_variables < 0) ||
+      any(geo_summary$adjusted_design_rank < geo_summary$full_design_rank)) {
+    stop(accession, " contains invalid SVA design diagnostics.")
+  }
 }
 
 ranked <- read_csv(file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"), show_col_types = FALSE)
@@ -175,17 +197,39 @@ if (emtab_values[["emtab1980_events"]] != 23) {
   stop("E-MTAB-1980 event count must be 23.")
 }
 
-stability <- read_csv(file.path(DIRS$tables, "selection_stability_frozen_candidates.csv"), show_col_types = FALSE)
-if (nrow(stability) != values[["high_confidence_candidate"]]) {
-  stop("Selection-stability frozen-candidate count does not match high-confidence candidate count.")
+bootstrap_summary <- read_csv(
+  file.path(DIRS$tables, "candidate_cox_bootstrap_summary.csv"),
+  show_col_types = FALSE
+)
+if (nrow(bootstrap_summary) != values[["high_confidence_candidate"]]) {
+  stop("Cox bootstrap summary count does not match high-confidence candidate count.")
 }
-if (any(stability$selection_frequency < 0 | stability$selection_frequency > 1, na.rm = TRUE)) {
-  stop("Selection frequencies must be between zero and one.")
+required_bootstrap_columns <- c(
+  "bootstrap_se",
+  "bootstrap_ci_low",
+  "bootstrap_ci_high",
+  "bootstrap_bias",
+  "direction_agreement"
+)
+if (!all(required_bootstrap_columns %in% names(bootstrap_summary))) {
+  stop("Cox bootstrap summary is missing uncertainty columns.")
+}
+if (any(
+  bootstrap_summary$successful_repeats != RESAMPLING$coefficient_bootstrap_repeats |
+    !is.finite(bootstrap_summary$bootstrap_se) |
+    bootstrap_summary$bootstrap_ci_low > bootstrap_summary$bootstrap_ci_high
+)) {
+  stop("Cox bootstrap summary contains incomplete or invalid estimates.")
 }
 
-stability_repeats <- read_csv(file.path(DIRS$tables, "selection_stability_repeats.csv"), show_col_types = FALSE)
-if (nrow(stability_repeats) != RESAMPLING$stability_repeats) {
-  stop("Selection-stability repeat count does not match configuration.")
+bootstrap_repeats <- read_csv(
+  file.path(DIRS$tables, "candidate_cox_bootstrap_repeats.csv"),
+  show_col_types = FALSE
+)
+expected_bootstrap_rows <- values[["high_confidence_candidate"]] *
+  RESAMPLING$coefficient_bootstrap_repeats
+if (nrow(bootstrap_repeats) != expected_bootstrap_rows) {
+  stop("Cox bootstrap repeat table does not have complete candidate-by-repeat coverage.")
 }
 
 cv <- read_csv(file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"), show_col_types = FALSE)
@@ -200,50 +244,6 @@ if (any(cv$mean_clinical_c_index < 0 | cv$mean_clinical_c_index > 1 |
 hpa <- read_csv(file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"), show_col_types = FALSE)
 if (length(unique(hpa$symbol)) != values[["high_confidence_candidate"]]) {
   stop("HPA cell-source output does not cover every high-confidence candidate.")
-}
-
-pipeline_bootstrap <- read_csv(
-  file.path(DIRS$tables, "pipeline_bootstrap_frozen_candidates.csv"),
-  show_col_types = FALSE
-)
-if (nrow(pipeline_bootstrap) != values[["high_confidence_candidate"]]) {
-  stop("Pipeline-bootstrap frozen-candidate count does not match high-confidence candidate count.")
-}
-if (any(
-  pipeline_bootstrap$selection_frequency < 0 |
-    pipeline_bootstrap$selection_frequency > 1,
-  na.rm = TRUE
-)) {
-  stop("Pipeline-bootstrap selection frequencies must be between zero and one.")
-}
-
-pipeline_bootstrap_repeats <- read_csv(
-  file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
-  show_col_types = FALSE
-)
-if (nrow(pipeline_bootstrap_repeats) != RESAMPLING$pipeline_bootstrap_repeats) {
-  stop("Pipeline-bootstrap repeat count does not match configuration.")
-}
-if (any(
-  pipeline_bootstrap_repeats$oob_patients <= 0 |
-    pipeline_bootstrap_repeats$oob_events <= 0
-)) {
-  stop("Every pipeline-bootstrap repeat must have an evaluable out-of-bag set.")
-}
-
-pipeline_bootstrap_oob <- read_csv(
-  file.path(DIRS$tables, "pipeline_bootstrap_oob_summary.csv"),
-  show_col_types = FALSE
-)
-if (nrow(pipeline_bootstrap_oob) != values[["high_confidence_candidate"]]) {
-  stop("Pipeline-bootstrap OOB summary must include every frozen candidate.")
-}
-if (any(
-  pipeline_bootstrap_oob$selection_frequency < 0 |
-    pipeline_bootstrap_oob$selection_frequency > 1,
-  na.rm = TRUE
-)) {
-  stop("Pipeline-bootstrap OOB selection frequencies must be between zero and one.")
 }
 
 purity <- read_csv(
@@ -269,7 +269,7 @@ if (length(missing_purity_columns) > 0) {
   )
 }
 if (nrow(purity) != values[["high_confidence_candidate"]]) {
-  stop("Direct tumor-purity sensitivity must include every frozen candidate.")
+  stop("Direct tumor-purity sensitivity must include every revised candidate.")
 }
 if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
   stop("Direct tumor-purity output contains non-finite gene estimates.")
