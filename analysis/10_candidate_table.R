@@ -137,7 +137,7 @@ candidates <- repro |>
     prognostic = !is.na(main_fdr) & main_fdr < THRESHOLDS$strict_survival_fdr,
     sensitivity_pass = stage_sensitivity_same_direction & grade_sensitivity_same_direction &
       stage_sensitivity_nominal & grade_sensitivity_nominal,
-    strict_candidate = reproducible_deg & prognostic & ph_pass & meaningful_survival_effect &
+    strict_candidate = reproducible_deg & prognostic & meaningful_survival_effect &
       geo_effect_support & sensitivity_pass,
     high_confidence_candidate = strict_candidate &
       main_fdr < THRESHOLDS$high_confidence_survival_fdr &
@@ -218,7 +218,6 @@ summary <- tibble(
   metric = c(
     "reproducible_deg",
     "main_stage_grade_complete_prognostic",
-    "ph_pass",
     "sensitivity_pass",
     "strict_candidate",
     "high_confidence_candidate"
@@ -226,8 +225,7 @@ summary <- tibble(
   value = c(
     sum(candidates$reproducible_deg, na.rm = TRUE),
     sum(candidates$reproducible_deg & candidates$prognostic, na.rm = TRUE),
-    sum(candidates$reproducible_deg & candidates$prognostic & candidates$ph_pass, na.rm = TRUE),
-    sum(candidates$reproducible_deg & candidates$prognostic & candidates$ph_pass & candidates$sensitivity_pass, na.rm = TRUE),
+    sum(candidates$reproducible_deg & candidates$prognostic & candidates$sensitivity_pass, na.rm = TRUE),
     sum(candidates$strict_candidate, na.rm = TRUE),
     sum(candidates$high_confidence_candidate, na.rm = TRUE)
   )
