@@ -4,6 +4,7 @@ source("analysis/functions/io.R")
 suppressPackageStartupMessages({
   library(Biobase)
   library(limma)
+  library(sva)
   library(dplyr)
   library(readr)
   library(stringr)
@@ -72,14 +73,35 @@ run_geo_limma <- function(accession) {
     stop(accession, " condition parsing failed. Parsed levels: ", paste(levels(droplevels(condition)), collapse = ", "), call. = FALSE)
   }
 
-  design <- model.matrix(~ patient + condition)
+  full_design <- model.matrix(~ patient + condition)
+  null_design <- model.matrix(~ patient)
+  n_sv <- sva::num.sv(gene_expr, full_design, method = "leek")
+  sv_object <- if (n_sv > 0) {
+    sva::sva(gene_expr, full_design, null_design, n.sv = n_sv)
+  } else {
+    NULL
+  }
+  design <- if (is.null(sv_object)) {
+    full_design
+  } else {
+    cbind(full_design, sv_object$sv)
+  }
+
   fit <- lmFit(gene_expr, design)
   fit <- eBayes(fit)
 
-  result <- topTable(fit, coef = "conditiontumor", number = Inf, sort.by = "P") |>
+  result <- topTable(
+    fit,
+    coef = "conditiontumor",
+    number = Inf,
+    sort.by = "P",
+    confint = 0.95
+  ) |>
     rownames_to_column("symbol") |>
     rename(
       log2FoldChange = logFC,
+      log2fc_ci_low = CI.L,
+      log2fc_ci_high = CI.R,
       pvalue = P.Value,
       padj = adj.P.Val
     ) |>
@@ -87,16 +109,40 @@ run_geo_limma <- function(accession) {
       accession = accession,
       significant = padj < THRESHOLDS$deg_fdr & abs(log2FoldChange) >= THRESHOLDS$deg_abs_log2fc
     ) |>
-    select(accession, symbol, log2FoldChange, AveExpr, t, pvalue, padj, B, significant)
+    select(
+      accession,
+      symbol,
+      log2FoldChange,
+      log2fc_ci_low,
+      log2fc_ci_high,
+      AveExpr,
+      t,
+      pvalue,
+      padj,
+      B,
+      significant
+    )
 
   out_path <- file.path(DIRS$tables, paste0(tolower(accession), "_limma_tumor_vs_normal.csv"))
   write_csv_atomic(result, out_path)
 
   sample_summary <- tibble(accession = accession, condition = condition, patient = patient) |>
-    count(accession, condition, name = "n_samples")
+    count(accession, condition, name = "n_samples") |>
+    mutate(
+      n_patients = length(unique(patient)),
+      n_surrogate_variables = n_sv,
+      full_design_rank = qr(full_design)$rank,
+      adjusted_design_rank = qr(design)$rank
+    )
   write_csv_atomic(sample_summary, file.path(DIRS$tables, paste0(tolower(accession), "_sample_summary.csv")))
 
-  message(accession, " limma complete. Significant DEG count: ", sum(result$significant, na.rm = TRUE))
+  message(
+    accession,
+    " SVA-adjusted limma complete. Surrogate variables: ",
+    n_sv,
+    "; significant DEG count: ",
+    sum(result$significant, na.rm = TRUE)
+  )
 }
 
 args <- commandArgs(trailingOnly = TRUE)
