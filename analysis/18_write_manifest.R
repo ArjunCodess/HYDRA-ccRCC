@@ -20,10 +20,10 @@ source_rows <- tribble(
   mutate(
     access_date = format(Sys.Date(), "%Y-%m-%d"),
     retrieval = "scripted public download",
-    frozen_candidate_feedback = if_else(
+    candidate_definition_role = if_else(
       source_id %in% c("E-MTAB-1980", "HPA-v25.1", "Aran-2015-CPE"),
-      "none; used only after TCGA/GEO candidate freezing",
-      "part of discovery or prespecified validation"
+      "downstream evaluation only; not used to define the reviewer-driven revised candidate set",
+      "part of discovery or upstream replication"
     )
   )
 
