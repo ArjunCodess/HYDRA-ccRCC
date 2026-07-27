@@ -119,6 +119,16 @@ FUT6,respiratory secretory cells,52.9,other,7,-0.4058860669942024
 FUT6,esophageal suprabasal cells,48.8,other,8,-0.4058860669942024
 FUT6,enteric transient amplifying cells,47.1,other,9,-0.4058860669942024
 FUT6,enteric stem cells,40.9,other,10,-0.4058860669942024
+GJB1,hepatocytes,335.9,other,1,-0.4224650121316321
+GJB1,cholangiocytes,111.9,other,2,-0.4224650121316321
+GJB1,enterocytes,103.2,other,3,-0.4224650121316321
+GJB1,enteric transient amplifying cells,75.5,other,4,-0.4224650121316321
+GJB1,epididymal principal cells,75.2,other,5,-0.4224650121316321
+GJB1,oligodendrocytes,65.1,other,6,-0.4224650121316321
+GJB1,colonocytes,64.7,other,7,-0.4224650121316321
+GJB1,enteric stem cells,63.3,other,8,-0.4224650121316321
+GJB1,epididymal efferent duct absorptive cells,60,other,9,-0.4224650121316321
+GJB1,melanocytes,44.3,other,10,-0.4224650121316321
 GRAMD1A,neutrophils,679.5,immune,1,0.43806916847653543
 GRAMD1A,pancreatic acinar cells,166.8,other,2,0.43806916847653543
 GRAMD1A,monocytes,121.5,immune,3,0.43806916847653543
@@ -189,6 +199,16 @@ LRBA,renal connecting tubule cells,981.8,other,7,-0.4531098301322976
 LRBA,lactotrophs,973.4,other,8,-0.4531098301322976
 LRBA,endometrial glandular cells,955.5,other,9,-0.4531098301322976
 LRBA,thyrotrophs,939.6,other,10,-0.4531098301322976
+LTB4R,proximal tubule cells,8.3,renal_epithelial,1,0.4178160043117369
+LTB4R,papillary tip epithelial cells,6.7,other,2,0.4178160043117369
+LTB4R,ependymal cells,6,other,3,0.4178160043117369
+LTB4R,microglia,5.2,other,4,0.4178160043117369
+LTB4R,renal collecting duct intercalated cells,4.9,renal_epithelial,5,0.4178160043117369
+LTB4R,distal convoluted tubule cells,3.9,other,6,0.4178160043117369
+LTB4R,renal connecting tubule cells,3.8,other,7,0.4178160043117369
+LTB4R,podocytes,3.6,other,8,0.4178160043117369
+LTB4R,loop of henle epithelial cells,2.8,other,9,0.4178160043117369
+LTB4R,renal collecting duct principal cells,2.7,renal_epithelial,10,0.4178160043117369
 PANK1,hepatocytes,251.4,other,1,-0.4768214482591282
 PANK1,myonuclei,131.1,other,2,-0.4768214482591282
 PANK1,choroid plexus epithelial cells,126.6,other,3,-0.4768214482591282
@@ -209,6 +229,16 @@ PODXL,lymphatic endothelial cells,135.9,vascular,7,-0.40933662500657014
 PODXL,endometrial glandular cells,130.7,other,8,-0.40933662500657014
 PODXL,fallopian secretory cells,92.5,other,9,-0.40933662500657014
 PODXL,thymic myoid cells,91.1,other,10,-0.40933662500657014
+RBM47,neutrophils,4921.4,immune,1,-0.4090358003875217
+RBM47,choroid plexus epithelial cells,2488.6,other,2,-0.4090358003875217
+RBM47,esophageal apical cells,2084,other,3,-0.4090358003875217
+RBM47,urothelial cells,1824.4,renal_epithelial,4,-0.4090358003875217
+RBM47,monocytes,1608.9,immune,5,-0.4090358003875217
+RBM47,syncytiotrophoblasts,1575.8,other,6,-0.4090358003875217
+RBM47,salivary acinar cells,1346.5,other,7,-0.4090358003875217
+RBM47,macrophages,1223.5,immune,8,-0.4090358003875217
+RBM47,prostatic glandular cells,1032.6,other,9,-0.4090358003875217
+RBM47,foveolar cells,961.3,other,10,-0.4090358003875217
 TCIRG1,neutrophils,169,immune,1,0.4294557278534527
 TCIRG1,monocytes,135.2,immune,2,0.4294557278534527
 TCIRG1,foveolar cells,116.7,other,3,0.4294557278534527

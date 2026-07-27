@@ -1,2 +1,2 @@
 check,observed_overlap,expected_overlap_mean,expected_overlap_sd,empirical_p_greater_equal,n_permutations,interpretation
-overlap_geo_effect_support_with_survival_filter_within_reproducible_deg,519,496.857,12.294539711054933,0.04495504495504495,1000,Permutation shuffles survival-filter pass labels within reproducible DEGs; it does not rerun Cox models.
+overlap_geo_effect_support_with_survival_filter_within_reproducible_deg,536,520.983,12.508604085835325,0.11188811188811189,1000,Permutation shuffles survival-filter pass labels within reproducible DEGs; it does not rerun Cox models.
