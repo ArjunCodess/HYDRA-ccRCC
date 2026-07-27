@@ -120,7 +120,13 @@ if (nrow(ranked) != values[["high_confidence_candidate"]]) {
 }
 
 survival_report <- read_csv(file.path(DIRS$tables, "candidate_survival_report.csv"), show_col_types = FALSE)
-required_survival_cols <- c("main_hr", "main_hr_ci_low", "main_hr_ci_high", "main_ph_p_value", "ph_status")
+required_survival_cols <- c(
+  "main_hr",
+  "main_hr_ci_low",
+  "main_hr_ci_high",
+  "main_ph_p_value",
+  "ph_diagnostic_p_ge_0_05"
+)
 missing_survival_cols <- setdiff(required_survival_cols, names(survival_report))
 if (length(missing_survival_cols) > 0) {
   stop("candidate_survival_report.csv is missing columns: ", paste(missing_survival_cols, collapse = ", "))

@@ -130,7 +130,7 @@ candidates <- repro |>
     grade_sensitivity_same_direction = !is.na(grade_complete_log_hr) & sign(grade_complete_log_hr) == sign(main_log_hr),
     stage_sensitivity_nominal = !is.na(stage_complete_p_value) & stage_complete_p_value < 0.05,
     grade_sensitivity_nominal = !is.na(grade_complete_p_value) & grade_complete_p_value < 0.05,
-    ph_pass = !is.na(main_ph_p_value) & main_ph_p_value >= THRESHOLDS$ph_min_p,
+    ph_diagnostic_p_ge_0_05 = !is.na(main_ph_p_value) & main_ph_p_value >= THRESHOLDS$ph_min_p,
     meaningful_survival_effect = !is.na(main_log_hr) & abs(main_log_hr) >= THRESHOLDS$min_abs_log_hr,
     geo_effect_support = abs(gse40435_log2fc) >= THRESHOLDS$min_geo_abs_log2fc &
       abs(gse53757_log2fc) >= THRESHOLDS$min_geo_abs_log2fc,

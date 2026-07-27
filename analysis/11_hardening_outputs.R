@@ -340,7 +340,7 @@ survival_report <- candidates |>
     main_ph_p_value,
     main_n,
     main_events,
-    ph_status = if_else(ph_pass, "pass", "fail"),
+    ph_diagnostic_p_ge_0_05,
     main_warning_count,
     main_warning_text,
     stage_complete_log_hr,
@@ -455,6 +455,7 @@ dossier_lines <- c(
   "# HYDRA-ccRCC High-Confidence Gene Dossiers",
   "",
   "These dossiers are generated from the reproducible pipeline. They are interpretation scaffolds, not final biological claims.",
+  "The rank score summarizes discovery, expression replication, TCGA survival strength, and sensitivity models only; it excludes proportional-hazards diagnostics and should not be read as an integrated external-validation or composition score.",
   ""
 )
 

@@ -1,6 +1,7 @@
 # HYDRA-ccRCC High-Confidence Gene Dossiers
 
 These dossiers are generated from the reproducible pipeline. They are interpretation scaffolds, not final biological claims.
+The rank score summarizes discovery, expression replication, TCGA survival strength, and sensitivity models only; it excludes proportional-hazards diagnostics and should not be read as an integrated external-validation or composition score.
 
 ## 1. DDC
 

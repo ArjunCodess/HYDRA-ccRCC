@@ -325,8 +325,8 @@ write_csv_atomic(
       "same_direction_fdr_candidates",
       "same_direction_adjusted_nominal_candidates",
       "same_direction_adjusted_fdr_candidates",
-      "proportional_hazards_pass_candidates",
-      "adjusted_proportional_hazards_pass_candidates",
+      "proportional_hazards_diagnostic_p_ge_0_05",
+      "adjusted_proportional_hazards_diagnostic_p_ge_0_05",
       "strict_external_support_candidates",
       "opposite_direction_nominal_candidates"
     ),
