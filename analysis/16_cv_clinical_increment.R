@@ -52,13 +52,13 @@ c_index <- function(time, event, score) {
   unname(concordance(Surv(time, event) ~ score, reverse = TRUE)$concordance)
 }
 
-set.seed(V2_RESAMPLING$seed + 1L)
-repeat_rows <- vector("list", V2_RESAMPLING$cv_repeats * nrow(candidates))
+set.seed(RESAMPLING$seed + 1L)
+repeat_rows <- vector("list", RESAMPLING$cv_repeats * nrow(candidates))
 row_id <- 1L
 
-for (repeat_id in seq_len(V2_RESAMPLING$cv_repeats)) {
-  message("Clinical-increment CV repeat ", repeat_id, "/", V2_RESAMPLING$cv_repeats)
-  fold_id <- make_folds(dat$os_event, V2_RESAMPLING$cv_folds)
+for (repeat_id in seq_len(RESAMPLING$cv_repeats)) {
+  message("Clinical-increment CV repeat ", repeat_id, "/", RESAMPLING$cv_repeats)
+  fold_id <- make_folds(dat$os_event, RESAMPLING$cv_folds)
 
   for (i in seq_len(nrow(candidates))) {
     gene <- candidates[i, ]
@@ -67,7 +67,7 @@ for (repeat_id in seq_len(V2_RESAMPLING$cv_repeats)) {
     clinical_lp <- rep(NA_real_, nrow(gene_dat))
     gene_lp <- rep(NA_real_, nrow(gene_dat))
 
-    for (fold in seq_len(V2_RESAMPLING$cv_folds)) {
+    for (fold in seq_len(RESAMPLING$cv_folds)) {
       train <- gene_dat[fold_id != fold, ]
       test <- gene_dat[fold_id == fold, ]
       clinical_fit <- tryCatch(

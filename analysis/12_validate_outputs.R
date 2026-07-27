@@ -184,7 +184,7 @@ if (any(stability$selection_frequency < 0 | stability$selection_frequency > 1, n
 }
 
 stability_repeats <- read_csv(file.path(DIRS$tables, "selection_stability_repeats.csv"), show_col_types = FALSE)
-if (nrow(stability_repeats) != V2_RESAMPLING$stability_repeats) {
+if (nrow(stability_repeats) != RESAMPLING$stability_repeats) {
   stop("Selection-stability repeat count does not match configuration.")
 }
 
@@ -221,7 +221,7 @@ pipeline_bootstrap_repeats <- read_csv(
   file.path(DIRS$tables, "pipeline_bootstrap_repeats.csv"),
   show_col_types = FALSE
 )
-if (nrow(pipeline_bootstrap_repeats) != V2_RESAMPLING$pipeline_bootstrap_repeats) {
+if (nrow(pipeline_bootstrap_repeats) != RESAMPLING$pipeline_bootstrap_repeats) {
   stop("Pipeline-bootstrap repeat count does not match configuration.")
 }
 if (any(

@@ -11,9 +11,9 @@ The strongest tumor-normal transcriptional changes in ccRCC are not necessarily 
 ## Datasets
 
 - Discovery: TCGA-KIRC RNA-seq STAR raw counts and clinical data from GDC.
-- GEO validation for v1: GSE40435 and GSE53757.
+- GEO tumor-normal validation: GSE40435 and GSE53757.
 - Small external survival-direction check: GSE29609.
-- Larger independent survival-validation datasets are deferred until after the v1 candidate set is manually reviewed.
+- Independent survival-validation datasets are evaluated only after the candidate set is frozen.
 
 ## Inclusion And Exclusion Criteria
 
@@ -36,7 +36,7 @@ A gene is a reproducible DEG if it satisfies all of:
 
 1. TCGA-KIRC FDR < 0.05.
 2. TCGA-KIRC absolute log2 fold change >= 1.
-3. Same direction of effect in both v1 GEO validation cohorts.
+3. Same direction of effect in both GEO validation cohorts.
 4. Nominal p < 0.05 in at least one GEO validation cohort.
 5. Clean gene identifier mapping across datasets.
 
@@ -103,7 +103,7 @@ A gene is a reproducible DEG if it satisfies all of:
 - Adjacent normal tissue is not perfectly healthy tissue.
 - Retrospective cohorts can contain confounding.
 - Association does not prove causation.
-- No wet-lab validation in v1.
+- No wet-lab validation is included.
 - GEO expression cohorts validate tumor-normal expression direction, not survival.
 - TCGA-derived survival candidates require independent outcome validation before biomarker language.
 - GSE29609 is underpowered and should be interpreted as a small external stress test.

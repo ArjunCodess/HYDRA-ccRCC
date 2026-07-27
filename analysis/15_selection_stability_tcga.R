@@ -75,13 +75,13 @@ stratified_sample <- function(data, fraction) {
     pull(sample_barcode)
 }
 
-set.seed(V2_RESAMPLING$seed)
-repeat_results <- vector("list", V2_RESAMPLING$stability_repeats)
-repeat_summary <- vector("list", V2_RESAMPLING$stability_repeats)
+set.seed(RESAMPLING$seed)
+repeat_results <- vector("list", RESAMPLING$stability_repeats)
+repeat_summary <- vector("list", RESAMPLING$stability_repeats)
 
-for (repeat_id in seq_len(V2_RESAMPLING$stability_repeats)) {
-  sampled <- stratified_sample(sample_data, V2_RESAMPLING$stability_fraction)
-  message("Selection stability repeat ", repeat_id, "/", V2_RESAMPLING$stability_repeats)
+for (repeat_id in seq_len(RESAMPLING$stability_repeats)) {
+  sampled <- stratified_sample(sample_data, RESAMPLING$stability_fraction)
+  message("Selection stability repeat ", repeat_id, "/", RESAMPLING$stability_repeats)
 
   main <- bind_rows(lapply(gene_table$tcga_gene_id, function(gene_id) {
     out <- fit_expr(gene_id, sampled, c("age", "sex", "stage", "grade"))

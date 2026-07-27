@@ -155,10 +155,10 @@ draw_stratified_bootstrap <- function(event) {
   }), use.names = FALSE)
 }
 
-set.seed(V2_RESAMPLING$seed + 2L)
-repeat_results <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
-repeat_summary <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
-oob_results <- vector("list", V2_RESAMPLING$pipeline_bootstrap_repeats)
+set.seed(RESAMPLING$seed + 2L)
+repeat_results <- vector("list", RESAMPLING$pipeline_bootstrap_repeats)
+repeat_summary <- vector("list", RESAMPLING$pipeline_bootstrap_repeats)
+oob_results <- vector("list", RESAMPLING$pipeline_bootstrap_repeats)
 
 detected_cores <- parallel::detectCores(logical = FALSE)
 if (!is.finite(detected_cores)) detected_cores <- 2L
@@ -204,14 +204,14 @@ fit_main_screen <- function(gene_ids, indices) {
   ))
 }
 
-for (repeat_id in seq_len(V2_RESAMPLING$pipeline_bootstrap_repeats)) {
+for (repeat_id in seq_len(RESAMPLING$pipeline_bootstrap_repeats)) {
   inbag_indices <- draw_stratified_bootstrap(sample_data$os_event)
   oob_indices <- setdiff(seq_len(nrow(sample_data)), unique(inbag_indices))
   message(
     "Pipeline bootstrap repeat ",
     repeat_id,
     "/",
-    V2_RESAMPLING$pipeline_bootstrap_repeats
+    RESAMPLING$pipeline_bootstrap_repeats
   )
 
   main <- fit_main_screen(gene_table$tcga_gene_id, inbag_indices) |>
@@ -384,7 +384,7 @@ write_csv_atomic(
 
 message(
   "Pipeline bootstrap complete. Repeats: ",
-  V2_RESAMPLING$pipeline_bootstrap_repeats,
+  RESAMPLING$pipeline_bootstrap_repeats,
   "; frozen candidates assessed: ",
   sum(bootstrap_stability$frozen_high_confidence)
 )

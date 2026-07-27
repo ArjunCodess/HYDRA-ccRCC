@@ -43,7 +43,7 @@ THRESHOLDS <- list(
   min_samples = 10
 )
 
-V2_RESAMPLING <- list(
+RESAMPLING <- list(
   seed = 20260725,
   stability_repeats = 20,
   stability_fraction = 0.80,

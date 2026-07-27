@@ -2,7 +2,7 @@
 
 **High-Discipline Reproducible Analysis of Clear Cell Renal Cell Carcinoma**
 
-HYDRA-ccRCC is a reproducible public-data pipeline that tests whether genes consistently dysregulated between clear cell renal cell carcinoma (ccRCC) and normal kidney also carry stable, externally supported prognostic signal. The v2 pipeline uses TCGA-KIRC for discovery, GSE40435 and GSE53757 for tumor-normal replication, GSE29609 and E-MTAB-1980 for independent survival checks, patient-level resampling for selection stability and out-of-bag performance, published consensus tumor-purity estimates, and Human Protein Atlas single-cell data for cell-source triangulation.
+HYDRA-ccRCC is a reproducible public-data pipeline that tests whether genes consistently dysregulated between clear cell renal cell carcinoma (ccRCC) and normal kidney also carry stable, externally supported prognostic signal. The pipeline uses TCGA-KIRC for discovery, GSE40435 and GSE53757 for tumor-normal replication, GSE29609 and E-MTAB-1980 for independent survival checks, patient-level resampling for selection stability and out-of-bag performance, published consensus tumor-purity estimates, and Human Protein Atlas single-cell data for cell-source triangulation.
 
 The completed run identified 3,304 reproducible differentially expressed genes, 519 strict TCGA-derived prognostic candidates, and a frozen 24-candidate high-confidence set. In E-MTAB-1980, 23 candidates mapped, 20 retained the TCGA hazard direction, and eight passed the prespecified external direction, FDR, adjusted-model, and proportional-hazards gates: `DDC`, `CRYL1`, `ACADM`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`.
 
@@ -10,7 +10,7 @@ This is an evidence-hardening study, not a validated biomarker panel. The strong
 
 The development manuscript is in [`paper/main.pdf`](paper/main.pdf), with source in [`paper/main.tex`](paper/main.tex). It is an AI-assisted internal draft, not text for direct submission to IRIS or ISEF. The student must independently verify, rewrite, and cite the final submission.
 
-## What v2 adds
+## What the pipeline includes
 
 - **Frozen independent survival validation:** E-MTAB-1980 tests all 24 candidates without feeding its results back into discovery or ranking.
 - **Selection-stability analysis:** Twenty stratified 80% TCGA resamples rerun the complete 3,304-gene survival-selection screen.
@@ -62,7 +62,7 @@ Published consensus purity estimates matched 516 complete-case TCGA tumors with 
 
 Human Protein Atlas normal-tissue single-cell data mapped all 24 candidates. `TEK` and `EMCN` were vascular-dominant; `CYFIP2`, `GRAMD1A`, and `TCIRG1` were immune-dominant under the prespecified mapping. These results reinforce composition cautions, but they do not replace tumor single-cell data.
 
-The combined v2 evidence changes the lead hierarchy:
+The combined evidence changes the lead hierarchy:
 
 - `ACADM`, `CRYL1`, and `DDC` have the strongest convergence of TCGA association, repeated selection stability, held-out increment, and E-MTAB-1980 support.
 - `PANK1`, `CLCN5`, and `CYFIP2` are internally stable, but they do not pass the strict E-MTAB-1980 gate.
@@ -111,7 +111,7 @@ The pipeline generates:
 - PCA, volcano, funnel, forest, and directional-discordance figures
 - source provenance, package versions, and output checksums
 
-Key v2 files:
+Key files:
 
 - [`analysis/14_external_survival_emtab1980.R`](analysis/14_external_survival_emtab1980.R)
 - [`analysis/15_selection_stability_tcga.R`](analysis/15_selection_stability_tcga.R)
@@ -157,6 +157,6 @@ All inputs are downloaded programmatically from public accession identifiers.
 
 ## Completion state
 
-The v2 computational pipeline and its prespecified analysis outputs are complete and pass automated validation. Direct consensus tumor-purity sensitivity, full-screen patient bootstrapping, external survival testing, bulk marker-score adjustment, and HPA cell-source triangulation are implemented. Tumor single-cell or spatial validation remains outside the current pipeline.
+The computational pipeline and its prespecified analysis outputs are complete and pass automated validation. Direct consensus tumor-purity sensitivity, full-screen patient bootstrapping, external survival testing, bulk marker-score adjustment, and HPA cell-source triangulation are implemented. Tumor single-cell or spatial validation remains outside the current pipeline.
 
 Mentor review, student-authored IRIS materials, citation verification, source-data eligibility confirmation, and final submission are separate next-stage tasks. Internal mentor briefs and readiness checklists are intentionally kept out of version control.
