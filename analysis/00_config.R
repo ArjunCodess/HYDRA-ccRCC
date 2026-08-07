@@ -26,6 +26,8 @@ FILES <- list(
   tcga_vst = file.path(DIRS$processed, "tcga_kirc_vst.rds"),
   tcga_deg = file.path(DIRS$tables, "tcga_kirc_deseq2_tumor_vs_normal.csv"),
   tcga_survival = file.path(DIRS$tables, "tcga_kirc_cox_models.csv"),
+  tcga_apeglm_survival = file.path(DIRS$tables, "tcga_kirc_apeglm_all_gene_survival.csv"),
+  tcga_apeglm_survival_summary = file.path(DIRS$tables, "tcga_kirc_apeglm_all_gene_survival_summary.csv"),
   tcga_enrichment = file.path(DIRS$tables, "tcga_kirc_enrichment_go_bp.csv"),
   tcga_session = file.path("environment", "sessionInfo.txt")
 )
@@ -68,6 +70,7 @@ BIOC_PACKAGES <- c(
   "TCGAbiolinks",
   "SummarizedExperiment",
   "DESeq2",
+  "apeglm",
   "edgeR",
   "limma",
   "GEOquery",

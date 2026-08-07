@@ -24,10 +24,23 @@ dds <- DESeqDataSetFromMatrix(
 
 dds <- DESeq(dds)
 res <- results(dds, contrast = c("condition", "TP", "NT"))
+coef_name <- "condition_TP_vs_NT"
+if (!coef_name %in% resultsNames(dds)) {
+  stop(
+    "Expected DESeq2 coefficient is unavailable: ", coef_name,
+    ". Available coefficients: ", paste(resultsNames(dds), collapse = ", ")
+  )
+}
+res_apeglm <- lfcShrink(dds, coef = coef_name, type = "apeglm")
+apeglm_lfc <- setNames(res_apeglm$log2FoldChange, rownames(res_apeglm))
+apeglm_lfc_se <- setNames(res_apeglm$lfcSE, rownames(res_apeglm))
+
 res_df <- as.data.frame(res) |>
   tibble::rownames_to_column("gene_id") |>
   arrange(padj) |>
   mutate(
+    log2FoldChange_apeglm = unname(apeglm_lfc[gene_id]),
+    lfcSE_apeglm = unname(apeglm_lfc_se[gene_id]),
     significant = !is.na(padj) &
       padj < THRESHOLDS$deg_fdr &
       abs(log2FoldChange) >= THRESHOLDS$deg_abs_log2fc

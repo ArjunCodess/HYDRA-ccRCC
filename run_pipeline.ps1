@@ -69,6 +69,7 @@ $steps += @(
   "analysis/05_deg_geo.R",
   "analysis/06_reproducibility.R",
   "analysis/07_survival_tcga.R",
+  "analysis/07b_apeglm_global_survival_sensitivity.R",
   "analysis/08_enrichment_tcga.R",
   "analysis/10_candidate_table.R",
   "analysis/11_hardening_outputs.R",

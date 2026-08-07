@@ -14,6 +14,8 @@ required_files <- c(
   file.path(DIRS$tables, "gse53757_limma_tumor_vs_normal.csv"),
   file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse53757.csv"),
   FILES$tcga_survival,
+  FILES$tcga_apeglm_survival,
+  FILES$tcga_apeglm_survival_summary,
   FILES$tcga_enrichment,
   file.path(DIRS$tables, "candidate_gene_evidence_table.csv"),
   file.path(DIRS$tables, "strict_candidate_genes.csv"),
@@ -83,6 +85,74 @@ if (values[["high_confidence_candidate"]] > values[["strict_candidate"]]) {
 }
 if (values[["strict_candidate"]] > values[["sensitivity_pass"]]) {
   stop("Strict candidate count exceeds sensitivity-pass count.")
+}
+
+tcga_deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
+required_apeglm_columns <- c("log2FoldChange_apeglm", "lfcSE_apeglm")
+if (!all(required_apeglm_columns %in% names(tcga_deg))) {
+  stop("TCGA differential-expression output is missing apeglm MAP estimates.")
+}
+if (any(!is.finite(tcga_deg$log2FoldChange_apeglm))) {
+  stop("TCGA apeglm MAP estimates contain non-finite values.")
+}
+
+apeglm_sensitivity <- read_csv(FILES$tcga_apeglm_survival, show_col_types = FALSE)
+required_apeglm_sensitivity_columns <- c(
+  "gene_id",
+  "tcga_mle_log2fc",
+  "tcga_apeglm_log2fc",
+  "primary_tcga_deg_gate",
+  "primary_reproducible_deg",
+  "log_hr",
+  "p_value",
+  "global_fdr",
+  "model_status",
+  "global_fdr_lt_0_05"
+)
+missing_apeglm_sensitivity_columns <- setdiff(
+  required_apeglm_sensitivity_columns,
+  names(apeglm_sensitivity)
+)
+if (length(missing_apeglm_sensitivity_columns) > 0) {
+  stop(
+    "All-gene apeglm sensitivity output is missing columns: ",
+    paste(missing_apeglm_sensitivity_columns, collapse = ", ")
+  )
+}
+if (anyDuplicated(apeglm_sensitivity$gene_id)) {
+  stop("All-gene apeglm sensitivity output contains duplicate gene IDs.")
+}
+modeled_apeglm <- apeglm_sensitivity$model_status == "ok"
+if (any(!is.finite(apeglm_sensitivity$p_value[modeled_apeglm])) ||
+    any(!is.finite(apeglm_sensitivity$global_fdr[modeled_apeglm]))) {
+  stop("All-gene apeglm sensitivity contains non-finite modeled p-values or FDR values.")
+}
+expected_global_fdr <- p.adjust(
+  apeglm_sensitivity$p_value[modeled_apeglm],
+  method = "BH"
+)
+if (!isTRUE(all.equal(
+  apeglm_sensitivity$global_fdr[modeled_apeglm],
+  expected_global_fdr,
+  tolerance = 1e-12,
+  check.attributes = FALSE
+))) {
+  stop("All-gene sensitivity FDR is not a single BH correction across all modeled genes.")
+}
+
+apeglm_summary <- read_csv(FILES$tcga_apeglm_survival_summary, show_col_types = FALSE)
+required_apeglm_metrics <- c(
+  "qc_filtered_genes",
+  "successfully_modeled_genes",
+  "global_survival_fdr_lt_0_05"
+)
+if (!all(required_apeglm_metrics %in% apeglm_summary$metric)) {
+  stop("All-gene apeglm sensitivity summary is missing required metrics.")
+}
+apeglm_summary_values <- setNames(apeglm_summary$value, apeglm_summary$metric)
+if (apeglm_summary_values[["qc_filtered_genes"]] != nrow(apeglm_sensitivity) ||
+    apeglm_summary_values[["successfully_modeled_genes"]] != sum(modeled_apeglm)) {
+  stop("All-gene apeglm sensitivity summary does not match its detail table.")
 }
 
 for (accession in c("gse40435", "gse53757")) {

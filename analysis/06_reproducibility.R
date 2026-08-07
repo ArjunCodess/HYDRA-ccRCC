@@ -31,6 +31,8 @@ tcga_symbol <- tcga |>
     symbol = SYMBOL,
     tcga_gene_id = gene_id,
     tcga_log2fc = log2FoldChange,
+    tcga_apeglm_log2fc = log2FoldChange_apeglm,
+    tcga_apeglm_lfc_se = lfcSE_apeglm,
     tcga_padj = padj,
     tcga_significant = !is.na(padj) & padj < THRESHOLDS$deg_fdr & abs(log2FoldChange) >= THRESHOLDS$deg_abs_log2fc,
     tcga_direction = sign(log2FoldChange)
