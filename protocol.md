@@ -17,6 +17,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 ## Differential expression and reproducibility
 
 - TCGA uses DESeq2 on raw STAR unstranded counts. Significance requires FDR below 0.05 and absolute log2 fold change of at least 1.
+- A separate sensitivity analysis estimates TCGA MAP log2 fold changes with `lfcShrink(type = "apeglm")`, applies no absolute fold-change inclusion threshold, and preserves the original MLE-based rule as the primary analysis.
 - Each GEO cohort uses limma with patient-pair blocking. SVA protects the tumor-normal contrast using a full `patient + condition` model and a null `patient` model; estimated surrogate variables are added to the limma design.
 - GEO tables report log2 fold-change confidence intervals and SVA design diagnostics. Zero estimated surrogate variables is retained as a valid result.
 - A reproducible DEG must be TCGA-significant, have the same effect direction in both GEO cohorts, and have nominal p below 0.05 in at least one GEO cohort.
@@ -28,6 +29,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - A strict candidate requires reproducible differential expression, main-model FDR below 0.05, absolute log hazard ratio of at least log(1.25), non-trivial GEO effects, and same-direction nominal support in both sensitivity models.
 - A high-confidence candidate additionally requires main-model FDR below 0.01 and absolute log hazard ratio of at least log(1.5).
 - `cox.zph` results are reported diagnostically. They do not exclude candidates, determine external support, or contribute to ranking; coefficients with diagnostic non-proportionality are interpreted as average hazard effects.
+- The hard-threshold sensitivity fits the main age-, sex-, stage-, and grade-adjusted Cox model to every count-QC gene represented in the VST matrix. Benjamini--Hochberg correction is applied once across the complete successfully modeled universe, and the output is not used to redefine candidate membership.
 
 ## Coefficient uncertainty and prediction
 

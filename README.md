@@ -4,7 +4,7 @@
 
 HYDRA-ccRCC is a reproducible public-data pipeline that asks whether genes consistently dysregulated between clear cell renal cell carcinoma (ccRCC) and normal kidney also carry externally supported prognostic associations. It uses TCGA-KIRC for discovery, GSE40435 and GSE53757 for tumor-normal replication, GSE29609 and E-MTAB-1980 for survival checks, published consensus tumor-purity estimates, and Human Protein Atlas single-cell data for cell-source triangulation.
 
-Following external statistical review, the analysis was revised to use surrogate-variable analysis (SVA) within the paired GEO models, report proportional-hazards tests as diagnostics rather than exclusion criteria, and use patient bootstrapping to estimate Cox coefficient uncertainty rather than repeated threshold-selection frequency. The resulting 27-candidate set is a reviewer-driven reanalysis. External outcomes were not used in its selection rule, but earlier versions of the project had already inspected those cohorts, so this repository does not describe the revised set as prospectively frozen or blindly validated.
+Following external statistical review, the analysis was revised to use surrogate-variable analysis (SVA) within the paired GEO models, report proportional-hazards tests as diagnostics rather than exclusion criteria, and use patient bootstrapping to estimate Cox coefficient uncertainty rather than repeated threshold-selection frequency. A separate sensitivity analysis now uses `apeglm` MAP log2 fold changes, removes the hard fold-change inclusion gate, tests every QC-filtered TCGA gene, and applies one global survival FDR correction. The resulting 27-candidate set remains the primary reviewer-driven reanalysis; the all-gene result does not redefine it. External outcomes were not used in its selection rule, but earlier versions of the project had already inspected those cohorts, so this repository does not describe the revised set as prospectively frozen or blindly validated.
 
 The completed run identified 3,304 reproducible differentially expressed genes, 536 strict TCGA-derived prognostic candidates, and 27 high-confidence candidates. E-MTAB-1980 mapped 26 candidates and supported 13 under the revised same-direction, unadjusted-FDR, and adjusted-FDR rule: `DDC`, `CRYL1`, `ACADM`, `KL`, `ACAT1`, `CLCN5`, `TCIRG1`, `GJB1`, `TEK`, `EMCN`, `PODXL`, `FUT6`, and `HIBCH`. The increase from the previously reported eight externally supported genes to 13 reflects removal of the PH exclusion gate, not five new experiments or uniformly stronger replication.
 
@@ -14,6 +14,7 @@ This is an evidence-hardening study, not a validated biomarker panel. The develo
 
 - **Paired, SVA-aware replication:** GSE40435 and GSE53757 use patient blocking, protect the tumor-normal contrast, estimate latent factors with SVA, and include any estimated surrogate variables in limma. The current run estimated zero additional surrogate variables in both cohorts.
 - **Diagnostic PH testing:** `cox.zph` results remain in survival tables, but they do not exclude genes, determine external support, or contribute to candidate ranking.
+- **Hard-threshold sensitivity:** DESeq2 `apeglm` MAP effects are reported for all 32,916 count-QC genes, and the fully adjusted Cox model is tested across that complete universe with one BH correction rather than an upstream absolute-LFC gate.
 - **Coefficient uncertainty:** One thousand event-stratified patient bootstraps refit each high-confidence adjusted Cox coefficient and report bootstrap standard errors, percentile 95% intervals, bias, and direction agreement.
 - **Held-out prediction:** Twenty repeats of five-fold cross-validation compare clinical-only models with clinical-plus-one-gene models using out-of-fold concordance. Cross-validation is used only for prediction assessment.
 - **External survival checks:** GSE29609 retains missing and contradictory results; E-MTAB-1980 reports unadjusted and limited-adjustment associations for every revised candidate.
@@ -37,6 +38,10 @@ This is an evidence-hardening study, not a validated biomarker panel. The develo
 | High-confidence candidates | 27 |
 
 `RBM47`, `GJB1`, and `LTB4R` are the three high-confidence additions created by removing PH-based exclusion. Their PH diagnostic p-values are below 0.05, so their Cox coefficients are interpreted as average hazard effects and the non-proportionality signal remains visible in the result tables. This correction broadens the set but does not make the three genes new primary leads: `RBM47` has an opposite-direction nominal result in GSE29609 and an immune-dominant normal-tissue profile, `GJB1` is composition-sensitive despite strict E-MTAB-1980 support, and `LTB4R` lacks strict external support.
+
+### Hard-threshold sensitivity
+
+All 32,916 genes that passed the count filter were successfully fit in the age-, sex-, stage-, and grade-adjusted Cox sensitivity analysis. One BH correction across all 32,916 tests retained 12,135 genes at FDR below 0.05; 1,188 of the 3,304 primary reproducible DEGs were among them. This broad association burden shows why the result is a boundary-sensitivity analysis rather than a replacement candidate set: `apeglm` stabilizes noisy fold changes, while removing the inclusion cutoff prevents small fluctuations around absolute log2 fold change 1 from deciding which genes receive a survival test.
 
 ### External survival checks
 
@@ -78,10 +83,12 @@ Useful options:
 ## Key outputs
 
 - [`analysis/05_deg_geo.R`](analysis/05_deg_geo.R) implements paired SVA-adjusted GEO differential expression.
+- [`analysis/07b_apeglm_global_survival_sensitivity.R`](analysis/07b_apeglm_global_survival_sensitivity.R) runs the no-hard-LFC, globally corrected survival sensitivity analysis.
 - [`analysis/15_cox_bootstrap_uncertainty.R`](analysis/15_cox_bootstrap_uncertainty.R) estimates coefficient uncertainty without resample selection gates.
 - [`analysis/16_cv_clinical_increment.R`](analysis/16_cv_clinical_increment.R) estimates held-out concordance.
 - [`analysis/14_external_survival_emtab1980.R`](analysis/14_external_survival_emtab1980.R) performs revised external testing.
 - [`results/tables/candidate_cox_bootstrap_summary.csv`](results/tables/candidate_cox_bootstrap_summary.csv) contains bootstrap uncertainty summaries.
+- [`results/tables/tcga_kirc_apeglm_all_gene_survival.csv`](results/tables/tcga_kirc_apeglm_all_gene_survival.csv) contains shrunken TCGA effects, GEO effects, and globally corrected Cox results for the QC-filtered universe.
 - [`results/tables/candidate_cv_clinical_increment.csv`](results/tables/candidate_cv_clinical_increment.csv) contains cross-validated concordance changes.
 - [`results/tables/external_survival_emtab1980.csv`](results/tables/external_survival_emtab1980.csv) retains external effect, FDR, and PH diagnostic results.
 - [`results/tables/run_manifest.csv`](results/tables/run_manifest.csv) records generated-file checksums.
@@ -93,6 +100,7 @@ Useful options:
 - External null, missing, and contradictory results are retained.
 - Cross-validation estimates internal incremental discrimination, not clinical utility.
 - Bootstrap intervals quantify coefficient uncertainty and do not define candidate membership.
+- The all-gene `apeglm` analysis is sensitivity-only and does not replace or retrospectively expand the primary candidate set.
 - Published consensus purity is inferred rather than direct histopathologic measurement.
 - HPA data come from normal tissues, not ccRCC tumor single-cell samples.
 - RNA associations do not establish protein effects, mechanisms, therapeutic targets, or causation.
