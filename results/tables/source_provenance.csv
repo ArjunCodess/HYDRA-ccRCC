@@ -1,8 +1,8 @@
-source_id,role,url,access_date,retrieval,frozen_candidate_feedback
-TCGA-KIRC,discovery expression and survival,https://portal.gdc.cancer.gov/projects/TCGA-KIRC,2026-07-26,scripted public download,part of discovery or prespecified validation
-GSE40435,tumor-normal expression validation,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE40435,2026-07-26,scripted public download,part of discovery or prespecified validation
-GSE53757,tumor-normal expression validation,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE53757,2026-07-26,scripted public download,part of discovery or prespecified validation
-GSE29609,small external survival direction check,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29609,2026-07-26,scripted public download,part of discovery or prespecified validation
-E-MTAB-1980,independent external survival validation,https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-1980,2026-07-26,scripted public download,none; used only after TCGA/GEO candidate freezing
-HPA-v25.1,independent single-cell type expression,https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip,2026-07-26,scripted public download,none; used only after TCGA/GEO candidate freezing
-Aran-2015-CPE,published consensus TCGA tumor-purity sensitivity,https://doi.org/10.1038/ncomms9971,2026-07-26,scripted public download,none; used only after TCGA/GEO candidate freezing
+source_id,role,url,access_date,retrieval,candidate_definition_role
+TCGA-KIRC,discovery expression and survival,https://portal.gdc.cancer.gov/projects/TCGA-KIRC,2026-07-28,scripted public download,part of discovery or upstream replication
+GSE40435,tumor-normal expression validation,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE40435,2026-07-28,scripted public download,part of discovery or upstream replication
+GSE53757,tumor-normal expression validation,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE53757,2026-07-28,scripted public download,part of discovery or upstream replication
+GSE29609,small external survival direction check,https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29609,2026-07-28,scripted public download,part of discovery or upstream replication
+E-MTAB-1980,independent external survival validation,https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-1980,2026-07-28,scripted public download,downstream evaluation only; not used to define the reviewer-driven revised candidate set
+HPA-v25.1,independent single-cell type expression,https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip,2026-07-28,scripted public download,downstream evaluation only; not used to define the reviewer-driven revised candidate set
+Aran-2015-CPE,published consensus TCGA tumor-purity sensitivity,https://doi.org/10.1038/ncomms9971,2026-07-28,scripted public download,downstream evaluation only; not used to define the reviewer-driven revised candidate set

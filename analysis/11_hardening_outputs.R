@@ -65,7 +65,10 @@ manual_context <- tribble(
   "ACAT1", "Mitochondrial acetyl-CoA/ketone and amino-acid metabolism.", "Metabolic cancer relevance likely, ccRCC specificity needs review.", "Strong candidate for metabolic-adaptation interpretation.",
   "DBT", "Branched-chain amino-acid metabolism.", "Metabolic cancer relevance likely, ccRCC specificity needs review.", "Strong candidate for metabolic-adaptation interpretation.",
   "TNFAIP2", "TNF/inflammatory-response signal.", "Inflammation/cancer literature likely; ccRCC specificity needs review.", "Interpret as immune/inflammatory until cell source is resolved.",
-  "FHOD1", "Actin/cytoskeletal remodeling signal.", "Cancer migration literature likely; ccRCC specificity needs review.", "Check whether survival signal reflects invasion biology or stromal composition."
+  "FHOD1", "Actin/cytoskeletal remodeling signal.", "Cancer migration literature likely; ccRCC specificity needs review.", "Check whether survival signal reflects invasion biology or stromal composition.",
+  "RBM47", "RNA-binding and splicing-regulatory signal with broad normal-tissue expression.", "Cancer-regulatory literature exists; ccRCC-specific evidence needs review.", "Interpret cautiously because HPA mapping is immune-dominant and the TCGA proportional-hazards diagnostic is nominally significant.",
+  "GJB1", "Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.", "Connexin biology is established; ccRCC-specific prognostic evidence needs review.", "Treat as a compartment-sensitive epithelial hypothesis and report the non-proportional-hazards diagnostic.",
+  "LTB4R", "Leukotriene-receptor inflammatory signal with renal epithelial and immune expression.", "Inflammatory signaling is biologically plausible; ccRCC-specific cell source needs review.", "Treat as a composition-sensitive risk association and report the non-proportional-hazards diagnostic."
 )
 
 high_conf <- candidates |>
@@ -80,7 +83,6 @@ high_conf <- candidates |>
         nominal_support_count / 2
     ),
     survival_strength_component = rescale01(safe_neglog10(main_fdr) + abs(main_log_hr)),
-    ph_component = rescale01(pmin(main_ph_p_value, 1)),
     sensitivity_component = as.numeric(stage_sensitivity_same_direction & grade_sensitivity_same_direction) +
       as.numeric(stage_sensitivity_nominal & grade_sensitivity_nominal),
     pathway_component = if_else(pathway_class != "Unclassified", 1, 0),
@@ -90,10 +92,9 @@ high_conf <- candidates |>
       TRUE ~ 0
     ),
     final_rank_score =
-      0.30 * reproducibility_component +
-      0.30 * survival_strength_component +
-      0.15 * ph_component +
-      0.10 * sensitivity_component / 2 +
+      0.35 * reproducibility_component +
+      0.35 * survival_strength_component +
+      0.15 * sensitivity_component / 2 +
       0.10 * pathway_component +
       0.05 * literature_component,
     pubmed_ccrcc_query = paste0(
@@ -157,7 +158,10 @@ manual_priority <- tribble(
   "LRBA", "do not highlight", "immune-composition signal",
   "FUT6", "do not highlight", "weak and directionally fragile glycosylation signal",
   "HIBCH", "do not highlight", "plausible but under-validated metabolic signal",
-  "TNFAIP2", "do not highlight", "non-specific inflammatory signal"
+  "TNFAIP2", "do not highlight", "non-specific inflammatory signal",
+  "RBM47", "interpret cautiously", "RNA-binding and immune-composition-sensitive association",
+  "GJB1", "interpret cautiously", "gap-junction and epithelial-compartment association",
+  "LTB4R", "composition flag", "inflammatory and renal-compartment association"
 )
 
 manuscript_candidates <- ranked_shortlist |>
@@ -336,7 +340,7 @@ survival_report <- candidates |>
     main_ph_p_value,
     main_n,
     main_events,
-    ph_status = if_else(ph_pass, "pass", "fail"),
+    ph_diagnostic_p_ge_0_05,
     main_warning_count,
     main_warning_text,
     stage_complete_log_hr,
@@ -362,7 +366,6 @@ threshold_sensitivity <- threshold_grid |>
       candidates$reproducible_deg &
         !is.na(candidates$main_fdr) &
         candidates$main_fdr < survival_fdr &
-        candidates$ph_pass &
         abs(candidates$main_log_hr) >= min_abs_log_hr &
         abs(candidates$gse40435_log2fc) >= min_geo_abs_log2fc &
         abs(candidates$gse53757_log2fc) >= min_geo_abs_log2fc &
@@ -379,7 +382,6 @@ set.seed(20260530)
 eligible <- candidates |> filter(reproducible_deg, !is.na(main_fdr))
 expression_pass <- eligible$geo_effect_support
 survival_pass <- eligible$prognostic &
-  eligible$ph_pass &
   eligible$meaningful_survival_effect &
   eligible$sensitivity_pass
 observed_overlap <- sum(expression_pass & survival_pass, na.rm = TRUE)
@@ -453,6 +455,7 @@ dossier_lines <- c(
   "# HYDRA-ccRCC High-Confidence Gene Dossiers",
   "",
   "These dossiers are generated from the reproducible pipeline. They are interpretation scaffolds, not final biological claims.",
+  "The rank score summarizes discovery, expression replication, TCGA survival strength, and sensitivity models only; it excludes proportional-hazards diagnostics and should not be read as an integrated external-validation or composition score.",
   ""
 )
 
@@ -489,7 +492,6 @@ funnel <- tibble(
       "TCGA significant after symbol mapping",
       "Reproducible DEG",
       "Main Cox FDR < 0.05",
-      "PH pass",
       "Sensitivity pass",
       "Strict candidate",
       "High-confidence candidate"
@@ -498,7 +500,6 @@ funnel <- tibble(
       "TCGA significant after symbol mapping",
       "Reproducible DEG",
       "Main Cox FDR < 0.05",
-      "PH pass",
       "Sensitivity pass",
       "Strict candidate",
       "High-confidence candidate"
@@ -508,7 +509,6 @@ funnel <- tibble(
     sum(candidates$tcga_significant, na.rm = TRUE),
     summary_counts$value[match("reproducible_deg", summary_counts$metric)],
     summary_counts$value[match("main_stage_grade_complete_prognostic", summary_counts$metric)],
-    summary_counts$value[match("ph_pass", summary_counts$metric)],
     summary_counts$value[match("sensitivity_pass", summary_counts$metric)],
     summary_counts$value[match("strict_candidate", summary_counts$metric)],
     summary_counts$value[match("high_confidence_candidate", summary_counts$metric)]

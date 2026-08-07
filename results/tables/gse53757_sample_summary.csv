@@ -1,3 +1,3 @@
-accession,condition,n_samples
-GSE53757,normal,72
-GSE53757,tumor,72
+accession,condition,n_samples,n_patients,n_surrogate_variables,full_design_rank,adjusted_design_rank
+GSE53757,normal,72,72,0,73,73
+GSE53757,tumor,72,72,0,73,73

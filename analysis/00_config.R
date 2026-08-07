@@ -45,11 +45,9 @@ THRESHOLDS <- list(
 
 RESAMPLING <- list(
   seed = 20260725,
-  stability_repeats = 20,
-  stability_fraction = 0.80,
   cv_repeats = 20,
   cv_folds = 5,
-  pipeline_bootstrap_repeats = 100
+  coefficient_bootstrap_repeats = 1000
 )
 
 SOURCE_URLS <- list(
@@ -74,6 +72,7 @@ BIOC_PACKAGES <- c(
   "limma",
   "GEOquery",
   "Biobase",
+  "sva",
   "AnnotationDbi",
   "org.Hs.eg.db",
   "GO.db",

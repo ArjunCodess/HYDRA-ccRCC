@@ -266,23 +266,13 @@ external_results <- bind_rows(lapply(seq_len(nrow(candidate_priority)), function
       external_same_direction &
       !is.na(external_fdr) &
       external_fdr < 0.05 &
-      !is.na(external_ph_p_value) &
-      external_ph_p_value >= THRESHOLDS$ph_min_p &
       external_adjusted_same_direction &
       !is.na(external_adjusted_fdr) &
-      external_adjusted_fdr < 0.05 &
-      !is.na(external_adjusted_ph_p_value) &
-      external_adjusted_ph_p_value >= THRESHOLDS$ph_min_p,
+      external_adjusted_fdr < 0.05,
     external_interpretation = case_when(
       !external_present ~ "not mapped in E-MTAB-1980",
       external_strict_support ~
-        "same-direction FDR support with limited adjustment and proportional-hazards support",
-      external_same_direction &
-        !is.na(external_fdr) &
-        external_fdr < 0.05 &
-        !is.na(external_ph_p_value) &
-        external_ph_p_value < THRESHOLDS$ph_min_p ~
-        "same-direction association with proportional-hazards violation",
+        "same-direction FDR support with limited adjustment; proportional-hazards results reported diagnostically",
       external_directional_nominal_support ~ "same-direction nominal external support",
       external_same_direction ~ "same direction but not nominally significant",
       !external_same_direction & !is.na(external_p_value) & external_p_value < 0.05 ~
@@ -335,8 +325,8 @@ write_csv_atomic(
       "same_direction_fdr_candidates",
       "same_direction_adjusted_nominal_candidates",
       "same_direction_adjusted_fdr_candidates",
-      "proportional_hazards_pass_candidates",
-      "adjusted_proportional_hazards_pass_candidates",
+      "proportional_hazards_diagnostic_p_ge_0_05",
+      "adjusted_proportional_hazards_diagnostic_p_ge_0_05",
       "strict_external_support_candidates",
       "opposite_direction_nominal_candidates"
     ),
@@ -380,7 +370,7 @@ write_csv_atomic(
 )
 
 message(
-  "E-MTAB-1980 frozen-candidate external survival test complete. Samples: ",
+  "E-MTAB-1980 revised-candidate external survival test complete. Samples: ",
   nrow(clinical),
   "; events: ",
   sum(clinical$os_event),

@@ -4,6 +4,6 @@ tcga_primary_tumors,517
 tcga_primary_tumors_with_cpe,516
 complete_case_purity_survival_samples,516
 complete_case_purity_survival_events,170
-frozen_candidates_tested,24
-same_direction_after_purity,24
-purity_adjusted_fdr_candidates,24
+revised_candidates_tested,27
+same_direction_after_purity,27
+purity_adjusted_fdr_candidates,27

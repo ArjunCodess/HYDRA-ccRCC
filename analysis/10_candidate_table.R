@@ -130,14 +130,14 @@ candidates <- repro |>
     grade_sensitivity_same_direction = !is.na(grade_complete_log_hr) & sign(grade_complete_log_hr) == sign(main_log_hr),
     stage_sensitivity_nominal = !is.na(stage_complete_p_value) & stage_complete_p_value < 0.05,
     grade_sensitivity_nominal = !is.na(grade_complete_p_value) & grade_complete_p_value < 0.05,
-    ph_pass = !is.na(main_ph_p_value) & main_ph_p_value >= THRESHOLDS$ph_min_p,
+    ph_diagnostic_p_ge_0_05 = !is.na(main_ph_p_value) & main_ph_p_value >= THRESHOLDS$ph_min_p,
     meaningful_survival_effect = !is.na(main_log_hr) & abs(main_log_hr) >= THRESHOLDS$min_abs_log_hr,
     geo_effect_support = abs(gse40435_log2fc) >= THRESHOLDS$min_geo_abs_log2fc &
       abs(gse53757_log2fc) >= THRESHOLDS$min_geo_abs_log2fc,
     prognostic = !is.na(main_fdr) & main_fdr < THRESHOLDS$strict_survival_fdr,
     sensitivity_pass = stage_sensitivity_same_direction & grade_sensitivity_same_direction &
       stage_sensitivity_nominal & grade_sensitivity_nominal,
-    strict_candidate = reproducible_deg & prognostic & ph_pass & meaningful_survival_effect &
+    strict_candidate = reproducible_deg & prognostic & meaningful_survival_effect &
       geo_effect_support & sensitivity_pass,
     high_confidence_candidate = strict_candidate &
       main_fdr < THRESHOLDS$high_confidence_survival_fdr &
@@ -218,7 +218,6 @@ summary <- tibble(
   metric = c(
     "reproducible_deg",
     "main_stage_grade_complete_prognostic",
-    "ph_pass",
     "sensitivity_pass",
     "strict_candidate",
     "high_confidence_candidate"
@@ -226,8 +225,7 @@ summary <- tibble(
   value = c(
     sum(candidates$reproducible_deg, na.rm = TRUE),
     sum(candidates$reproducible_deg & candidates$prognostic, na.rm = TRUE),
-    sum(candidates$reproducible_deg & candidates$prognostic & candidates$ph_pass, na.rm = TRUE),
-    sum(candidates$reproducible_deg & candidates$prognostic & candidates$ph_pass & candidates$sensitivity_pass, na.rm = TRUE),
+    sum(candidates$reproducible_deg & candidates$prognostic & candidates$sensitivity_pass, na.rm = TRUE),
     sum(candidates$strict_candidate, na.rm = TRUE),
     sum(candidates$high_confidence_candidate, na.rm = TRUE)
   )

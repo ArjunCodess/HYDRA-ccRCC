@@ -59,6 +59,11 @@ FUT6,renal_epithelial,129.1,26.36,proximal tubule cells,2,other,-0.4058860669942
 FUT6,immune,1,0.45,mast cells,3,other,-0.4058860669942024
 FUT6,stromal,1,0.55,endometrial stromal cells,3,other,-0.4058860669942024
 FUT6,vascular,0.4,0.24,vascular smooth muscle cells,5,other,-0.4058860669942024
+GJB1,other,335.9,11.707575757575757,hepatocytes,1,other,-0.4224650121316321
+GJB1,renal_epithelial,10.1,3.7,proximal tubule cells,2,other,-0.4224650121316321
+GJB1,stromal,3.8,1.0999999999999999,endometrial stromal cells,3,other,-0.4224650121316321
+GJB1,immune,1.1,0.41250000000000003,neutrophils,4,other,-0.4224650121316321
+GJB1,vascular,0.4,0.24000000000000002,vascular endothelial cells,5,other,-0.4224650121316321
 GRAMD1A,immune,679.5,132.5,neutrophils,1,immune,0.43806916847653543
 GRAMD1A,other,166.8,31.810606060606062,pancreatic acinar cells,2,immune,0.43806916847653543
 GRAMD1A,vascular,97.8,51.16,vascular endothelial cells,3,immune,0.43806916847653543
@@ -94,6 +99,11 @@ LRBA,renal_epithelial,1611.7,738.5,renal collecting duct principal cells,2,other
 LRBA,immune,548,258.725,b-cells,3,other,-0.4531098301322976
 LRBA,vascular,203.7,142.98,vascular endothelial cells,4,other,-0.4531098301322976
 LRBA,stromal,130.7,95.425,fibroblasts,5,other,-0.4531098301322976
+LTB4R,renal_epithelial,8.3,3.18,proximal tubule cells,1,renal_epithelial,0.4178160043117369
+LTB4R,other,6.7,0.33106060606060606,papillary tip epithelial cells,2,renal_epithelial,0.4178160043117369
+LTB4R,immune,2.4,0.875,b-cells,3,renal_epithelial,0.4178160043117369
+LTB4R,vascular,0.6,0.27999999999999997,vascular endothelial cells,4,renal_epithelial,0.4178160043117369
+LTB4R,stromal,0.2,0.05,fibroblasts,5,renal_epithelial,0.4178160043117369
 PANK1,other,251.4,15.05151515151515,hepatocytes,1,other,-0.4768214482591282
 PANK1,renal_epithelial,96.4,28.36,proximal tubule cells,2,other,-0.4768214482591282
 PANK1,vascular,15.5,6.12,vascular smooth muscle cells,3,other,-0.4768214482591282
@@ -104,6 +114,11 @@ PODXL,vascular,298.4,93.02,vascular endothelial cells,2,other,-0.409336625006570
 PODXL,stromal,16.3,9.325,endometrial stromal cells,3,other,-0.40933662500657014
 PODXL,renal_epithelial,12.7,7.06,proximal tubule cells,4,other,-0.40933662500657014
 PODXL,immune,4.9,3.175,macrophages,5,other,-0.40933662500657014
+RBM47,immune,4921.4,1123.3,neutrophils,1,immune,-0.4090358003875217
+RBM47,other,2488.6,346.92727272727274,choroid plexus epithelial cells,2,immune,-0.4090358003875217
+RBM47,renal_epithelial,1824.4,796.7,urothelial cells,3,immune,-0.4090358003875217
+RBM47,vascular,22.2,15.879999999999999,lymphatic endothelial cells,4,immune,-0.4090358003875217
+RBM47,stromal,17.4,13.35,fibroblasts,5,immune,-0.4090358003875217
 TCIRG1,immune,169,68.775,neutrophils,1,immune,0.4294557278534527
 TCIRG1,other,116.7,17.761363636363637,foveolar cells,2,immune,0.4294557278534527
 TCIRG1,stromal,34,20.175,decidual stromal cells,3,immune,0.4294557278534527

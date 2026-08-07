@@ -156,7 +156,7 @@ coverage <- tibble(
     "tcga_primary_tumors_with_cpe",
     "complete_case_purity_survival_samples",
     "complete_case_purity_survival_events",
-    "frozen_candidates_tested",
+    "revised_candidates_tested",
     "same_direction_after_purity",
     "purity_adjusted_fdr_candidates"
   ),

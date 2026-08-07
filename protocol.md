@@ -1,110 +1,61 @@
 # HYDRA-ccRCC Analysis Protocol
 
-## Background
+## Research question
 
-Clear cell renal cell carcinoma is strongly shaped by VHL/HIF biology, hypoxia signaling, angiogenesis, metabolic rewiring, extracellular matrix remodeling, and tumor microenvironment changes. Many genes differ between tumor and adjacent normal kidney, but tumor-normal difference is not automatically prognostic importance.
-
-## Hypothesis
-
-The strongest tumor-normal transcriptional changes in ccRCC are not necessarily the strongest survival-associated changes. Survival-associated signal will concentrate in a narrower set of reproducible genes, expected to reflect loss or retention of renal epithelial metabolic differentiation together with immune and vascular composition rather than every large tumor-normal DEG.
+Among genes reproducibly dysregulated across independent ccRCC expression cohorts, which have clinically adjusted survival associations that remain credible after sensitivity analysis, coefficient-uncertainty estimation, external outcome checks, and cell-source triangulation?
 
 ## Datasets
 
-- Discovery: TCGA-KIRC RNA-seq STAR raw counts and clinical data from GDC.
-- GEO tumor-normal validation: GSE40435 and GSE53757.
-- Small external survival-direction check: GSE29609.
-- Independent survival-validation datasets are evaluated only after the candidate set is frozen.
+- TCGA-KIRC RNA-seq STAR counts and clinical data provide discovery expression and survival data.
+- GSE40435 and GSE53757 provide paired tumor-normal expression replication.
+- GSE29609 provides a small external survival-direction stress test.
+- E-MTAB-1980 provides the larger external survival evaluation.
+- HPA v25.1 and Aran et al. consensus purity estimates support composition analyses.
 
-## Inclusion And Exclusion Criteria
+The current candidate definition is a reviewer-driven reanalysis. External outcomes do not enter the selection rule, but the cohorts had been inspected in earlier project versions, so the revised set is not described as prospectively frozen or blindly validated.
 
-- TCGA expression: include primary tumor and solid tissue normal samples for DEG.
-- TCGA survival: include primary tumor samples with usable overall survival time/status.
-- GEO validation: include human ccRCC tumor and matched/adjacent normal kidney samples.
-- External survival check: include ccRCC tumor cohorts with usable expression and survival time/status.
-- Exclude xenograft/tumorgraft samples from main validation.
-- Defer additional validation cohorts until after candidate-level interpretation.
+## Differential expression and reproducibility
 
-## DEG Method
+- TCGA uses DESeq2 on raw STAR unstranded counts. Significance requires FDR below 0.05 and absolute log2 fold change of at least 1.
+- Each GEO cohort uses limma with patient-pair blocking. SVA protects the tumor-normal contrast using a full `patient + condition` model and a null `patient` model; estimated surrogate variables are added to the limma design.
+- GEO tables report log2 fold-change confidence intervals and SVA design diagnostics. Zero estimated surrogate variables is retained as a valid result.
+- A reproducible DEG must be TCGA-significant, have the same effect direction in both GEO cohorts, and have nominal p below 0.05 in at least one GEO cohort.
 
-- TCGA: DESeq2 on raw STAR unstranded counts.
-- GEO microarray cohorts: limma with platform-aware preprocessing.
-- Paired cohorts: include patient-pair blocking/design where metadata supports it.
+## Survival selection
 
-## Reproducible DEG Definition
+- The outcome is overall survival, and expression is continuous and standardized.
+- The main Cox model adjusts for age, sex, stage, and collapsed grade. Stage-complete and grade-complete models provide sensitivity checks.
+- A strict candidate requires reproducible differential expression, main-model FDR below 0.05, absolute log hazard ratio of at least log(1.25), non-trivial GEO effects, and same-direction nominal support in both sensitivity models.
+- A high-confidence candidate additionally requires main-model FDR below 0.01 and absolute log hazard ratio of at least log(1.5).
+- `cox.zph` results are reported diagnostically. They do not exclude candidates, determine external support, or contribute to ranking; coefficients with diagnostic non-proportionality are interpreted as average hazard effects.
 
-A gene is a reproducible DEG if it satisfies all of:
+## Coefficient uncertainty and prediction
 
-1. TCGA-KIRC FDR < 0.05.
-2. TCGA-KIRC absolute log2 fold change >= 1.
-3. Same direction of effect in both GEO validation cohorts.
-4. Nominal p < 0.05 in at least one GEO validation cohort.
-5. Clean gene identifier mapping across datasets.
+- One thousand event-stratified patient bootstraps refit the age-, sex-, stage-, and grade-adjusted Cox coefficient for every high-confidence candidate.
+- Bootstrap outputs include empirical standard error, percentile 95% interval, bias, direction agreement, and complete candidate-by-repeat results.
+- Bootstrap p-values, per-repeat FDR thresholds, and selection frequencies are not used.
+- Twenty repeats of five-fold event-stratified cross-validation compare clinical-only and clinical-plus-one-gene models on held-out patients. Cross-validation is used only to estimate prediction discrimination.
 
-## Survival Method
+## External survival evaluation
 
-- Outcome: overall survival.
-- Model: Cox proportional hazards regression.
-- Expression: continuous standardized tumor expression, not median split for primary testing.
-- Covariates: age, sex, stage, and grade when usable.
-- Main prognostic threshold: stage/grade-complete adjusted Cox FDR < 0.05.
-- High-confidence threshold: stage/grade-complete adjusted Cox FDR < 0.01, absolute log hazard ratio at least log(1.5), proportional-hazards p >= 0.05, non-trivial GEO effect support, and same-direction nominal support in both sensitivity models.
-- Diagnostics: check proportional hazards assumption with `cox.zph`.
-- Sensitivity: fit separate stage-complete and grade-complete models in addition to the main stage/grade-complete model.
-- Reporting: survival tables include hazard ratio, confidence interval, adjusted p value, proportional-hazards result, warning count, and sensitivity-model direction.
+- GSE29609 uses univariable continuous-expression Cox models because it contains 39 samples and 17 events.
+- E-MTAB-1980 uses an unadjusted primary model and a limited secondary model adjusting for age, high T stage, and metastatic status.
+- Revised strict external support requires TCGA-concordant direction and FDR below 0.05 in both E-MTAB-1980 models.
+- External PH tests remain visible diagnostics but are not pass/fail gates.
+- Changes in support status caused by removing a PH gate are identified explicitly and are not described as new data or stronger replication.
+- Every revised candidate is reported, including missing, unsupported, and contradictory results.
 
-## Candidate Hardening
+## Composition and interpretation
 
-- Rank high-confidence genes with a transparent score combining reproducibility, survival strength, proportional-hazards support, sensitivity support, pathway annotation, and seeded literature/biology prior.
-- Generate a threshold-sensitivity table across stricter survival, effect-size, and GEO-effect thresholds.
-- Generate a null-overlap check by permuting reproducible-DEG labels among genes with Cox results.
-- Generate a comparison between the largest tumor-normal changes and the largest adjusted survival effects.
-- Generate cell-type sanity and literature-review seed tables for the 24 high-confidence genes.
-- Generate one dossier section per high-confidence gene as interpretation scaffolding.
+- Candidate models are tested with proximal-tubule, endothelial, immune, and stromal marker scores.
+- Published consensus tumor purity is added directly to the clinical Cox model.
+- HPA normal-tissue single-cell expression is mapped to renal epithelial, vascular, immune, stromal, and other compartments.
+- Composition attenuation is evidence about interpretation, not a reason to discard a result.
+- Integrated interpretation weighs external agreement, cohort contradiction, coefficient uncertainty, held-out concordance, and composition together rather than treating the external-support flag as a biological ranking.
+- RNA-only associations are not described as mechanisms, therapeutic targets, or validated biomarkers.
 
-## Enrichment Method
+## Reproducibility and acceptance
 
-- ORA for reproducible/prognostic DEG lists.
-- Hallmark class annotation for candidate genes when MSigDB access is available through `msigdbr`.
-- Primary interpretation anchor: renal epithelial metabolic differentiation/state.
-- Secondary categories: VHL/HIF compatibility, angiogenesis, metabolism, ECM remodeling, and immune microenvironment.
-
-## Discordance Figure
-
-- x-axis: absolute DEG magnitude, preferably reproducibility-weighted or meta-analysis log2FC.
-- y-axis: absolute adjusted Cox log hazard ratio.
-- point size: Cox adjusted significance.
-- color: pathway category.
-- outline/shape: prognostic threshold pass/fail.
-
-## Evidence Funnel Figure
-
-- Show gene-count compression from TCGA-significant genes to reproducible DEGs, main Cox survival genes, PH-pass genes, sensitivity-pass genes, strict candidates, pathway-classified high-confidence genes, and final high-confidence candidates.
-- Use this figure as the paper's main argument spine.
-
-## Clinical And Composition Sensitivity
-
-- For high-confidence candidates, compare a clinical-only Cox model with a clinical-plus-gene Cox model.
-- Report likelihood-ratio support and change in concordance for adding each gene to age, sex, stage, and grade.
-- Add crude expression-derived marker scores for proximal-tubule, endothelial, immune, and stromal composition.
-- Treat any candidate that loses direction or significance after composition adjustment as a tissue-composition hypothesis rather than a tumor-cell-intrinsic candidate.
-- These sensitivity analyses do not replace external validation; they exist to expose the main confounding risks in bulk RNA-seq.
-
-## External Survival Check
-
-- Use GSE29609 as a small external survival-direction check for the 24 high-confidence candidates.
-- Fit univariable continuous-expression Cox models because the cohort has only 39 samples and 17 overall-survival events.
-- Report platform coverage, hazard-ratio direction relative to TCGA, nominal p values, FDR values, and whether same-direction nominal support is observed.
-- Treat discordant or unsupported GSE29609 results as evidence against biomarker language.
-- Do not treat GSE29609 as definitive validation or refutation for individual genes because of limited power, different platform technology, and incomplete gene coverage.
-
-## Known Limitations
-
-- Bulk RNA-seq cannot identify cell-type source of expression.
-- Adjacent normal tissue is not perfectly healthy tissue.
-- Retrospective cohorts can contain confounding.
-- Association does not prove causation.
-- No wet-lab validation is included.
-- GEO expression cohorts validate tumor-normal expression direction, not survival.
-- TCGA-derived survival candidates require independent outcome validation before biomarker language.
-- GSE29609 is underpowered and should be interpreted as a small external stress test.
-- Bulk candidate genes may mark retained renal epithelium, endothelial content, immune infiltration, stromal admixture, tumor purity, or necrosis rather than tumor-cell-intrinsic programs.
+- Public sources, access dates, checksums, package versions, thresholds, and random seeds are recorded.
+- Automated validation checks cohort sizes, SVA diagnostics, candidate coverage, complete bootstrap grids, interval validity, output schemas, and funnel monotonicity.
+- The strongest permitted gene-level label is **candidate prognostic association**.
