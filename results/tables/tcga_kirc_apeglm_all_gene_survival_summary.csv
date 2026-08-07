@@ -1,0 +1,7 @@
+metric,value
+qc_filtered_genes,32916
+successfully_modeled_genes,32916
+failed_or_zero_variance_models,0
+global_survival_fdr_lt_0_05,12135
+genes_with_both_geo_effects,14354
+same_apeglm_direction_all_three_cohorts,9047
