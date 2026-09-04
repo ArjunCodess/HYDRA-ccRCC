@@ -47,6 +47,20 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Changes in support status caused by removing a PH gate are identified explicitly and are not described as new data or stronger replication.
 - Every revised candidate is reported, including missing, unsupported, and contradictory results.
 
+## Multiregion transportability sensitivity
+
+- Public TRACERx Renal primary-tumor TPM data are linked to patient, region, and overall-survival annotations from a pinned repository commit.
+- For each high-confidence candidate, the high/low readout threshold is the median of patient-level regional medians. A multiregion tumor is discordant when at least one sampled region lies below the threshold and another lies at or above it.
+- One thousand repeats select one primary-tumor region per patient and fit an unadjusted continuous-expression Cox model. A second scenario repeats the analysis in event-stratified 39-patient subsets to estimate the extra dispersion associated with a cohort the size of GSE29609.
+- This analysis measures regional readout and coefficient instability. It does not turn TRACERx into a blinded validation cohort or determine that spatial sampling caused the GSE29609 disagreement.
+
+## Randomized treatment-interaction analysis
+
+- Public supplementary data from Braun et al. link normalized pretreatment RNA expression to treatment and outcomes for the CheckMate 025 randomized comparison of nivolumab with everolimus.
+- The analysis retains the 250 RNA-linked CheckMate 025 patients, standardizes each candidate across the combined trial subset, and fits a common Cox model containing treatment, continuous expression, and their interaction. Overall survival is the primary endpoint; progression-free survival is secondary.
+- An unadjusted model preserves the randomized comparison. A limited sensitivity model adjusts for age, sex, and MSKCC risk group. Benjamini--Hochberg correction is applied across all 27 candidate interaction tests within each endpoint and model.
+- Interaction estimates test differential treatment association, while treatment-arm-specific expression coefficients remain descriptive. This retrospective, post hoc analysis does not convert a prognostic candidate into a validated treatment-selection biomarker.
+
 ## Composition and interpretation
 
 - Candidate models are tested with proximal-tubule, endothelial, immune, and stromal marker scores.
