@@ -1,31 +1,39 @@
 % DEVELOPMENT MANUSCRIPT: AI-assisted internal draft.
 % Not for direct IRIS/ISEF submission. The student must independently verify,
 % rewrite, and cite every claim used in a final submission.
-\documentclass[conference]{IEEEtran}
+\documentclass{article}
 
-\usepackage{cite}
+% Anonymous ICBINB-BIO workshop submission. Do not add the final or preprint
+% option until the paper has been accepted.
+\PassOptionsToPackage{numbers,compress}{natbib}
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{I Can't Believe It's Not Better (ICBINB): Failure Modes of AI in Biology}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{courier}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
 \usepackage{url}
 
 \title{An Evidence-Hardening Funnel for Transcriptomic Prognostic Claims in Clear Cell Renal Cell Carcinoma}
 
-\author{
-\IEEEauthorblockN{Arjun}
-\IEEEauthorblockA{Independent Student Researcher}
-}
+\author{Anonymous Author(s)}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Public transcriptomic studies often treat large tumor--normal expression changes as candidate prognostic biomarkers without testing whether the associations are externally reproducible or driven by tissue composition. We developed HYDRA-ccRCC, a reproducible evidence-hardening workflow for clear cell renal cell carcinoma. TCGA-KIRC RNA sequencing was used for discovery; SVA-aware paired analyses of GSE40435 and GSE53757 tested tumor--normal replication; and GSE29609 and E-MTAB-1980 provided survival checks. Following external statistical review, proportional-hazards tests were retained as diagnostics rather than exclusion gates, and 1,000 patient bootstraps estimated adjusted Cox coefficient uncertainty without repeated significance selection. The revised analysis identified 3,304 reproducible differentially expressed genes, 536 strict candidates, and 27 high-confidence candidates. A separate apeglm sensitivity removed the hard fold-change gate and globally corrected survival tests across all 32,916 count-QC genes without redefining the primary set. E-MTAB-1980 mapped 26 candidates, 23 retained the TCGA hazard direction, and 13 had same-direction FDR support in both unadjusted and limited-adjustment models; five of the 13 entered this category because PH diagnostics no longer acted as exclusion gates. GSE29609 was not broadly supportive. All 27 bootstrap intervals excluded zero, all 27 candidates retained direction and FDR support after published consensus tumor-purity adjustment, and normal-tissue single-cell data reinforced vascular and immune composition cautions. ACADM and CRYL1 showed the cleanest metabolic convergence, while DDC remained high-priority but cohort-dependent. HYDRA-ccRCC prioritizes candidate prognostic associations while exposing cohort disagreement and composition dependence; it does not establish a validated biomarker panel.
+Public transcriptomic studies often treat large tumor--normal expression changes as candidate prognostic biomarkers without testing whether the associations are externally reproducible or driven by tissue composition. We developed HYDRA-ccRCC, a reproducible evidence-hardening workflow for clear cell renal cell carcinoma. TCGA-KIRC RNA sequencing was used for discovery; SVA-aware paired analyses of GSE40435 and GSE53757 tested tumor--normal replication; and GSE29609 and E-MTAB-1980 provided survival checks. Following external statistical review, proportional-hazards tests were retained as diagnostics rather than exclusion gates, and 1,000 patient bootstraps estimated adjusted Cox coefficient uncertainty without repeated significance selection. The revised analysis identified 3,304 reproducible differentially expressed genes, 536 strict candidates, and 27 high-confidence candidates. A separate apeglm sensitivity removed the hard fold-change gate and globally corrected survival tests across all 32,916 count-QC genes without redefining the primary set. E-MTAB-1980 mapped 26 candidates, 23 retained the TCGA hazard direction, and 13 had same-direction FDR support in both unadjusted and limited-adjustment models; GSE29609 was not broadly supportive. All 27 bootstrap intervals excluded zero, and all 27 candidates retained direction and FDR support after published consensus tumor-purity adjustment. A TRACERx Renal sensitivity linked 186 primary-tumor regions from 73 patients. Regional high/low discordance affected 32.8--51.7\% of multiregion tumors, while reducing the resampled cohort from 73 to 39 patients lowered the median direction-agreement fraction from 99.3\% to 86.8\%. A randomized CheckMate 025 analysis linked all candidates to 250 patients, but no expression-by-treatment interaction survived FDR correction for overall or progression-free survival. ACADM and CRYL1 showed the cleanest metabolic prognostic convergence, while DDC remained high-priority but cohort-dependent. HYDRA-ccRCC prioritizes candidate prognostic associations while exposing cohort disagreement, composition dependence, spatial sampling sensitivity, and the absence of corrected treatment-effect modification; it does not establish a validated biomarker panel.
 \end{abstract}
 
-\begin{IEEEkeywords}
+\paragraph{Keywords}
 clear cell renal cell carcinoma, TCGA, GEO, transcriptomics, survival analysis, bootstrap uncertainty, external evaluation
-\end{IEEEkeywords}
 
 \section{Introduction}
 Clear cell renal cell carcinoma (ccRCC) is shaped by VHL loss, hypoxia-inducible signaling, angiogenesis, altered metabolism, and a heterogeneous tumor microenvironment \cite{tcga_kirc_2013,vhl_hif_review_2024}. These processes produce broad transcriptomic differences between tumor and normal kidney. A large differential-expression effect, however, can reflect tumor identity, loss of normal nephron compartments, immune or vascular admixture, or technical context rather than stable prognostic information.
@@ -48,6 +56,14 @@ Overall survival models used TCGA primary tumors and standardized continuous exp
 
 \subsection{External Survival Testing}
 External expression values were standardized within cohort. GSE29609 tested unadjusted continuous-expression Cox associations and retained missing and contradictory results. E-MTAB-1980 tested all revised candidates with an unadjusted primary model and a limited secondary model adjusting for age, high T stage, and metastatic status. Candidate-wise multiplicity was controlled with Benjamini--Hochberg FDR. Strict external support required TCGA-concordant direction and FDR support in both external models. Proportional-hazards tests remained visible diagnostics but were not support gates.
+
+\subsection{Multiregion Transportability Sensitivity}
+Processed TRACERx Renal tumor TPM values, region annotations, and clinical data were retrieved from a public repository pinned to commit \texttt{3fefd80a} \cite{fernandez_sanroman_tracerx_2025}. The analysis retained primary-tumor regions with linked overall-survival data and mapped all high-confidence candidates by gene symbol. Expression was transformed as $\log_2(\mathrm{TPM}+1)$. For each gene, the exploratory high/low threshold was the median of patient-level regional medians, which prevented patients with more sampled regions from determining the cutoff. A tumor was discordant when at least one region fell below the threshold and another fell at or above it.
+
+One thousand repeats selected one primary region per patient and fit an unadjusted Cox model using standardized continuous expression. A second scenario selected event-stratified subsets of 39 patients, the size of GSE29609, before choosing one region per patient. These subsets contained nine deaths because they preserved the TRACERx event fraction. The resulting quantiles describe estimate dispersion under region selection and cohort subsampling; they are not confidence intervals for a fixed population parameter.
+
+\subsection{Randomized Treatment-Interaction Analysis}
+Normalized pretreatment RNA expression and linked clinical data were obtained from the public supplementary workbook of Braun et al. for CheckMate 025, a randomized comparison of nivolumab with everolimus in previously treated advanced ccRCC \cite{braun_checkmate_2020}. Each candidate was standardized across the combined RNA-profiled trial subset. For overall survival and progression-free survival, the randomized model contained treatment, continuous expression, and their interaction. A limited sensitivity model additionally adjusted for age, sex, and MSKCC risk group. Benjamini--Hochberg correction was applied across the 27 interaction tests within each endpoint and model. Arm-specific expression coefficients and proportional-hazards tests were reported as descriptive diagnostics, not as substitutes for the interaction estimate.
 
 \subsection{Coefficient Uncertainty and Held-Out Clinical Increment}
 Coefficient uncertainty used 1,000 event-stratified patient bootstraps. Each repeat refit the age-, sex-, stage-, and grade-adjusted Cox coefficient for every high-confidence candidate. We recorded empirical standard errors, percentile 95\% intervals, bias, and direction agreement without applying per-repeat p-value, FDR, PH, or selection-frequency gates.
@@ -130,6 +146,16 @@ Opposite-direction nominal & 5 & 0 \\
 
 The revised strict E-MTAB-1980 set was DDC, CRYL1, ACADM, KL, ACAT1, CLCN5, TCIRG1, GJB1, TEK, EMCN, PODXL, FUT6, and HIBCH. Eight of the 13 had PH diagnostic p-values of at least 0.05 in both external models. KL, ACAT1, and CLCN5 had nominal PH diagnostics in the unadjusted model, while TCIRG1 and GJB1 had nominal diagnostics in both models; these five entered the revised support set because PH diagnostics no longer acted as exclusion gates. The increase from eight to 13 is therefore a change in statistical classification rather than five new replications. Statistical agreement also did not make the genes biologically equivalent: TEK and EMCN were vascular signals, PODXL and GJB1 were compartment-sensitive, and TCIRG1 carried an immune-composition interpretation.
 
+\subsection{Multiregion Sampling Widens Candidate Effects}
+The TRACERx sensitivity included 186 primary regions from 73 patients with 16 deaths; 58 patients had at least two regions. All 27 candidates mapped. Under the exploratory median readout, candidate-level regional discordance ranged from 32.8\% to 51.7\% of multiregion tumors. ACADM was discordant in 19 of 58 patients (32.8\%), CRYL1 in 24 (41.4\%), and DDC in 26 (44.8\%). These rates quantify cutoff crossing rather than continuous-expression measurement error and depend on the cohort-relative threshold.
+
+In the full-cohort one-region analysis, 26 of 27 candidates retained the TCGA hazard direction at the median; PANK1 was the exception. Across candidates, the median direction-agreement fraction was 99.3\%, and central 95\% resampling intervals excluded zero for 18 candidates. In 39-patient subsets with nine deaths, the median direction-agreement fraction fell to 86.8\%, and only four intervals excluded zero. ACADM retained the TCGA direction in 100.0\% of full-cohort repeats and 97.5\% of smaller-cohort repeats. CRYL1 fell from 99.5\% to 86.8\%, while DDC fell from 98.0\% to 80.4\%; their smaller-cohort intervals crossed zero.
+
+\subsection{Randomized Data Do Not Establish Treatment Effect Modification}
+The CheckMate 025 RNA subset contained 250 patients, including 120 assigned to nivolumab and 130 to everolimus, with 191 overall-survival and 222 progression-free-survival events. The overall nivolumab-versus-everolimus hazard ratio was 0.675 for overall survival (95\% CI 0.506--0.899; $p=0.0073$) and 0.790 for progression-free survival (95\% CI 0.605--1.033; $p=0.085$), confirming that treatment coding recovered the expected overall-survival advantage in this molecular subset.
+
+No candidate-by-treatment interaction survived FDR correction for either endpoint in the randomized or adjusted model. ACADM had a nominal overall-survival interaction in the unadjusted model (interaction HR per SD, 0.746; 95\% CI 0.559--0.996; $p=0.0467$; FDR $=0.393$), but the adjusted interval crossed one (HR, 0.748; 95\% CI 0.554--1.009; $p=0.0571$; FDR $=0.385$). CRYL1 and DDC had no nominal interaction for either endpoint. Thus, the randomized comparison distinguishes the candidates' prognostic evidence from unproven treatment-predictive value.
+
 \subsection{Bootstrap Intervals Support Coefficient Direction}
 All 27 candidates completed all 1,000 event-stratified patient bootstraps. Every median bootstrap coefficient retained its full-fit direction, and every percentile 95\% interval excluded zero. Empirical standard errors ranged from 0.067 to 0.105. These distributions quantify uncertainty in the adjusted coefficients; they were not converted into another candidate-selection rule.
 
@@ -162,18 +188,22 @@ HYDRA-ccRCC shows why prognostic transcriptomic claims need several distinct tes
 
 The two external survival cohorts should be interpreted together. GSE29609 supplied a useful contradictory result, but its small event count and microarray coverage limit power. E-MTAB-1980 provided stronger directional and multiplicity-controlled support, but its 23 deaths still constrain adjustment and precision. Thirteen revised external hits are evidence for candidate-level agreement, not evidence for a deployable panel.
 
+The TRACERx results make spatial sampling a measurable qualification rather than a generic concern. High/low classifications changed across regions for at least 32.8\% of multiregion tumors, yet hazard direction was usually stable when all 73 patients were retained. The 39-patient scenario widened the effect distributions and weakened direction agreement, especially for CRYL1 and DDC, while ACADM remained comparatively stable. This pattern supports the narrower interpretation proposed from multiregion ccRCC work: regional sampling noise becomes more consequential as cohort information decreases \cite{gerlinger_multiregion_2012,fernandez_sanroman_tracerx_2025}. It does not identify sampling as the cause of GSE29609 disagreement because the cohorts also differ in platform, case mix, events, and follow-up.
+
 ACADM and CRYL1 are the most consistent next-stage metabolic focus. DDC remains worth studying because its strong TCGA and E-MTAB-1980 results and bootstrap interval coexist with explicit contradiction in GSE29609 and composition sensitivity, making it a conditional rather than uniformly replicated lead. The five genes added to the E-MTAB-1980 support set by removal of PH gating should likewise be interpreted through their time-averaged effects, cross-cohort results, and cell-source evidence rather than promoted on the revised flag alone.
 
+The CheckMate 025 analysis directly separates prognosis from treatment effect modification. The nominal ACADM overall-survival interaction is biologically interesting because higher ACADM expression was associated with lower hazard in the nivolumab arm but not the everolimus arm. Its FDR near 0.39, loss of nominal significance after limited adjustment, and null progression-free-survival interaction make it hypothesis-generating only. CRYL1 and DDC show no randomized evidence of differential benefit. RCC still provides a precedent for the distinction: sarcomatoid differentiation is associated with poor prognosis, yet a post hoc CheckMate 214 analysis found substantially better outcomes with nivolumab plus ipilimumab than with sunitinib in this subgroup \cite{tannir_sarcomatoid_2021,motzer_checkmate214_2018}. A future confirmatory analysis should prespecify a small biomarker set or metabolic score and an interaction model in an independent randomized immunotherapy cohort.
+
 \section{Limitations}
-This retrospective study uses public bulk transcriptomic data. TCGA supplies discovery, selection, the all-gene boundary sensitivity, bootstrap coefficient estimation, and repeated internal prediction assessment. The global all-gene Cox result reuses TCGA for expression and survival analysis and is sensitivity evidence rather than external validation. The bootstrap intervals are conditional on the revised full-data candidate set and do not account for uncertainty in upstream candidate selection. E-MTAB-1980 has only 23 deaths and permits limited covariate adjustment; GSE29609 has 17 deaths, different technology, and incomplete candidate coverage. The external cohorts had been inspected before this reviewer-driven reanalysis, so their results cannot be described as blind prospective validation. Overall survival is affected by treatment, comorbidity, and follow-up differences.
+This retrospective study uses public bulk transcriptomic data. TCGA supplies discovery, selection, the all-gene boundary sensitivity, bootstrap coefficient estimation, and repeated internal prediction assessment. The global all-gene Cox result reuses TCGA for expression and survival analysis and is sensitivity evidence rather than external validation. The bootstrap intervals are conditional on the revised full-data candidate set and do not account for uncertainty in upstream candidate selection. E-MTAB-1980 has only 23 deaths and permits limited covariate adjustment; GSE29609 has 17 deaths, different technology, and incomplete candidate coverage. Neither external cohort has multiregion sampling. TRACERx provides that structure but contributes only 73 survival-linked patients and 16 deaths, so its Cox models are unadjusted and exploratory. Its median threshold is cohort-relative, and its 39-patient subsets contain nine rather than 17 deaths; the analysis therefore cannot recreate GSE29609 or apportion its disagreement among sampling, platform, and clinical differences. The external cohorts had been inspected before this reviewer-driven reanalysis, so their results cannot be described as blind prospective validation. The CheckMate 025 interaction analysis is post hoc, covers an RNA-profiled trial subset rather than every randomized patient, uses archived normalized expression, and tests 27 candidates across two endpoints. Two patients lacked age for adjusted models. No corrected interaction is confirmatory, and the everolimus comparator does not address current first-line immunotherapy combinations.
 
 Adjacent normal kidney is not equivalent to healthy kidney. Consensus purity is inferred from several molecular and pathology estimates and is not direct histopathologic measurement in this analysis. HPA v25.1 contains normal-tissue rather than ccRCC tumor single-cell data. Bulk RNA cannot separate tumor-cell-intrinsic expression from nephron retention, immune infiltration, endothelial content, stromal admixture, or necrosis. RNA abundance also does not demonstrate protein effect, causation, mechanism, or therapeutic relevance.
 
 \section{Conclusion}
-The revised workflow narrows thousands of reproducible tumor--normal changes to 27 high-confidence candidates, evaluates them in two external survival cohorts, quantifies adjusted-coefficient uncertainty with patient bootstrapping, estimates held-out clinical increment with cross-validation, adjusts directly for consensus tumor purity, and triangulates normal-tissue cell source. ACADM and CRYL1 provide the cleanest integrated metabolic evidence; DDC remains a conditional lead, and several externally supported genes carry non-proportionality, cohort-conflict, or composition qualifications. The appropriate output is a prioritized set of candidate prognostic associations and a transparent record of where the evidence remains fragile, not a validated biomarker panel.
+The revised workflow narrows thousands of reproducible tumor--normal changes to 27 high-confidence candidates, evaluates them in two external survival cohorts, quantifies adjusted-coefficient uncertainty with patient bootstrapping, estimates held-out clinical increment with cross-validation, adjusts directly for consensus tumor purity, triangulates normal-tissue cell source, measures multiregion sampling sensitivity, and tests treatment effect modification in randomized CheckMate 025 data. ACADM provides the most stable integrated metabolic prognostic evidence and a nominal treatment-interaction hypothesis, but no candidate has multiplicity-controlled evidence of differential nivolumab benefit. CRYL1 remains a strong but small-cohort-sensitive prognostic lead, while DDC remains conditional. The appropriate output is a prioritized set of candidate prognostic associations and a transparent record of where the evidence remains fragile, not a validated biomarker panel.
 
 \section*{Data Availability}
-All source data are public and identified by TCGA-KIRC, GSE40435, GSE53757, GSE29609, E-MTAB-1980, Human Protein Atlas v25.1, and the Aran et al. TCGA purity supplement. Download URLs, access dates, and checksums are recorded in \url{../results/tables/source_provenance.csv}; generated tables and figures are stored under \url{../results/}; and the one-command entry point is \url{../run_pipeline.ps1}.
+All source data are public and identified by TCGA-KIRC, GSE40435, GSE53757, GSE29609, E-MTAB-1980, Human Protein Atlas v25.1, TRACERx Renal, CheckMate 025 supplementary data, and the Aran et al. TCGA purity supplement. TRACERx files are pinned to the repository commit recorded in \url{../results/tables/tracerx_multiregion_source_files.csv}; the CheckMate workbook checksum is recorded in \url{../results/tables/checkmate025_source_file.csv}. Download URLs, access dates, and checksums are recorded in \url{../results/tables/source_provenance.csv}; generated tables and figures are stored under \url{../results/}; and the one-command entry point is \url{../run_pipeline.ps1}.
 
 \section*{Ethics Declaration}
 This secondary analysis used public, de-identified datasets and involved no new recruitment, intervention, or access to identifiable private information. Final competition or publication requirements should be confirmed with the relevant review body.
@@ -182,7 +212,7 @@ This secondary analysis used public, de-identified datasets and involved no new 
 The student researcher is responsible for the project question, methodological decisions, verification of the analysis, interpretation, and final writing. Contributions must be reviewed and updated before submission to match the student's documented work.
 
 \section*{Acknowledgments}
-We thank Levi Waldron for constructive statistical feedback on proportional-hazards screening, resampling, and batch adjustment, and Michael Love for guidance on shrunken fold-change estimates and hard-threshold instability. Their feedback prompted the methodological sensitivity analyses documented here; the authors remain solely responsible for the implementation, interpretation, and conclusions.
+We thank Levi Waldron for constructive statistical feedback on proportional-hazards screening, resampling, and batch adjustment, and Michael Love for guidance on shrunken fold-change estimates and hard-threshold instability. We also thank Philip Saylor for independently reviewing the project and recommending further single-cell expertise, Samra Turajli\'c for identifying regional sampling instability and proposing the one-region-per-patient multiregion analysis, and David McDermott for advising that prognosis and immunotherapy effect modification be separated in a randomized treatment comparison. Their comments shaped the sensitivity analyses and validation design described here; the author remains solely responsible for the implementation, interpretation, and conclusions.
 
 \section*{Funding}
 No external funding was reported for this development-stage project.
@@ -193,7 +223,7 @@ The author reports no conflict of interest.
 \section*{AI Assistance Disclosure}
 OpenAI Codex assisted with code auditing, implementation support, debugging, reproducibility checks, and revision of this internal development manuscript. The student remains responsible for understanding and independently verifying the code, statistical decisions, citations, and scientific claims. AI-generated prose must not be copied directly into IRIS or ISEF submission materials.
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{plainnat}
 \bibliography{references}
 
 \end{document}
