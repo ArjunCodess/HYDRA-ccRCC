@@ -42,6 +42,16 @@ required_files <- c(
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
   file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
   file.path(DIRS$tables, "tumor_purity_coverage.csv"),
+  file.path(DIRS$tables, "tracerx_multiregion_source_files.csv"),
+  file.path(DIRS$tables, "tracerx_candidate_patient_region_discordance.csv"),
+  file.path(DIRS$tables, "tracerx_candidate_multiregion_summary.csv"),
+  file.path(DIRS$tables, "tracerx_one_region_cox_repeats.csv"),
+  file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
+  file.path(DIRS$tables, "tracerx_multiregion_study_summary.csv"),
+  file.path(DIRS$tables, "checkmate025_source_file.csv"),
+  file.path(DIRS$tables, "checkmate025_candidate_treatment_interactions.csv"),
+  file.path(DIRS$tables, "checkmate025_overall_treatment_effects.csv"),
+  file.path(DIRS$tables, "checkmate025_study_summary.csv"),
   file.path(DIRS$tables, "source_provenance.csv"),
   file.path(DIRS$tables, "run_manifest.csv"),
   file.path("results", "high_confidence_gene_dossiers.md"),
@@ -351,6 +361,159 @@ if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
   stop("Direct tumor-purity output contains non-finite gene estimates.")
 }
 
+tracerx_discordance <- read_csv(
+  file.path(DIRS$tables, "tracerx_candidate_multiregion_summary.csv"),
+  show_col_types = FALSE
+)
+required_tracerx_discordance <- c(
+  "symbol",
+  "patients_total",
+  "multiregion_patients",
+  "discordant_multiregion_patients",
+  "discordant_multiregion_percent"
+)
+if (!all(required_tracerx_discordance %in% names(tracerx_discordance))) {
+  stop("TRACERx discordance summary is missing required columns.")
+}
+if (nrow(tracerx_discordance) != values[["high_confidence_candidate"]] ||
+    any(tracerx_discordance$discordant_multiregion_percent < 0 |
+        tracerx_discordance$discordant_multiregion_percent > 100)) {
+  stop("TRACERx discordance summary has invalid candidate coverage or percentages.")
+}
+
+tracerx_study <- read_csv(
+  file.path(DIRS$tables, "tracerx_multiregion_study_summary.csv"),
+  show_col_types = FALSE
+)
+required_tracerx_metrics <- c(
+  "tracerx_primary_regions",
+  "tracerx_survival_linked_patients",
+  "tracerx_survival_events",
+  "tracerx_multiregion_patients",
+  "candidates_mapped",
+  "region_resampling_repeats",
+  "size_matched_patients",
+  "size_matched_events"
+)
+if (!all(required_tracerx_metrics %in% tracerx_study$metric)) {
+  stop("TRACERx study summary is missing required metrics.")
+}
+tracerx_values <- setNames(tracerx_study$value, tracerx_study$metric)
+if (tracerx_values[["candidates_mapped"]] != values[["high_confidence_candidate"]] ||
+    tracerx_values[["region_resampling_repeats"]] != RESAMPLING$tracerx_region_repeats ||
+    tracerx_values[["size_matched_patients"]] != RESAMPLING$tracerx_small_cohort_size) {
+  stop("TRACERx study summary does not match the configured analysis.")
+}
+
+tracerx_repeats <- read_csv(
+  file.path(DIRS$tables, "tracerx_one_region_cox_repeats.csv"),
+  show_col_types = FALSE
+)
+expected_tracerx_rows <- values[["high_confidence_candidate"]] *
+  RESAMPLING$tracerx_region_repeats * 2
+if (nrow(tracerx_repeats) != expected_tracerx_rows ||
+    any(!is.finite(tracerx_repeats$log_hr)) ||
+    any(!tracerx_repeats$scenario %in% c("full_cohort", "size_matched_39"))) {
+  stop("TRACERx one-region repeat table is incomplete or invalid.")
+}
+if (any(tracerx_repeats$n[tracerx_repeats$scenario == "full_cohort"] !=
+        tracerx_values[["tracerx_survival_linked_patients"]]) ||
+    any(tracerx_repeats$events[tracerx_repeats$scenario == "full_cohort"] !=
+        tracerx_values[["tracerx_survival_events"]]) ||
+    any(tracerx_repeats$n[tracerx_repeats$scenario == "size_matched_39"] !=
+        tracerx_values[["size_matched_patients"]]) ||
+    any(tracerx_repeats$events[tracerx_repeats$scenario == "size_matched_39"] !=
+        tracerx_values[["size_matched_events"]])) {
+  stop("TRACERx resampling scenarios have inconsistent patient or event counts.")
+}
+
+tracerx_resampling <- read_csv(
+  file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
+  show_col_types = FALSE
+)
+if (nrow(tracerx_resampling) != values[["high_confidence_candidate"]] * 2 ||
+    any(tracerx_resampling$successful_repeats != RESAMPLING$tracerx_region_repeats)) {
+  stop("TRACERx one-region summary has incomplete candidate-by-scenario coverage.")
+}
+
+tracerx_sources <- read_csv(
+  file.path(DIRS$tables, "tracerx_multiregion_source_files.csv"),
+  show_col_types = FALSE
+)
+if (nrow(tracerx_sources) != 3 ||
+    any(is.na(tracerx_sources$md5) | tracerx_sources$md5 == "") ||
+    any(tracerx_sources$commit != TRACERX_DATA_COMMIT)) {
+  stop("TRACERx source inventory is incomplete or not pinned to the configured commit.")
+}
+
+checkmate_interactions <- read_csv(
+  file.path(DIRS$tables, "checkmate025_candidate_treatment_interactions.csv"),
+  show_col_types = FALSE
+)
+required_checkmate_columns <- c(
+  "endpoint", "model", "symbol", "n", "events",
+  "interaction_log_hr", "interaction_hr", "interaction_hr_ci_low",
+  "interaction_hr_ci_high", "interaction_p_value", "interaction_fdr",
+  "interaction_ph_p_value", "nivolumab_log_hr", "everolimus_log_hr"
+)
+if (!all(required_checkmate_columns %in% names(checkmate_interactions))) {
+  stop("CheckMate 025 interaction output is missing required columns.")
+}
+if (nrow(checkmate_interactions) != values[["high_confidence_candidate"]] * 4 ||
+    any(!is.finite(checkmate_interactions$interaction_log_hr)) ||
+    any(checkmate_interactions$interaction_p_value < 0 |
+        checkmate_interactions$interaction_p_value > 1) ||
+    any(checkmate_interactions$interaction_fdr < 0 |
+        checkmate_interactions$interaction_fdr > 1) ||
+    !setequal(checkmate_interactions$endpoint, c("OS", "PFS")) ||
+    !setequal(
+      checkmate_interactions$model,
+      c("randomized_unadjusted", "age_sex_mskcc_adjusted")
+    )) {
+  stop("CheckMate 025 interaction output has invalid coverage or estimates.")
+}
+
+checkmate_study <- read_csv(
+  file.path(DIRS$tables, "checkmate025_study_summary.csv"),
+  show_col_types = FALSE
+)
+required_checkmate_metrics <- c(
+  "checkmate025_rna_linked_patients", "nivolumab_patients",
+  "everolimus_patients", "os_events", "pfs_events",
+  "adjusted_complete_cases", "candidates_mapped"
+)
+if (!all(required_checkmate_metrics %in% checkmate_study$metric)) {
+  stop("CheckMate 025 study summary is missing required metrics.")
+}
+checkmate_values <- setNames(checkmate_study$value, checkmate_study$metric)
+if (checkmate_values[["checkmate025_rna_linked_patients"]] != 250 ||
+    checkmate_values[["nivolumab_patients"]] != 120 ||
+    checkmate_values[["everolimus_patients"]] != 130 ||
+    checkmate_values[["os_events"]] != 191 ||
+    checkmate_values[["pfs_events"]] != 222 ||
+    checkmate_values[["candidates_mapped"]] != values[["high_confidence_candidate"]]) {
+  stop("CheckMate 025 cohort counts do not match the public supplementary data.")
+}
+
+checkmate_overall <- read_csv(
+  file.path(DIRS$tables, "checkmate025_overall_treatment_effects.csv"),
+  show_col_types = FALSE
+)
+if (nrow(checkmate_overall) != 2 ||
+    !setequal(checkmate_overall$endpoint, c("OS", "PFS")) ||
+    any(!is.finite(checkmate_overall$nivolumab_vs_everolimus_hr))) {
+  stop("CheckMate 025 overall treatment-effect output is incomplete.")
+}
+
+checkmate_source <- read_csv(
+  file.path(DIRS$tables, "checkmate025_source_file.csv"),
+  show_col_types = FALSE
+)
+if (nrow(checkmate_source) != 1 ||
+    tolower(checkmate_source$md5) != CHECKMATE_BRAUN_WORKBOOK_MD5) {
+  stop("CheckMate 025 source inventory does not match the pinned workbook.")
+}
+
 provenance <- read_csv(file.path(DIRS$tables, "source_provenance.csv"), show_col_types = FALSE)
 if (!all(c(
   "TCGA-KIRC",
@@ -359,6 +522,8 @@ if (!all(c(
   "GSE29609",
   "E-MTAB-1980",
   "HPA-v25.1",
+  "TRACERx-Renal",
+  "CheckMate-025-Braun",
   "Aran-2015-CPE"
 ) %in%
          provenance$source_id)) {

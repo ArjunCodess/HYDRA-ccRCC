@@ -79,6 +79,8 @@ $steps += @(
   "analysis/16_cv_clinical_increment.R",
   "analysis/17_hpa_cell_source.R",
   "analysis/19_direct_tumor_purity.R",
+  "analysis/20_tracerx_multiregion_transportability.R",
+  "analysis/21_checkmate025_treatment_interaction.R",
   "analysis/09_figures_tcga.R",
   "analysis/18_write_manifest.R",
   "analysis/12_validate_outputs.R"

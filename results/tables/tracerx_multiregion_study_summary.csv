@@ -1,0 +1,9 @@
+metric,value
+tracerx_primary_regions,186
+tracerx_survival_linked_patients,73
+tracerx_survival_events,16
+tracerx_multiregion_patients,58
+candidates_mapped,27
+region_resampling_repeats,1000
+size_matched_patients,39
+size_matched_events,9

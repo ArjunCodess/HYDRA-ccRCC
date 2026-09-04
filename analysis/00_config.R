@@ -49,7 +49,15 @@ RESAMPLING <- list(
   seed = 20260725,
   cv_repeats = 20,
   cv_folds = 5,
-  coefficient_bootstrap_repeats = 1000
+  coefficient_bootstrap_repeats = 1000,
+  tracerx_region_repeats = 1000,
+  tracerx_small_cohort_size = 39
+)
+
+TRACERX_DATA_COMMIT <- "3fefd80afe33cafc091b3154dbd32d8c27b92c81"
+TRACERX_RAW_BASE <- paste0(
+  "https://raw.githubusercontent.com/sanroman-24/tx100_rna_2024/",
+  TRACERX_DATA_COMMIT
 )
 
 SOURCE_URLS <- list(
@@ -59,12 +67,22 @@ SOURCE_URLS <- list(
   geo_gse29609 = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE29609",
   emtab1980 = "https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-1980",
   hpa_single_cell = "https://www.proteinatlas.org/download/tsv/rna_single_cell_type.tsv.zip",
+  tracerx_renal = "https://github.com/sanroman-24/tx100_rna_2024",
+  tracerx_tumour_tpm = paste0(TRACERX_RAW_BASE, "/data/processed/tumour_tpm.rds"),
+  tracerx_annotation = paste0(TRACERX_RAW_BASE, "/data/meta/tx_annotation.tsv"),
+  tracerx_clinical = paste0(TRACERX_RAW_BASE, "/data/meta/TRACERx_s1_1_clinical.txt"),
+  checkmate_braun = paste0(
+    "https://static-content.springer.com/esm/art%3A10.1038%2F",
+    "s41591-020-0839-y/MediaObjects/41591_2020_839_MOESM2_ESM.xlsx"
+  ),
   aran2015_purity_study = "https://doi.org/10.1038/ncomms9971",
   aran2015_purity_data = paste0(
     "https://static-content.springer.com/esm/art%3A10.1038%2F",
     "ncomms9971/MediaObjects/41467_2015_BFncomms9971_MOESM1236_ESM.xlsx"
   )
 )
+
+CHECKMATE_BRAUN_WORKBOOK_MD5 <- "aea91c06c171f090100eb3c0141e3428"
 
 BIOC_PACKAGES <- c(
   "TCGAbiolinks",

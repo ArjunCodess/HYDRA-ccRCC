@@ -15,13 +15,15 @@ source_rows <- tribble(
   "GSE29609", "small external survival direction check", SOURCE_URLS$geo_gse29609,
   "E-MTAB-1980", "independent external survival validation", SOURCE_URLS$emtab1980,
   "HPA-v25.1", "independent single-cell type expression", SOURCE_URLS$hpa_single_cell,
+  "TRACERx-Renal", "multiregion transportability sensitivity", SOURCE_URLS$tracerx_renal,
+  "CheckMate-025-Braun", "randomized nivolumab-versus-everolimus treatment-interaction analysis", SOURCE_URLS$checkmate_braun,
   "Aran-2015-CPE", "published consensus TCGA tumor-purity sensitivity", SOURCE_URLS$aran2015_purity_study
 ) |>
   mutate(
     access_date = format(Sys.Date(), "%Y-%m-%d"),
     retrieval = "scripted public download",
     candidate_definition_role = if_else(
-      source_id %in% c("E-MTAB-1980", "HPA-v25.1", "Aran-2015-CPE"),
+      source_id %in% c("E-MTAB-1980", "HPA-v25.1", "TRACERx-Renal", "CheckMate-025-Braun", "Aran-2015-CPE"),
       "downstream evaluation only; not used to define the reviewer-driven revised candidate set",
       "part of discovery or upstream replication"
     )
