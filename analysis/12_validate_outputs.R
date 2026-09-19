@@ -19,6 +19,7 @@ required_files <- c(
   FILES$tcga_enrichment,
   file.path(DIRS$tables, "candidate_gene_evidence_table.csv"),
   file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"),
+  file.path(DIRS$tables, "prior_candidate_delta.csv"),
   file.path(DIRS$tables, "strict_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"),
