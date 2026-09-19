@@ -13,8 +13,8 @@ source_rows <- tribble(
   "GSE40435", "tumor-normal expression validation", SOURCE_URLS$geo_gse40435,
   "GSE53757", "tumor-normal expression validation", SOURCE_URLS$geo_gse53757,
   "GSE29609", "small external survival direction check", SOURCE_URLS$geo_gse29609,
-  "E-MTAB-1980", "independent external survival validation", SOURCE_URLS$emtab1980,
-  "HPA-v25.1", "independent single-cell type expression", SOURCE_URLS$hpa_single_cell,
+  "E-MTAB-1980", "previously inspected exploratory external survival comparison", SOURCE_URLS$emtab1980,
+  "HPA-v25.1", "normal-tissue single-cell source context", SOURCE_URLS$hpa_single_cell,
   "TRACERx-Renal", "multiregion transportability sensitivity", SOURCE_URLS$tracerx_renal,
   "CheckMate-025-Braun", "randomized nivolumab-versus-everolimus treatment-interaction analysis", SOURCE_URLS$checkmate_braun,
   "Aran-2015-CPE", "published consensus TCGA tumor-purity sensitivity", SOURCE_URLS$aran2015_purity_study
@@ -50,7 +50,8 @@ files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
 }))
 files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1",
-           "environment/sessionInfo.txt", "environment/package_versions.csv")
+           "environment/sessionInfo.txt", "environment/package_versions.csv",
+           "paper/main.tex", "paper/results_macros.tex", "paper/main.pdf")
 files <- files[file.exists(files) & !dir.exists(files)]
 files <- files[!grepl("run_manifest\\.csv$", files)]
 info <- file.info(files)
