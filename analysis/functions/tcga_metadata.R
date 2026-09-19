@@ -35,13 +35,22 @@ derive_os <- function(clinical) {
   death <- get_optional_column(clinical, "days_to_death")
   follow_up <- get_optional_column(clinical, c("days_to_last_follow_up", "days_to_last_known_alive"))
   vital <- get_optional_column(clinical, "vital_status")
+  vital_clean <- tolower(trimws(as.character(vital)))
+  if (any(!is.na(vital_clean) & !vital_clean %in% c("alive", "dead"))) {
+    stop("Unexpected TCGA vital_status value; survival events cannot be coded safely.")
+  }
+  death_clean <- suppressWarnings(as.numeric(death))
+  follow_up_clean <- suppressWarnings(as.numeric(follow_up))
+  if (any(vital_clean == "dead" & is.na(death_clean) & !is.na(follow_up_clean), na.rm = TRUE)) {
+    stop("A deceased TCGA patient lacks a death time; refusing follow-up as death time.")
+  }
 
   clinical |>
     dplyr::mutate(
-      days_to_death_clean = suppressWarnings(as.numeric(death)),
-      days_to_last_follow_up_clean = suppressWarnings(as.numeric(follow_up)),
-      os_time = dplyr::coalesce(.data$days_to_death_clean, .data$days_to_last_follow_up_clean),
-      os_event = dplyr::if_else(tolower(as.character(vital)) == "dead", 1L, 0L)
+      days_to_death_clean = death_clean,
+      days_to_last_follow_up_clean = follow_up_clean,
+      os_time = dplyr::if_else(vital_clean == "dead", death_clean, follow_up_clean),
+      os_event = dplyr::case_when(vital_clean == "dead" ~ 1L, vital_clean == "alive" ~ 0L, TRUE ~ NA_integer_)
     )
 }
 

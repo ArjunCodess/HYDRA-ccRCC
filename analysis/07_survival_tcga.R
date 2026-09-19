@@ -31,6 +31,8 @@ tumor_samples <- coldata |>
   mutate(patient_barcode = tcga_patient_barcode(sample_barcode)) |>
   inner_join(clinical_surv, by = "patient_barcode") |>
   filter(!is.na(os_time), os_time > 0, !is.na(os_event))
+if (anyDuplicated(tumor_samples$patient_barcode)) stop("TCGA survival join duplicates patients.")
+if (any(!tumor_samples$os_event %in% c(0L, 1L))) stop("TCGA survival events must be binary.")
 
 repro_path <- file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse53757.csv")
 if (file.exists(repro_path)) {

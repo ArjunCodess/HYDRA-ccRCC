@@ -63,9 +63,19 @@ run_geo_limma <- function(accession) {
   }
 
   keep_samples <- !is.na(condition) & !is.na(patient)
+  if (!all(keep_samples)) {
+    stop(accession, " has samples without an identified patient and condition.", call. = FALSE)
+  }
   expr <- expr[, keep_samples]
   condition <- factor(condition[keep_samples], levels = c("normal", "tumor"))
   patient <- factor(patient[keep_samples])
+  pair_counts <- table(patient, condition)
+  if (any(pair_counts != 1L)) {
+    stop(accession, " is not exactly one tumor and one normal per parsed patient.", call. = FALSE)
+  }
+  if (accession == "GSE53757" && any(condition[seq(1L, length(condition), by = 2L)] == condition[seq(2L, length(condition), by = 2L)])) {
+    stop("GSE53757 row-adjacent samples have the same condition; pairing assumption failed.", call. = FALSE)
+  }
 
   gene_expr <- collapse_to_gene(expr, fdata, accession)
 

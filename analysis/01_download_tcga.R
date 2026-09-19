@@ -12,6 +12,12 @@ suppressPackageStartupMessages({
 force_download <- identical(Sys.getenv("HYDRA_FORCE_DOWNLOAD"), "1")
 if (!force_download && all(file.exists(c(FILES$tcga_se, FILES$tcga_counts, FILES$tcga_coldata, FILES$tcga_clinical)))) {
   clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
+  checked_clinical <- derive_os(clinical)
+  if (!isTRUE(all.equal(clinical$os_event, checked_clinical$os_event, check.attributes = FALSE)) ||
+      !isTRUE(all.equal(clinical$os_time, checked_clinical$os_time, check.attributes = FALSE))) {
+    stop("Cached TCGA survival endpoints disagree with vital status and follow-up dates.")
+  }
+  if (anyDuplicated(clinical$submitter_id)) stop("TCGA clinical table duplicates a patient.")
   if (!"gender" %in% names(clinical) && "sex_at_birth" %in% names(clinical)) {
     clinical <- clinical |> mutate(gender = sex_at_birth)
     write_csv(clinical, FILES$tcga_clinical)
