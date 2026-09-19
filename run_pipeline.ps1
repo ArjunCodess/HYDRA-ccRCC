@@ -61,6 +61,7 @@ if (-not $SkipInstall) {
 }
 $steps += @(
   "analysis/00_check_environment.R",
+  "analysis/tests/test_identity_and_endpoints.R",
   "analysis/01_download_tcga.R",
   "analysis/02_download_geo_manifest.R",
   "analysis/02_download_geo.R",
@@ -85,9 +86,13 @@ $steps += @(
   "analysis/19_direct_tumor_purity.R",
   "analysis/20_tracerx_multiregion_transportability.R",
   "analysis/21_checkmate025_treatment_interaction.R",
+  "analysis/22_nested_cv.R",
   "analysis/23_survival_shape.R",
   "analysis/24_funnel_ablations.R",
+  "analysis/26_acceptance_report.R",
+  "analysis/25_paper_numbers.R",
   "analysis/09_figures_tcga.R",
+  "analysis/27_audit_figures.R",
   "analysis/18_write_manifest.R",
   "analysis/12_validate_outputs.R"
 )
