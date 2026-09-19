@@ -41,12 +41,18 @@ required_files <- c(
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
   file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
+  file.path(DIRS$tables, "candidate_survival_shape_sensitivity.csv"),
+  file.path(DIRS$tables, "funnel_matched_lists.csv"),
+  file.path(DIRS$tables, "funnel_external_gene_results.csv"),
+  file.path(DIRS$tables, "funnel_external_summary.csv"),
+  file.path(DIRS$tables, "funnel_external_paired_bootstrap.csv"),
   file.path(DIRS$tables, "tumor_purity_coverage.csv"),
   file.path(DIRS$tables, "tracerx_multiregion_source_files.csv"),
   file.path(DIRS$tables, "tracerx_candidate_patient_region_discordance.csv"),
   file.path(DIRS$tables, "tracerx_candidate_multiregion_summary.csv"),
   file.path(DIRS$tables, "tracerx_one_region_cox_repeats.csv"),
   file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
+  file.path(DIRS$tables, "tracerx_fixed_subset_patients.csv"),
   file.path(DIRS$tables, "tracerx_multiregion_study_summary.csv"),
   file.path(DIRS$tables, "checkmate025_source_file.csv"),
   file.path(DIRS$tables, "checkmate025_candidate_treatment_interactions.csv"),
@@ -410,10 +416,10 @@ tracerx_repeats <- read_csv(
   show_col_types = FALSE
 )
 expected_tracerx_rows <- values[["high_confidence_candidate"]] *
-  RESAMPLING$tracerx_region_repeats * 2
+  RESAMPLING$tracerx_region_repeats * 3
 if (nrow(tracerx_repeats) != expected_tracerx_rows ||
     any(!is.finite(tracerx_repeats$log_hr)) ||
-    any(!tracerx_repeats$scenario %in% c("full_cohort", "size_matched_39"))) {
+    any(!tracerx_repeats$scenario %in% c("full_cohort", "size_matched_39", "fixed_subset_regions"))) {
   stop("TRACERx one-region repeat table is incomplete or invalid.")
 }
 if (any(tracerx_repeats$n[tracerx_repeats$scenario == "full_cohort"] !=
@@ -423,6 +429,10 @@ if (any(tracerx_repeats$n[tracerx_repeats$scenario == "full_cohort"] !=
     any(tracerx_repeats$n[tracerx_repeats$scenario == "size_matched_39"] !=
         tracerx_values[["size_matched_patients"]]) ||
     any(tracerx_repeats$events[tracerx_repeats$scenario == "size_matched_39"] !=
+        tracerx_values[["size_matched_events"]]) ||
+    any(tracerx_repeats$n[tracerx_repeats$scenario == "fixed_subset_regions"] !=
+        tracerx_values[["size_matched_patients"]]) ||
+    any(tracerx_repeats$events[tracerx_repeats$scenario == "fixed_subset_regions"] !=
         tracerx_values[["size_matched_events"]])) {
   stop("TRACERx resampling scenarios have inconsistent patient or event counts.")
 }
@@ -431,7 +441,7 @@ tracerx_resampling <- read_csv(
   file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
   show_col_types = FALSE
 )
-if (nrow(tracerx_resampling) != values[["high_confidence_candidate"]] * 2 ||
+if (nrow(tracerx_resampling) != values[["high_confidence_candidate"]] * 3 ||
     any(tracerx_resampling$successful_repeats != RESAMPLING$tracerx_region_repeats)) {
   stop("TRACERx one-region summary has incomplete candidate-by-scenario coverage.")
 }
@@ -533,6 +543,18 @@ if (!all(c(
 manifest <- read_csv(file.path(DIRS$tables, "run_manifest.csv"), show_col_types = FALSE)
 if (any(is.na(manifest$md5) | manifest$md5 == "")) {
   stop("Run manifest contains missing checksums.")
+}
+
+funnel_lists <- read_csv(file.path(DIRS$tables, "funnel_matched_lists.csv"), show_col_types = FALSE)
+if (dplyr::n_distinct(funnel_lists$rule) != 6L ||
+    length(unique(table(funnel_lists$rule))) != 1L ||
+    anyDuplicated(paste(funnel_lists$rule, funnel_lists$symbol))) {
+  stop("Funnel ablation lists are not equally sized and gene-unique.")
+}
+funnel_external <- read_csv(file.path(DIRS$tables, "funnel_external_gene_results.csv"), show_col_types = FALSE)
+if (nrow(funnel_external) != nrow(funnel_lists) * 2L ||
+    any(funnel_external$fdr < 0 | funnel_external$fdr > 1, na.rm = TRUE)) {
+  stop("Funnel external evaluation has incomplete coverage or invalid FDR.")
 }
 
 funnel <- read_csv(file.path(DIRS$tables, "evidence_funnel.csv"), show_col_types = FALSE)
