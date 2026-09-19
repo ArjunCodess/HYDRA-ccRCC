@@ -64,6 +64,7 @@ $steps += @(
   "analysis/01_download_tcga.R",
   "analysis/02_download_geo_manifest.R",
   "analysis/02_download_geo.R",
+  "analysis/00_verify_inputs.R",
   "analysis/03_qc_tcga.R",
   "analysis/04_deg_tcga.R",
   "analysis/04b_paired_deg_tcga.R",
