@@ -45,6 +45,11 @@ input_manifest <- tibble(
 )
 write_csv_atomic(input_manifest, file.path(DIRS$tables, "input_manifest.csv"))
 
+writeLines(
+  sub("[[:space:]]+$", "", capture.output(sessionInfo())),
+  "environment/sessionInfo.txt"
+)
+
 roots <- c("analysis", "results/tables", "results/figures")
 files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
@@ -59,15 +64,10 @@ info <- file.info(files)
 manifest <- tibble(
   path = gsub("\\\\", "/", files),
   bytes = as.numeric(info$size),
-  modified_utc = format(as.POSIXct(info$mtime, tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   md5 = unname(tools::md5sum(files))
 ) |>
   arrange(path)
 
 write_csv_atomic(manifest, file.path(DIRS$tables, "run_manifest.csv"))
-writeLines(
-  sub("[[:space:]]+$", "", capture.output(sessionInfo())),
-  "environment/sessionInfo.txt"
-)
 
 message("Run manifest complete. Files checksummed: ", nrow(manifest))
