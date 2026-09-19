@@ -39,6 +39,13 @@ required_files <- c(
   file.path(DIRS$tables, "candidate_cox_bootstrap_summary.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment_repeats.csv"),
+  file.path(DIRS$tables, "nested_cv_predictions.csv"),
+  file.path(DIRS$tables, "nested_cv_folds.csv"),
+  file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"),
+  file.path(DIRS$tables, "nested_cv_patient_bootstrap.csv"),
+  file.path(DIRS$tables, "nested_cv_summary.csv"),
+  file.path(DIRS$tables, "nested_cv_clinical_null.csv"),
+  file.path(DIRS$tables, "acceptance_criteria.csv"),
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
   file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
@@ -70,7 +77,10 @@ required_files <- c(
   file.path(DIRS$figures, "tcga_kirc_discordance.png"),
   file.path(DIRS$figures, "tcga_kirc_directional_discordance.png"),
   file.path(DIRS$figures, "candidate_forest_plot.png"),
-  file.path(DIRS$figures, "evidence_funnel.png")
+  file.path(DIRS$figures, "evidence_funnel.png"),
+  file.path(DIRS$figures, "nested_cv_increment.png"),
+  file.path(DIRS$figures, "funnel_external_comparison.png"),
+  file.path("paper", "results_macros.tex")
 )
 
 missing_files <- required_files[!file.exists(required_files)]
@@ -396,6 +406,27 @@ if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
   stop("Direct tumor-purity output contains non-finite gene estimates.")
 }
 
+nested_folds <- read_csv(file.path(DIRS$tables, "nested_cv_folds.csv"), show_col_types = FALSE)
+nested_scores <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"), show_col_types = FALSE)
+nested_summary <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"), show_col_types = FALSE)
+nested_predictions <- read_csv(file.path(DIRS$tables, "nested_cv_predictions.csv"), show_col_types = FALSE)
+nested_null <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null.csv"), show_col_types = FALSE)
+if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
+    nrow(nested_summary) != 1L || nrow(nested_null) != 200L ||
+    any(table(nested_predictions$repeat_id) != nested_summary$n_patients) ||
+    anyDuplicated(paste(nested_predictions$repeat_id, nested_predictions$patient_barcode)) ||
+    sum(nested_folds$no_gene_selected) != nested_summary$no_gene_folds ||
+    any(!is.finite(nested_scores$delta_c)) ||
+    any(!is.finite(nested_scores$delta_brier3))) {
+  stop("Selection-aware CV or clinical-only null has incomplete coverage.")
+}
+if (!isTRUE(all.equal(nested_summary$mean_delta_c, mean(nested_scores$delta_c),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(nested_summary$mean_delta_brier3, mean(nested_scores$delta_brier3),
+                      tolerance = 1e-12, check.attributes = FALSE))) {
+  stop("Nested CV summary differs from its repeat-level metrics.")
+}
+
 tracerx_discordance <- read_csv(
   file.path(DIRS$tables, "tracerx_candidate_multiregion_summary.csv"),
   show_col_types = FALSE
@@ -572,6 +603,10 @@ if (!all(c(
 manifest <- read_csv(file.path(DIRS$tables, "run_manifest.csv"), show_col_types = FALSE)
 if (any(is.na(manifest$md5) | manifest$md5 == "")) {
   stop("Run manifest contains missing checksums.")
+}
+if (any(!file.exists(manifest$path)) ||
+    any(unname(tools::md5sum(manifest$path)) != manifest$md5)) {
+  stop("Generated output differs from the run manifest.")
 }
 
 funnel_lists <- read_csv(file.path(DIRS$tables, "funnel_matched_lists.csv"), show_col_types = FALSE)
