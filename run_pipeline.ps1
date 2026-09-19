@@ -75,6 +75,7 @@ $steps += @(
   "analysis/07b_apeglm_global_survival_sensitivity.R",
   "analysis/08_enrichment_tcga.R",
   "analysis/10_candidate_table.R",
+  "analysis/10b_paired_candidates.R",
   "analysis/11_hardening_outputs.R",
   "analysis/13_external_survival_gse29609.R",
   "analysis/14_external_survival_emtab1980.R",

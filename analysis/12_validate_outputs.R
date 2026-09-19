@@ -18,6 +18,7 @@ required_files <- c(
   FILES$tcga_apeglm_survival_summary,
   FILES$tcga_enrichment,
   file.path(DIRS$tables, "candidate_gene_evidence_table.csv"),
+  file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"),
   file.path(DIRS$tables, "strict_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"),
@@ -225,6 +226,12 @@ for (accession in c("gse40435", "gse53757")) {
 ranked <- read_csv(file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"), show_col_types = FALSE)
 if (nrow(ranked) != values[["high_confidence_candidate"]]) {
   stop("Ranked shortlist row count does not match high-confidence candidate count.")
+}
+paired_candidates <- read_csv(file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"), show_col_types = FALSE)
+if (nrow(paired_candidates) != values[["high_confidence_candidate"]] ||
+    anyDuplicated(paired_candidates$tcga_gene_id) ||
+    any(is.na(paired_candidates$same_direction))) {
+  stop("Paired DE sensitivity lacks complete candidate coverage.")
 }
 
 survival_report <- read_csv(file.path(DIRS$tables, "candidate_survival_report.csv"), show_col_types = FALSE)
