@@ -60,6 +60,7 @@ if (-not $SkipInstall) {
   $steps += @("analysis/00_install_packages.R")
 }
 $steps += @(
+  "analysis/00_check_environment.R",
   "analysis/01_download_tcga.R",
   "analysis/02_download_geo_manifest.R",
   "analysis/02_download_geo.R",

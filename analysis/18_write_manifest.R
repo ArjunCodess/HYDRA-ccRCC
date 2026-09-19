@@ -20,8 +20,8 @@ source_rows <- tribble(
   "Aran-2015-CPE", "published consensus TCGA tumor-purity sensitivity", SOURCE_URLS$aran2015_purity_study
 ) |>
   mutate(
-    access_date = format(Sys.Date(), "%Y-%m-%d"),
-    retrieval = "scripted public download",
+    access_date = NA_character_,
+    retrieval = "cached public input; original retrieval date not recorded",
     candidate_definition_role = if_else(
       source_id %in% c("E-MTAB-1980", "HPA-v25.1", "TRACERx-Renal", "CheckMate-025-Braun", "Aran-2015-CPE"),
       "downstream evaluation only; not used to define the reviewer-driven revised candidate set",
@@ -31,11 +31,26 @@ source_rows <- tribble(
 
 write_csv_atomic(source_rows, file.path(DIRS$tables, "source_provenance.csv"))
 
+input_files <- list.files(DIRS$raw, recursive = TRUE, full.names = TRUE)
+input_files <- c(input_files, FILES$tcga_se, FILES$tcga_counts, FILES$tcga_coldata,
+                 FILES$tcga_clinical,
+                 file.path(DIRS$processed, paste0(c("gse40435", "gse53757", "gse29609"), "_series_matrix.rds")))
+input_files <- sort(unique(input_files[file.exists(input_files) & !dir.exists(input_files)]))
+input_info <- file.info(input_files)
+input_manifest <- tibble(
+  path = gsub("\\\\", "/", input_files),
+  bytes = as.numeric(input_info$size),
+  md5 = unname(tools::md5sum(input_files)),
+  provenance = "cached public input; original retrieval date unknown"
+)
+write_csv_atomic(input_manifest, file.path(DIRS$tables, "input_manifest.csv"))
+
 roots <- c("analysis", "results/tables", "results/figures")
 files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
 }))
-files <- c(files, "README.md", "protocol.md", "run_pipeline.ps1", "environment/sessionInfo.txt")
+files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1",
+           "environment/sessionInfo.txt", "environment/package_versions.csv")
 files <- files[file.exists(files) & !dir.exists(files)]
 files <- files[!grepl("run_manifest\\.csv$", files)]
 info <- file.info(files)
