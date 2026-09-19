@@ -104,6 +104,25 @@ if (values[["strict_candidate"]] > values[["sensitivity_pass"]]) {
 }
 
 tcga_deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
+tcga_samples <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"), show_col_types = FALSE)
+if (tcga_samples$n_samples[tcga_samples$sample_type == "Primary Tumor"] != 533L ||
+    tcga_samples$n_samples[tcga_samples$sample_type == "Solid Tissue Normal"] != 72L) {
+  stop("TCGA selected sample counts differ from the audited cached cohort.")
+}
+paired_summary <- read_csv(file.path(DIRS$tables, "tcga_kirc_paired_deg_summary.csv"), show_col_types = FALSE)
+paired_values <- setNames(paired_summary$value, paired_summary$metric)
+if (paired_values[["paired_samples"]] != 2L * paired_values[["paired_patients"]] ||
+    paired_values[["paired_patients"]] > 72L) {
+  stop("Paired TCGA differential expression has invalid patient coverage.")
+}
+survival <- read_csv(FILES$tcga_survival, show_col_types = FALSE)
+for (model in unique(survival$model_type)) {
+  rows <- survival$model_type == model
+  if (!isTRUE(all.equal(survival$fdr[rows], p.adjust(survival$p_value[rows], "BH"),
+                        tolerance = 1e-12, check.attributes = FALSE))) {
+    stop("TCGA survival FDR differs from BH correction for model: ", model)
+  }
+}
 required_apeglm_columns <- c("log2FoldChange_apeglm", "lfcSE_apeglm")
 if (!all(required_apeglm_columns %in% names(tcga_deg))) {
   stop("TCGA differential-expression output is missing apeglm MAP estimates.")
@@ -197,6 +216,9 @@ for (accession in c("gse40435", "gse53757")) {
   if (any(geo_summary$n_surrogate_variables < 0) ||
       any(geo_summary$adjusted_design_rank < geo_summary$full_design_rank)) {
     stop(accession, " contains invalid SVA design diagnostics.")
+  }
+  if (nrow(geo_summary) != 2L || any(geo_summary$n_samples != geo_summary$n_patients)) {
+    stop(accession, " parsed tumor-normal pairs do not cover exactly one sample per condition.")
   }
 }
 
