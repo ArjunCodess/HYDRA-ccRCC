@@ -44,7 +44,7 @@ candidates <- read_csv(
   show_col_types = FALSE
 ) |>
   filter(high_confidence_candidate, tcga_gene_id %in% rownames(vst_mat)) |>
-  select(symbol, tcga_gene_id, original_main_log_hr = main_log_hr)
+  select(symbol, tcga_gene_id)
 
 clinical_surv <- clinical |>
   transmute(
@@ -97,6 +97,10 @@ fit_candidate <- function(gene_id) {
     return(NULL)
   }
 
+  baseline <- tryCatch(
+    coxph(Surv(os_time, os_event) ~ expr + age + sex + stage + grade, data = dat),
+    error = function(e) NULL
+  )
   fit <- tryCatch(
     coxph(
       Surv(os_time, os_event) ~ expr + purity + age + sex + stage + grade,
@@ -104,12 +108,14 @@ fit_candidate <- function(gene_id) {
     ),
     error = function(e) NULL
   )
-  if (is.null(fit)) return(NULL)
+  if (is.null(fit) || is.null(baseline)) return(NULL)
 
   terms <- tidy(fit, conf.int = TRUE)
   gene_term <- terms |> filter(term == "expr")
   purity_term <- terms |> filter(term == "purity")
   if (nrow(gene_term) != 1 || nrow(purity_term) != 1) return(NULL)
+  baseline_term <- tidy(baseline) |> filter(term == "expr")
+  if (nrow(baseline_term) != 1) return(NULL)
 
   zph <- tryCatch(cox.zph(fit), error = function(e) NULL)
   gene_ph_p <- if (is.null(zph) || !"expr" %in% rownames(zph$table)) {
@@ -119,6 +125,7 @@ fit_candidate <- function(gene_id) {
   }
 
   tibble(
+    original_main_log_hr = baseline_term$estimate,
     gene_log_hr = gene_term$estimate,
     gene_hr = exp(gene_term$estimate),
     gene_hr_ci_low = exp(gene_term$conf.low),

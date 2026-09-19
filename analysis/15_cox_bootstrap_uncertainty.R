@@ -52,7 +52,15 @@ sample_data <- coldata |>
 
 candidate_table <- candidates |>
   filter(high_confidence_candidate, tcga_gene_id %in% rownames(vst_mat)) |>
-  select(symbol, tcga_gene_id, full_fit_log_hr = main_log_hr)
+  select(symbol, tcga_gene_id)
+
+fit_reference <- function(gene_id) {
+  raw_expr <- as.numeric(vst_mat[gene_id, sample_data$sample_barcode])
+  dat <- sample_data |> mutate(expr = as.numeric(scale(raw_expr)))
+  fit <- coxph(Surv(os_time, os_event) ~ expr + age + sex + stage + grade, data = dat)
+  unname(coef(fit)[["expr"]])
+}
+candidate_table$full_fit_log_hr <- vapply(candidate_table$tcga_gene_id, fit_reference, numeric(1))
 
 draw_stratified_bootstrap <- function(event) {
   unlist(lapply(sort(unique(event)), function(value) {
