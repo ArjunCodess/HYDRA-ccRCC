@@ -20,6 +20,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - TCGA uses DESeq2 on raw STAR unstranded counts. Significance requires FDR below 0.05 and absolute log2 fold change of at least 1.
 - A separate sensitivity analysis estimates TCGA MAP log2 fold changes with `lfcShrink(type = "apeglm")`, applies no absolute fold-change inclusion threshold, and preserves the original MLE-based rule as the primary analysis.
 - Each GEO cohort uses limma with patient-pair blocking. SVA protects the tumor-normal contrast using a full `patient + condition` model and a null `patient` model; estimated surrogate variables are added to the limma design.
+- GSE53757 pair IDs are inferred from alternating row order. A condition-alternation assertion detects misordered rows, but it cannot independently establish patient identity without explicit subject identifiers.
 - GEO tables report log2 fold-change confidence intervals and SVA design diagnostics. Zero estimated surrogate variables is retained as a valid result.
 - A reproducible DEG must be TCGA-significant, have the same effect direction in both GEO cohorts, and have nominal p below 0.05 in at least one GEO cohort.
 
