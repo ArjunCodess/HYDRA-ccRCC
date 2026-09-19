@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -9,7 +10,7 @@ suppressPackageStartupMessages({
 })
 
 vst_mat <- read_required_rds(FILES$tcga_vst)
-coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+coldata <- read_selected_tcga_coldata(FILES$tcga_coldata, FILES$tcga_counts)
 clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
 candidates <- read_csv(file.path(DIRS$tables, "candidate_gene_evidence_table.csv"), show_col_types = FALSE) |>
   filter(high_confidence_candidate, tcga_gene_id %in% rownames(vst_mat)) |>

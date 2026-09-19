@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/plotting.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(SummarizedExperiment)
@@ -15,6 +16,10 @@ counts <- SummarizedExperiment::assay(se, "unstranded")
 coldata <- as.data.frame(SummarizedExperiment::colData(se)) |>
   tibble::rownames_to_column("sample_barcode") |>
   mutate(condition = factor(shortLetterCode, levels = c("NT", "TP")))
+coldata <- select_tcga_patient_samples(coldata, counts)
+counts <- counts[, coldata$sample_barcode, drop = FALSE]
+coldata <- as.data.frame(coldata)
+rownames(coldata) <- coldata$sample_barcode
 
 sample_summary <- coldata |>
   count(sample_type, shortLetterCode, name = "n_samples")

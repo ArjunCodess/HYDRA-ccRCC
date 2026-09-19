@@ -2,6 +2,7 @@ source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/plotting.R")
 source("analysis/functions/tcga_metadata.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -181,7 +182,7 @@ write_csv_atomic(manuscript_candidates, file.path(DIRS$tables, "manuscript_candi
 
 fit_composition_sensitivity <- function(high_conf_symbols) {
   vst_mat <- read_required_rds(FILES$tcga_vst)
-  coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+  coldata <- read_selected_tcga_coldata(FILES$tcga_coldata, FILES$tcga_counts)
   clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
   repro <- read_csv(file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse53757.csv"), show_col_types = FALSE)
 
