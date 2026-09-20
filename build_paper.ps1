@@ -31,7 +31,8 @@ Remove-Item -LiteralPath `
   (Join-Path $paperDir "main.aux"), `
   (Join-Path $paperDir "main.bbl"), `
   (Join-Path $paperDir "main.blg"), `
-  (Join-Path $paperDir "main.log") `
+  (Join-Path $paperDir "main.log"), `
+  (Join-Path $paperDir "main.out") `
   -Force -ErrorAction SilentlyContinue
 
 Write-Host "Built paper/main.pdf"

@@ -40,7 +40,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Bootstrap p-values, per-repeat FDR thresholds, and selection frequencies are not used.
 - Twenty repeats of five-fold event-stratified cross-validation compare clinical-only and clinical-plus-one-gene models on held-out patients. Cross-validation is used only to estimate prediction discrimination.
 - The 20-by-five-fold per-gene analysis above is conditional on the full-data candidate set and is descriptive. A separate 10-by-five-fold patient-level outer CV reruns TCGA DE, both-GEO replication, all primary survival gates, and training-only expression scaling in every training fold. It selects one top gene, uses clinical-only predictions if none qualifies, and reports pooled concordance, three-year IPCW Brier score, calibration slope, and a patient-resampled interval for concordance increment.
-- Two hundred clinical-only null simulations repeat the fold-level selection on simulated clinical-risk-dependent event times with resampled censoring. One of the five fixed outer folds is assessed per simulation, cycling folds, so this null distribution estimates selection behavior under a clinical-only data-generating process rather than another 10-by-five-fold CV interval.
+- Two hundred clinical-only null simulations repeat the fold-level selection on event times from an exponential baseline calibrated to the fitted clinical Cox cumulative hazard, with resampled censoring. One of the five fixed outer folds is assessed per simulation, cycling folds, so this null distribution estimates selection behavior under that specific clinical-only data-generating process rather than another 10-by-five-fold CV interval.
 
 ## External survival evaluation
 
