@@ -8,6 +8,17 @@ suppressPackageStartupMessages({
 cv <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"), show_col_types = FALSE)
 summary <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"), show_col_types = FALSE)
 funnel <- read_csv(file.path(DIRS$tables, "funnel_external_summary.csv"), show_col_types = FALSE)
+rule_labels <- c(
+  complete_rule = "Complete",
+  survival_only = "Survival only",
+  de_only = "DE only",
+  leave_out_gse40435 = "Leave GSE40435 out",
+  leave_out_gse53757 = "Leave GSE53757 out",
+  expression_matched_control = "Expression-matched control"
+)
+stopifnot(setequal(funnel$rule, names(rule_labels)))
+funnel$rule <- factor(funnel$rule, levels = names(rule_labels),
+                      labels = unname(rule_labels))
 
 p1 <- ggplot(cv, aes(repeat_id, delta_c)) +
   geom_hline(yintercept = 0, color = "grey50", linewidth = 0.4) +
@@ -30,7 +41,7 @@ p2 <- ggplot(funnel, aes(rule, directional_rate, fill = cohort)) +
        title = "Exploratory external comparison at matched list size",
        fill = "Cohort") +
   theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 28, hjust = 1))
+  theme(axis.text.x = element_text(angle = 23, hjust = 1))
 ggsave(file.path(DIRS$figures, "funnel_external_comparison.png"), p2,
        width = 9, height = 4.7, dpi = 180)
 message("Audit figures regenerated.")
