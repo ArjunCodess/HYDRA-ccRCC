@@ -125,7 +125,7 @@ fit_candidate <- function(gene_id) {
   }
 
   tibble(
-    original_main_log_hr = baseline_term$estimate,
+    matched_baseline_log_hr = baseline_term$estimate,
     gene_log_hr = gene_term$estimate,
     gene_hr = exp(gene_term$estimate),
     gene_hr_ci_low = exp(gene_term$conf.low),
@@ -147,11 +147,11 @@ results <- bind_rows(lapply(seq_len(nrow(candidates)), function(i) {
 })) |>
   mutate(
     gene_fdr = p.adjust(gene_p_value, method = "BH"),
-    same_direction_after_purity = sign(gene_log_hr) == sign(original_main_log_hr),
-    absolute_log_hr_attenuation = abs(original_main_log_hr) - abs(gene_log_hr),
+    same_direction_after_purity = sign(gene_log_hr) == sign(matched_baseline_log_hr),
+    absolute_log_hr_attenuation = abs(matched_baseline_log_hr) - abs(gene_log_hr),
     relative_log_hr_attenuation = if_else(
-      abs(original_main_log_hr) > 0,
-      1 - abs(gene_log_hr) / abs(original_main_log_hr),
+      abs(matched_baseline_log_hr) > 0,
+      1 - abs(gene_log_hr) / abs(matched_baseline_log_hr),
       NA_real_
     )
   ) |>

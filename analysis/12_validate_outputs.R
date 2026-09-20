@@ -384,6 +384,7 @@ purity <- read_csv(
 )
 required_purity_columns <- c(
   "symbol",
+  "matched_baseline_log_hr",
   "gene_log_hr",
   "gene_p_value",
   "gene_fdr",
@@ -405,6 +406,11 @@ if (nrow(purity) != values[["high_confidence_candidate"]]) {
 }
 if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
   stop("Direct tumor-purity output contains non-finite gene estimates.")
+}
+if (any(!is.finite(purity$matched_baseline_log_hr)) ||
+    any(purity$same_direction_after_purity !=
+        (sign(purity$gene_log_hr) == sign(purity$matched_baseline_log_hr)))) {
+  stop("Direct tumor-purity comparisons are inconsistent with matched baseline fits.")
 }
 
 nested_folds <- read_csv(file.path(DIRS$tables, "nested_cv_folds.csv"), show_col_types = FALSE)
