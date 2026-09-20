@@ -13,10 +13,21 @@ suppressPackageStartupMessages({
 
 se <- read_required_rds(FILES$tcga_se)
 counts <- SummarizedExperiment::assay(se, "unstranded")
-coldata <- as.data.frame(SummarizedExperiment::colData(se)) |>
+raw_coldata <- as.data.frame(SummarizedExperiment::colData(se)) |>
   tibble::rownames_to_column("sample_barcode") |>
   mutate(condition = factor(shortLetterCode, levels = c("NT", "TP")))
-coldata <- select_tcga_patient_samples(coldata, counts)
+coldata <- select_tcga_patient_samples(raw_coldata, counts)
+selection_audit <- raw_coldata |>
+  filter(shortLetterCode %in% c("NT", "TP")) |>
+  mutate(patient_barcode = substr(sample_barcode, 1, 12)) |>
+  group_by(sample_type, shortLetterCode) |>
+  summarise(raw_samples = n(), unique_patients = n_distinct(patient_barcode),
+            .groups = "drop") |>
+  left_join(coldata |> count(sample_type, shortLetterCode, name = "selected_samples"),
+            by = c("sample_type", "shortLetterCode")) |>
+  mutate(removed_replicate_samples = raw_samples - selected_samples)
+stopifnot(all(selection_audit$selected_samples == selection_audit$unique_patients))
+write_csv_atomic(selection_audit, file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"))
 counts <- counts[, coldata$sample_barcode, drop = FALSE]
 coldata <- as.data.frame(coldata)
 rownames(coldata) <- coldata$sample_barcode

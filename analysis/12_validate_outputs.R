@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
 
 required_files <- c(
   file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"),
+  file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"),
   file.path(DIRS$tables, "gse40435_sample_summary.csv"),
   file.path(DIRS$tables, "gse53757_sample_summary.csv"),
   file.path(DIRS$tables, "gse29609_sample_summary.csv"),
@@ -117,6 +118,17 @@ if (values[["strict_candidate"]] > values[["sensitivity_pass"]]) {
 
 tcga_deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
 tcga_samples <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"), show_col_types = FALSE)
+selection_audit <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"),
+                            show_col_types = FALSE)
+if (nrow(selection_audit) != 2L ||
+    !setequal(selection_audit$shortLetterCode, c("TP", "NT")) ||
+    any(selection_audit$selected_samples != selection_audit$unique_patients) ||
+    any(selection_audit$removed_replicate_samples !=
+        selection_audit$raw_samples - selection_audit$selected_samples) ||
+    selection_audit$selected_samples[selection_audit$shortLetterCode == "TP"] != 533L ||
+    selection_audit$raw_samples[selection_audit$shortLetterCode == "TP"] != 541L) {
+  stop("TCGA sample selection audit is inconsistent with the cached cohort.")
+}
 if (tcga_samples$n_samples[tcga_samples$sample_type == "Primary Tumor"] != 533L ||
     tcga_samples$n_samples[tcga_samples$sample_type == "Solid Tissue Normal"] != 72L) {
   stop("TCGA selected sample counts differ from the audited cached cohort.")
