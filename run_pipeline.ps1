@@ -1,6 +1,7 @@
 param(
   [switch]$ForceDownload,
-  [switch]$SkipInstall
+  [switch]$SkipInstall,
+  [ValidateRange(1, 5)][int]$NestedWorkers = 1
 )
 
 $ErrorActionPreference = "Stop"
@@ -41,6 +42,43 @@ function Invoke-RStep {
   if ($exitCode -ne 0) {
     throw "Pipeline step failed: $Step"
   }
+}
+
+function Invoke-NestedCV {
+  param([string]$RscriptPath, [int]$Workers)
+  if ($Workers -eq 1) {
+    Invoke-RStep -RscriptPath $RscriptPath -Step "analysis/22_nested_cv.R"
+    return
+  }
+
+  $processes = @()
+  try {
+    foreach ($worker in 0..($Workers - 1)) {
+      $repeatIds = @(1..10 | Where-Object { (($_ - 1) % $Workers) -eq $worker })
+      $env:HYDRA_REPEAT_IDS = $repeatIds -join ','
+      $stdout = "data/processed/nested_worker_$worker.stdout.log"
+      $stderr = "data/processed/nested_worker_$worker.stderr.log"
+      $processes += Start-Process -FilePath $RscriptPath -ArgumentList "analysis/22_nested_cv.R" `
+        -WorkingDirectory (Get-Location).Path -WindowStyle Hidden -PassThru `
+        -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+      Write-Host "Nested worker $worker started for repeats $env:HYDRA_REPEAT_IDS"
+    }
+  }
+  finally {
+    Remove-Item Env:HYDRA_REPEAT_IDS -ErrorAction SilentlyContinue
+  }
+
+  $failed = @()
+  foreach ($process in $processes) {
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) {
+      $failed += $process.Id
+    }
+  }
+  if ($failed.Count -gt 0) {
+    throw "Nested CV workers $($failed -join ', ') failed. Inspect data/processed/nested_worker_*.stderr.log."
+  }
+  Invoke-RStep -RscriptPath $RscriptPath -Step "analysis/22_nested_cv.R"
 }
 
 $rscript = Find-Rscript
@@ -100,7 +138,11 @@ $steps += @(
 )
 
 foreach ($step in $steps) {
-  Invoke-RStep -RscriptPath $rscript -Step $step
+  if ($step -eq "analysis/22_nested_cv.R") {
+    Invoke-NestedCV -RscriptPath $rscript -Workers $NestedWorkers
+  } else {
+    Invoke-RStep -RscriptPath $rscript -Step $step
+  }
 }
 
 Write-Host ""
