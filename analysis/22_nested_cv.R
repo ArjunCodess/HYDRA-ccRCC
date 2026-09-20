@@ -242,6 +242,12 @@ score_repeat <- function(pred) {
 predictions <- vector("list", n_repeats)
 fold_summary <- list()
 first_fold_cache <- vector("list", 5L)
+worker_spec <- Sys.getenv("HYDRA_REPEAT_IDS", "")
+worker_mode <- nzchar(worker_spec)
+repeat_ids <- if (worker_mode) as.integer(strsplit(worker_spec, ",", fixed = TRUE)[[1]])
+              else seq_len(n_repeats)
+if (anyNA(repeat_ids) || anyDuplicated(repeat_ids) ||
+    any(!repeat_ids %in% seq_len(n_repeats))) stop("Invalid HYDRA_REPEAT_IDS.")
 checkpoint_dir <- file.path(DIRS$processed, "nested_cv_fold_checkpoints")
 dir.create(checkpoint_dir, showWarnings = FALSE)
 checkpoint_inputs <- c("analysis/22_nested_cv.R", "analysis/00_config.R",
@@ -250,7 +256,7 @@ checkpoint_inputs <- c("analysis/22_nested_cv.R", "analysis/00_config.R",
                        file.path(DIRS$tables, "gse40435_limma_tumor_vs_normal.csv"),
                        file.path(DIRS$tables, "gse53757_limma_tumor_vs_normal.csv"))
 checkpoint_signature <- unname(tools::md5sum(checkpoint_inputs))
-for (repeat_id in seq_len(n_repeats)) {
+for (repeat_id in repeat_ids) {
   set.seed(RESAMPLING$seed + 22L + repeat_id)
   fold_id <- folds(patients$os_event, 5L)
   fold_predictions <- vector("list", 5L)
@@ -289,6 +295,10 @@ for (repeat_id in seq_len(n_repeats)) {
     gc()
   }
   predictions[[repeat_id]] <- bind_rows(fold_predictions)
+}
+if (worker_mode) {
+  message("Nested CV fold worker complete: ", worker_spec)
+  quit(save = "no", status = 0L)
 }
 pred <- bind_rows(predictions)
 scores <- pred |> group_by(repeat_id) |> group_modify(~ score_repeat(.x)) |> ungroup()
