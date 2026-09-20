@@ -130,6 +130,7 @@ $steps += @(
   "analysis/23_survival_shape.R",
   "analysis/24_funnel_ablations.R",
   "analysis/26_acceptance_report.R",
+  "analysis/30_update_readme.R",
   "analysis/25_paper_numbers.R",
   "analysis/09_figures_tcga.R",
   "analysis/27_audit_figures.R",
