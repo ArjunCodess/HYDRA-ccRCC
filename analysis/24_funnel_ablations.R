@@ -15,8 +15,12 @@ suppressPackageStartupMessages({
 })
 
 all_gene <- read_csv(FILES$tcga_apeglm_survival, show_col_types = FALSE) |>
-  filter(!is.na(symbol), symbol != "", model_status == "ok") |>
+  filter(!is.na(symbol), symbol != "", model_status == "ok")
+survival_gene <- all_gene |>
   arrange(global_fdr, gene_id) |>
+  distinct(symbol, .keep_all = TRUE)
+de_gene <- all_gene |>
+  arrange(tcga_de_fdr, gene_id) |>
   distinct(symbol, .keep_all = TRUE)
 full <- read_csv(file.path(DIRS$tables, "high_confidence_candidate_genes.csv"),
                  show_col_types = FALSE)
@@ -26,9 +30,9 @@ stopifnot(k > 0L, !anyDuplicated(full$symbol))
 list_rows <- list(
   complete_rule = full |> transmute(symbol, gene_id = tcga_gene_id,
                                     tcga_log_hr = main_log_hr),
-  survival_only = all_gene |> slice_head(n = k) |>
+  survival_only = survival_gene |> slice_head(n = k) |>
     transmute(symbol, gene_id, tcga_log_hr = log_hr),
-  de_only = all_gene |> arrange(tcga_de_fdr, gene_id) |> slice_head(n = k) |>
+  de_only = de_gene |> slice_head(n = k) |>
     transmute(symbol, gene_id, tcga_log_hr = log_hr)
 )
 
@@ -65,7 +69,7 @@ passes_sensitivity <- function(gene_id, direction) {
 for (kept_geo in c("gse40435", "gse53757")) {
   effect <- paste0(kept_geo, "_log2fc")
   p <- paste0(kept_geo, "_p_value")
-  eligible <- all_gene |>
+  eligible <- de_gene |>
     filter(primary_tcga_deg_gate, is.finite(.data[[effect]]),
            is.finite(.data[[p]]), .data[[p]] < 0.05,
            sign(tcga_mle_log2fc) == sign(.data[[effect]]),
@@ -85,10 +89,10 @@ for (kept_geo in c("gse40435", "gse53757")) {
 }
 
 # Controls match mean TCGA abundance but fail the genome-wide survival screen.
-pool <- all_gene |>
+pool <- survival_gene |>
   filter(global_fdr > 0.5, is.finite(base_mean), base_mean > 0,
          !symbol %in% unlist(lapply(list_rows, function(x) x$symbol)))
-targets <- full |> left_join(all_gene |> select(gene_id, base_mean),
+targets <- full |> left_join(de_gene |> select(gene_id, base_mean),
                             by = c("tcga_gene_id" = "gene_id"))
 controls <- vector("list", k)
 for (i in seq_len(k)) {
