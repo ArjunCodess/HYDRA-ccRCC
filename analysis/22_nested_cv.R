@@ -244,8 +244,11 @@ fold_summary <- list()
 first_fold_cache <- vector("list", 5L)
 worker_spec <- Sys.getenv("HYDRA_REPEAT_IDS", "")
 worker_mode <- nzchar(worker_spec)
-repeat_ids <- if (worker_mode) as.integer(strsplit(worker_spec, ",", fixed = TRUE)[[1]])
-              else seq_len(n_repeats)
+repeat_ids <- if (worker_mode) {
+  as.integer(strsplit(worker_spec, ",", fixed = TRUE)[[1]])
+} else {
+  seq_len(n_repeats)
+}
 if (anyNA(repeat_ids) || anyDuplicated(repeat_ids) ||
     any(!repeat_ids %in% seq_len(n_repeats))) stop("Invalid HYDRA_REPEAT_IDS.")
 checkpoint_dir <- file.path(DIRS$processed, "nested_cv_fold_checkpoints")
