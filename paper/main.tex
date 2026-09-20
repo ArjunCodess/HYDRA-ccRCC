@@ -56,7 +56,7 @@ All \HighGenes\ conditional bootstrap intervals excluded zero. The per-gene cond
 The within-reproducible-gene overlap permutation did not show enrichment of the GEO-effect gate among survival-pass genes (empirical $p=\NullOverlapP$). It shuffles pass labels rather than refitting survival models, so it is a limited negative control.
 
 \subsection{Selection-aware prediction and funnel comparison}
-The nested analysis selected no gene in \NestedNoGeneFolds\ of 50 training folds; \NestedOutlierFallbacks\ folds required a no-replacement retry after a DESeq2 outlier-replacement error. The mean out-of-fold concordance increment was \NestedDelta\ (patient-bootstrap 95\% interval \NestedCiLow\ to \NestedCiHigh); the mean gene-minus-clinical three-year Brier-score difference was \NestedBrierDelta. The predeclared prediction criterion \NestedPassed. The separate clinical-only null simulations are reported in the committed result table and do not change that criterion.
+The nested analysis selected no gene in \NestedNoGeneFolds\ of 50 training folds; \NestedOutlierFallbacks\ folds required a no-replacement retry after a DESeq2 outlier-replacement error. The mean out-of-fold concordance increment was \NestedDelta\ (patient-bootstrap 95\% interval \NestedCiLow\ to \NestedCiHigh); the mean gene-minus-clinical three-year Brier-score difference was \NestedBrierDelta. The predeclared prediction criterion \NestedPassed. The clinical-only null selected a gene in \NullSelected\ of 200 single-fold simulations. These simulations estimate selection under their specified clinical-risk model and do not change the repeated-CV criterion.
 
 \begin{figure}[htbp]
 \centering\includegraphics[width=\linewidth]{../results/figures/nested_cv_increment.png}

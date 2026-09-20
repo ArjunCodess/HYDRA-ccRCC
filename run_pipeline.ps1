@@ -88,6 +88,7 @@ $steps += @(
   "analysis/20_tracerx_multiregion_transportability.R",
   "analysis/21_checkmate025_treatment_interaction.R",
   "analysis/22_nested_cv.R",
+  "analysis/28_null_summary.R",
   "analysis/23_survival_shape.R",
   "analysis/24_funnel_ablations.R",
   "analysis/26_acceptance_report.R",

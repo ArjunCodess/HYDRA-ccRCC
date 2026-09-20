@@ -47,6 +47,7 @@ required_files <- c(
   file.path(DIRS$tables, "nested_cv_patient_bootstrap.csv"),
   file.path(DIRS$tables, "nested_cv_summary.csv"),
   file.path(DIRS$tables, "nested_cv_clinical_null.csv"),
+  file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
   file.path(DIRS$tables, "acceptance_criteria.csv"),
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
@@ -430,8 +431,12 @@ nested_scores <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv")
 nested_summary <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"), show_col_types = FALSE)
 nested_predictions <- read_csv(file.path(DIRS$tables, "nested_cv_predictions.csv"), show_col_types = FALSE)
 nested_null <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null.csv"), show_col_types = FALSE)
+null_summary <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
+                         show_col_types = FALSE)
 if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
     nrow(nested_summary) != 1L || nrow(nested_null) != 200L ||
+    nrow(null_summary) != 1L || null_summary$simulations != nrow(nested_null) ||
+    null_summary$gene_selected != sum(!is.na(nested_null$selected_gene)) ||
     any(table(nested_predictions$repeat_id) != nested_summary$n_patients) ||
     anyDuplicated(paste(nested_predictions$repeat_id, nested_predictions$patient_barcode)) ||
     sum(nested_folds$no_gene_selected) != nested_summary$no_gene_folds ||
