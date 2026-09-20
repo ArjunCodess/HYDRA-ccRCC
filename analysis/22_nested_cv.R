@@ -79,9 +79,15 @@ make_fold_data <- function(train_idx, test_idx) {
   train_meta <- as.data.frame(train_meta)
   rownames(train_meta) <- train_meta$sample_barcode
   dds <- DESeqDataSetFromMatrix(train_raw, train_meta, design = ~ condition)
-  # DESeq2's optional Cook outlier replacement fails in this pinned R runtime
-  # for some training folds; keep its outlier filtering but disable replacement.
-  dds <- DESeq(dds, quiet = TRUE, minReplicatesForReplace = Inf)
+  # Match the primary DESeq2 fit. If its optional Cook outlier replacement
+  # fails in a fold, retry without replacement and record that deviation.
+  replacement_fallback <- FALSE
+  dds <- tryCatch(DESeq(dds, quiet = TRUE), error = function(e) {
+    if (!grepl("is.finite(partial)", conditionMessage(e), fixed = TRUE)) stop(e)
+    message("DESeq2 outlier replacement failed: ", conditionMessage(e))
+    replacement_fallback <<- TRUE
+    DESeq(dds, quiet = TRUE, minReplicatesForReplace = Inf)
+  })
   de <- as.data.frame(results(dds, contrast = c("condition", "TP", "NT")))
   de$gene_id <- rownames(de)
   de <- de |>
@@ -95,7 +101,8 @@ make_fold_data <- function(train_idx, test_idx) {
            sign(log2FoldChange) == sign(gse40435_log2fc),
            sign(log2FoldChange) == sign(gse53757_log2fc),
            (gse40435_pvalue < 0.05 | gse53757_pvalue < 0.05))
-  if (nrow(de) == 0L) return(list(de = de, expr = matrix(numeric(), 0, nrow(patients))))
+  if (nrow(de) == 0L) return(list(de = de, expr = matrix(numeric(), 0, nrow(patients)),
+                                 replacement_fallback = replacement_fallback))
 
   # Estimate library size using training samples only, then apply the frozen
   # geometric-mean reference to held-out tumors.
@@ -109,7 +116,7 @@ make_fold_data <- function(train_idx, test_idx) {
   expr <- log2(sweep(counts[chosen, patients$sample_barcode, drop = FALSE],
                      2, all_sf[patients$sample_barcode], "/") + 1)
   stopifnot(all(is.finite(expr)))
-  list(de = de, expr = expr)
+  list(de = de, expr = expr, replacement_fallback = replacement_fallback)
 }
 
 gene_fit <- function(dat, expr, covariates) {
@@ -221,6 +228,7 @@ predictions <- vector("list", n_repeats)
 fold_summary <- list()
 first_fold_cache <- vector("list", 5L)
 for (repeat_id in seq_len(n_repeats)) {
+  set.seed(RESAMPLING$seed + 22L + repeat_id)
   fold_id <- folds(patients$os_event, 5L)
   fold_predictions <- vector("list", 5L)
   for (fold in seq_len(5L)) {
@@ -235,6 +243,7 @@ for (repeat_id in seq_len(n_repeats)) {
     fold_summary[[length(fold_summary) + 1L]] <- tibble(repeat_id, fold,
       n_train = length(train_idx), n_test = length(test_idx),
       train_de_genes = nrow(fd$de), selected_gene = selected,
+      outlier_replacement_fallback = fd$replacement_fallback,
       no_gene_selected = is.na(selected))
     if (repeat_id == 1L) first_fold_cache[[fold]] <- list(fd = fd, train = train_idx, test = test_idx)
     gc()
@@ -257,6 +266,8 @@ boot <- bind_rows(lapply(seq_len(1000L), function(i) {
 }))
 summary <- tibble(n_patients = nrow(patients), repeats = n_repeats, folds = 5L,
   no_gene_folds = sum(vapply(fold_summary, function(x) x$no_gene_selected, logical(1))),
+  outlier_replacement_fallbacks = sum(vapply(fold_summary,
+    function(x) x$outlier_replacement_fallback, logical(1))),
   mean_delta_c = mean(scores$delta_c),
   patient_bootstrap_ci_low = quantile(boot$delta_c, 0.025),
   patient_bootstrap_ci_high = quantile(boot$delta_c, 0.975),
