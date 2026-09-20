@@ -82,12 +82,27 @@ make_fold_data <- function(train_idx, test_idx) {
   # Match the primary DESeq2 fit. If its optional Cook outlier replacement
   # fails in a fold, retry without replacement and record that deviation.
   replacement_fallback <- FALSE
-  dds <- tryCatch(DESeq(dds, quiet = TRUE), error = function(e) {
-    if (!grepl("is.finite(partial)", conditionMessage(e), fixed = TRUE)) stop(e)
-    message("DESeq2 outlier replacement failed: ", conditionMessage(e))
-    replacement_fallback <<- TRUE
-    DESeq(dds, quiet = TRUE, minReplicatesForReplace = Inf)
-  })
+  fitted <- NULL
+  for (attempt in seq_len(3L)) {
+    fit <- tryCatch(
+      if (attempt == 1L) DESeq(dds, quiet = TRUE)
+      else DESeq(dds, quiet = TRUE, minReplicatesForReplace = Inf),
+      error = identity
+    )
+    if (!inherits(fit, "error")) {
+      fitted <- fit
+      break
+    }
+    if (!identical(conditionMessage(fit),
+                   "default method not implemented for type 'expression'") ||
+        !identical(deparse(conditionCall(fit)), "is.finite(partial)")) stop(fit)
+    replacement_fallback <- TRUE
+    message("DESeq2 trimmed-mean failure in fold, attempt ", attempt,
+            "; retrying without outlier replacement.")
+    gc()
+  }
+  if (is.null(fitted)) stop("DESeq2 failed after three fold-fit attempts.")
+  dds <- fitted
   de <- as.data.frame(results(dds, contrast = c("condition", "TP", "NT")))
   de$gene_id <- rownames(de)
   de <- de |>
@@ -227,11 +242,31 @@ score_repeat <- function(pred) {
 predictions <- vector("list", n_repeats)
 fold_summary <- list()
 first_fold_cache <- vector("list", 5L)
+checkpoint_dir <- file.path(DIRS$processed, "nested_cv_fold_checkpoints")
+dir.create(checkpoint_dir, showWarnings = FALSE)
+checkpoint_inputs <- c("analysis/22_nested_cv.R", "analysis/00_config.R",
+                       "analysis/functions/patient_samples.R", FILES$tcga_se,
+                       FILES$tcga_clinical,
+                       file.path(DIRS$tables, "gse40435_limma_tumor_vs_normal.csv"),
+                       file.path(DIRS$tables, "gse53757_limma_tumor_vs_normal.csv"))
+checkpoint_signature <- unname(tools::md5sum(checkpoint_inputs))
 for (repeat_id in seq_len(n_repeats)) {
   set.seed(RESAMPLING$seed + 22L + repeat_id)
   fold_id <- folds(patients$os_event, 5L)
   fold_predictions <- vector("list", 5L)
   for (fold in seq_len(5L)) {
+    checkpoint <- file.path(checkpoint_dir,
+                            sprintf("repeat_%02d_fold_%d.rds", repeat_id, fold))
+    if (file.exists(checkpoint)) {
+      saved <- readRDS(checkpoint)
+      if (identical(saved$signature, checkpoint_signature)) {
+        fold_predictions[[fold]] <- saved$prediction
+        fold_summary[[length(fold_summary) + 1L]] <- saved$summary
+        if (repeat_id == 1L) first_fold_cache[[fold]] <- saved$cache
+        message("Reused checkpoint: repeat ", repeat_id, " fold ", fold)
+        next
+      }
+    }
     train_idx <- which(fold_id != fold)
     test_idx <- which(fold_id == fold)
     message("Nested selection: repeat ", repeat_id, "/", n_repeats, " fold ", fold, "/5")
@@ -246,6 +281,11 @@ for (repeat_id in seq_len(n_repeats)) {
       outlier_replacement_fallback = fd$replacement_fallback,
       no_gene_selected = is.na(selected))
     if (repeat_id == 1L) first_fold_cache[[fold]] <- list(fd = fd, train = train_idx, test = test_idx)
+    write_rds_atomic(list(signature = checkpoint_signature,
+                          prediction = fold_predictions[[fold]],
+                          summary = fold_summary[[length(fold_summary)]],
+                          cache = if (repeat_id == 1L) first_fold_cache[[fold]] else NULL),
+                     checkpoint)
     gc()
   }
   predictions[[repeat_id]] <- bind_rows(fold_predictions)
