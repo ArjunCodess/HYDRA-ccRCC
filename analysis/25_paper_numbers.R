@@ -74,6 +74,7 @@ items <- c(
   macro("NestedCiHigh", sprintf("%.3f", nested$patient_bootstrap_ci_high)),
   macro("NestedBrierDelta", sprintf("%.3f", nested$mean_delta_brier3)),
   macro("NestedNoGeneFolds", number(nested$no_gene_folds)),
+  macro("NestedOutlierFallbacks", number(nested$outlier_replacement_fallbacks)),
   macro("NestedPassed", ifelse(nested$cv_acceptance, "passed", "failed")),
   macro("GseFunnelDelta", sprintf("%.3f", funnel_test$difference[funnel_test$cohort == "GSE29609"])),
   macro("GseFunnelCiLow", sprintf("%.3f", funnel_test$ci_low[funnel_test$cohort == "GSE29609"])),

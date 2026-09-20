@@ -435,6 +435,8 @@ if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
     any(table(nested_predictions$repeat_id) != nested_summary$n_patients) ||
     anyDuplicated(paste(nested_predictions$repeat_id, nested_predictions$patient_barcode)) ||
     sum(nested_folds$no_gene_selected) != nested_summary$no_gene_folds ||
+    sum(nested_folds$outlier_replacement_fallback) !=
+      nested_summary$outlier_replacement_fallbacks ||
     any(!is.finite(nested_scores$delta_c)) ||
     any(!is.finite(nested_scores$delta_brier3))) {
   stop("Selection-aware CV or clinical-only null has incomplete coverage.")
