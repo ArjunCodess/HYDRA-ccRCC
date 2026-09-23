@@ -100,6 +100,7 @@ if (-not $SkipInstall) {
 $steps += @(
   "analysis/00_check_environment.R",
   "analysis/tests/test_identity_and_endpoints.R",
+  "analysis/tests/test_nested_benchmark.R",
   "analysis/01_download_tcga.R",
   "analysis/02_download_geo_manifest.R",
   "analysis/02_download_geo.R",

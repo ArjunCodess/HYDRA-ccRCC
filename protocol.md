@@ -43,6 +43,19 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Two hundred clinical-only null simulations repeat the fold-level selection on event times from an exponential baseline calibrated to the fitted clinical Cox cumulative hazard, with resampled censoring. One of the five fixed outer folds is assessed per simulation, cycling folds, so this null distribution estimates selection behavior under that specific clinical-only data-generating process rather than another 10-by-five-fold CV interval.
 - The patient bootstrap resamples the saved out-of-fold predictions with patient identity linked across repeats. It does not refit selection or redraw folds, so its interval omits training-set and split uncertainty.
 
+## Nested selection benchmark
+
+`analysis/31_nested_selection_benchmark.R` asks a different question from the primary nested CV: on the same held-out patients, does the full funnel outperform simpler ways of choosing what to add to the clinical model? It uses the same 517 complete-case patients, the same repeat seeds (`RESAMPLING$seed + 22 + repeat`), and the same event-stratified five-fold assignments. Each fold refits training-only DESeq2 once. The HYDRA arm is checked against the saved primary nested-CV gene; a mismatch stops the run. Six predictors are scored on the held-out fold:
+
+- Clinical only: age, sex, stage, and collapsed grade.
+- HYDRA: the primary nested rule. GEO evidence stays fixed. Survival FDR is Benjamini--Hochberg within the training-fold reproducible DEGs. The top gene uses the existing evidence score, with gene-id ties already broken in that score.
+- Survival only: the same high-confidence survival thresholds and stage-only/grade-only sensitivity checks, with no tumor--normal or GEO requirement. Training count-QC genes are ranked by absolute correlation with martingale residuals from the training clinical model. Full Cox models are fit for the top 2,000. Benjamini--Hochberg pads every unscreened gene as p = 1, so the screen cannot make this FDR gate easier than a count-QC-wide correction. Ranking uses `-log10(FDR) + |log HR|`, then FDR, then gene id.
+- DE only: smallest training DESeq2 FDR among genes with absolute log2 fold change at least 1, after one row per gene symbol. No GEO or survival filter. Ties break by absolute fold change, then gene id.
+- Ridge: ridge-penalized Cox (`glmnet` alpha = 0, Efron ties) on the training-fold reproducible DEG set, which is the pool the HYDRA rule is allowed to choose from. Clinical covariates are unpenalized. The penalty minimizes training-only event-stratified five-fold partial-likelihood deviance (`lambda.min`). Held-out concordance uses the glmnet linear predictor. The three-year risk is read from that model's survival curve at three years.
+- Matched control: one training gene at or below the median absolute residual correlation, with mean training expression closest to the HYDRA gene. If HYDRA selected none, the target is the median expression of the reproducible DEGs. Genes chosen by the other rules in that fold are excluded. Ties break by gene id.
+
+If a rule selects no gene, its prediction equals the clinical prediction. Concordance, three-year IPCW Brier score, and calibration slope use the primary definitions. Patient-bootstrap intervals resample the saved predictions and do not refit selection or redraw folds. This comparison does not replace the prespecified 0.01 concordance criterion.
+
 ## External survival evaluation
 
 - GSE29609 uses univariable continuous-expression Cox models because it contains 39 samples and 17 events.
