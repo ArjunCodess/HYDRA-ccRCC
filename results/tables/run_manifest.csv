@@ -49,7 +49,7 @@ analysis/tests/test_identity_and_endpoints.R,1433,2845600c5dc04c6e33bc1960b2e58c
 analysis/tests/test_nested_benchmark.R,4596,bc332383bce26d5f80d93f215c7a43d8
 environment/package_versions.csv,17591,067e2a27692802538010e1b3b4dd104b
 environment/sessionInfo.txt,821,ef15f18f1a61d70a1b81d22fb84574f7
-paper/main.pdf,434421,92c42ffa1b73c30efcced82cf2488067
+paper/main.pdf,434421,4303d3c2c65e14c5fb86f8e3bc98a2aa
 paper/main.tex,22756,249643fff6c6ab59f1d563e60e90bbb6
 paper/results_macros.tex,3510,19f14cf655bfe52faa86714838a85c97
 protocol.md,13674,a981ac71a31217b6ac42bb7615446711
