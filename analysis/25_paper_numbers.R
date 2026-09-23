@@ -32,8 +32,16 @@ bootstrap <- tab("candidate_cox_bootstrap_summary.csv")
 tracerx <- tab("tracerx_one_region_cox_summary.csv")
 tracerx_cohort <- tab("tracerx_multiregion_study_summary.csv")
 nested <- tab("nested_cv_summary.csv")
+nested_folds <- tab("nested_cv_folds.csv")
+nested_repeats <- tab("nested_cv_repeat_metrics.csv")
 null_summary <- tab("nested_cv_clinical_null_summary.csv")
 funnel_test <- tab("funnel_external_paired_bootstrap.csv")
+funnel_summary <- tab("funnel_external_summary.csv")
+funnel_present <- function(rule, cohort) {
+  x <- funnel_summary$present[funnel_summary$rule == rule & funnel_summary$cohort == cohort]
+  if (length(x) != 1L) stop("Missing matched-list coverage: ", rule, ", ", cohort)
+  number(x)
+}
 shape <- tab("candidate_survival_shape_sensitivity.csv")
 overlap <- tab("null_overlap_check.csv")
 checkmate <- tab("checkmate025_study_summary.csv")
@@ -70,10 +78,16 @@ items <- c(
   macro("CompositionFailures", number(sum(composition$composition_adjusted_fdr >= 0.05, na.rm = TRUE))),
   macro("BootstrapIntervals", number(sum(bootstrap$ci_excludes_zero))),
   macro("ConditionalCvPositive", number(sum(cv_conditional$mean_delta_c_index > 0))),
-  macro("NestedDelta", sprintf("%.3f", nested$mean_delta_c)),
-  macro("NestedCiLow", sprintf("%.3f", nested$patient_bootstrap_ci_low)),
-  macro("NestedCiHigh", sprintf("%.3f", nested$patient_bootstrap_ci_high)),
-  macro("NestedBrierDelta", sprintf("%.3f", nested$mean_delta_brier3)),
+  macro("NestedDelta", sprintf("%.4f", nested$mean_delta_c)),
+  macro("NestedCiLow", sprintf("%.4f", nested$patient_bootstrap_ci_low)),
+  macro("NestedCiHigh", sprintf("%.4f", nested$patient_bootstrap_ci_high)),
+  macro("NestedBrierDelta", sprintf("%.4f", nested$mean_delta_brier3)),
+  macro("NestedClinicalC", sprintf("%.3f", mean(nested_repeats$clinical_c))),
+  macro("NestedGeneC", sprintf("%.3f", mean(nested_repeats$gene_c))),
+  macro("NestedClinicalSlope", sprintf("%.2f", mean(nested_repeats$clinical_calibration_slope))),
+  macro("NestedGeneSlope", sprintf("%.2f", mean(nested_repeats$gene_calibration_slope))),
+  macro("NestedDistinctGenes", number(n_distinct(nested_folds$selected_gene, na.rm = TRUE))),
+  macro("NestedTopGeneFolds", number(max(table(nested_folds$selected_gene)))),
   macro("NestedNoGeneFolds", number(nested$no_gene_folds)),
   macro("NestedOutlierFallbacks", number(nested$outlier_replacement_fallbacks)),
   macro("NestedPassed", ifelse(nested$cv_acceptance, "passed", "failed")),
@@ -81,6 +95,10 @@ items <- c(
   macro("GseFunnelDelta", sprintf("%.3f", funnel_test$difference[funnel_test$cohort == "GSE29609"])),
   macro("GseFunnelCiLow", sprintf("%.3f", funnel_test$ci_low[funnel_test$cohort == "GSE29609"])),
   macro("GseFunnelCiHigh", sprintf("%.3f", funnel_test$ci_high[funnel_test$cohort == "GSE29609"])),
+  macro("GseCompletePresent", funnel_present("complete_rule", "GSE29609")),
+  macro("GseSurvivalPresent", funnel_present("survival_only", "GSE29609")),
+  macro("EmCompletePresent", funnel_present("complete_rule", "E-MTAB-1980")),
+  macro("EmSurvivalPresent", funnel_present("survival_only", "E-MTAB-1980")),
   macro("FunnelPassed", ifelse(all(funnel_test$acceptance), "passed", "failed")),
   macro("ShapeNonlinear", number(sum(shape$nonlinear_fdr < 0.05, na.rm = TRUE))),
   macro("ShapeTimeVarying", number(sum(shape$time_varying_fdr < 0.05, na.rm = TRUE))),
