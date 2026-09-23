@@ -13,15 +13,15 @@ source_rows <- tribble(
   "GSE40435", "tumor-normal expression validation", SOURCE_URLS$geo_gse40435,
   "GSE53757", "tumor-normal expression validation", SOURCE_URLS$geo_gse53757,
   "GSE29609", "small external survival direction check", SOURCE_URLS$geo_gse29609,
-  "E-MTAB-1980", "independent external survival validation", SOURCE_URLS$emtab1980,
-  "HPA-v25.1", "independent single-cell type expression", SOURCE_URLS$hpa_single_cell,
+  "E-MTAB-1980", "previously inspected exploratory external survival comparison", SOURCE_URLS$emtab1980,
+  "HPA-v25.1", "normal-tissue single-cell source context", SOURCE_URLS$hpa_single_cell,
   "TRACERx-Renal", "multiregion transportability sensitivity", SOURCE_URLS$tracerx_renal,
   "CheckMate-025-Braun", "randomized nivolumab-versus-everolimus treatment-interaction analysis", SOURCE_URLS$checkmate_braun,
   "Aran-2015-CPE", "published consensus TCGA tumor-purity sensitivity", SOURCE_URLS$aran2015_purity_study
 ) |>
   mutate(
-    access_date = format(Sys.Date(), "%Y-%m-%d"),
-    retrieval = "scripted public download",
+    access_date = NA_character_,
+    retrieval = "cached public input; original retrieval date not recorded",
     candidate_definition_role = if_else(
       source_id %in% c("E-MTAB-1980", "HPA-v25.1", "TRACERx-Renal", "CheckMate-025-Braun", "Aran-2015-CPE"),
       "downstream evaluation only; not used to define the reviewer-driven revised candidate set",
@@ -31,11 +31,32 @@ source_rows <- tribble(
 
 write_csv_atomic(source_rows, file.path(DIRS$tables, "source_provenance.csv"))
 
-roots <- c("analysis", "results/tables", "results/figures")
+input_files <- list.files(DIRS$raw, recursive = TRUE, full.names = TRUE)
+input_files <- c(input_files, FILES$tcga_se, FILES$tcga_counts, FILES$tcga_coldata,
+                 FILES$tcga_clinical,
+                 file.path(DIRS$processed, paste0(c("gse40435", "gse53757", "gse29609"), "_series_matrix.rds")))
+input_files <- sort(unique(input_files[file.exists(input_files) & !dir.exists(input_files)]))
+input_info <- file.info(input_files)
+input_manifest <- tibble(
+  path = gsub("\\\\", "/", input_files),
+  bytes = as.numeric(input_info$size),
+  md5 = unname(tools::md5sum(input_files)),
+  provenance = "cached public input; original retrieval date unknown"
+)
+write_csv_atomic(input_manifest, file.path(DIRS$tables, "input_manifest.csv"))
+
+writeLines(
+  sub("[[:space:]]+$", "", capture.output(sessionInfo())),
+  "environment/sessionInfo.txt"
+)
+
+roots <- c("analysis", "results")
 files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
 }))
-files <- c(files, "README.md", "protocol.md", "run_pipeline.ps1", "environment/sessionInfo.txt")
+files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1",
+           "environment/sessionInfo.txt", "environment/package_versions.csv",
+           "paper/main.tex", "paper/results_macros.tex", "paper/main.pdf")
 files <- files[file.exists(files) & !dir.exists(files)]
 files <- files[!grepl("run_manifest\\.csv$", files)]
 info <- file.info(files)
@@ -43,15 +64,10 @@ info <- file.info(files)
 manifest <- tibble(
   path = gsub("\\\\", "/", files),
   bytes = as.numeric(info$size),
-  modified_utc = format(as.POSIXct(info$mtime, tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   md5 = unname(tools::md5sum(files))
 ) |>
   arrange(path)
 
 write_csv_atomic(manifest, file.path(DIRS$tables, "run_manifest.csv"))
-writeLines(
-  sub("[[:space:]]+$", "", capture.output(sessionInfo())),
-  "environment/sessionInfo.txt"
-)
 
 message("Run manifest complete. Files checksummed: ", nrow(manifest))

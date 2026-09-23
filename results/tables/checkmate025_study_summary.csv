@@ -5,8 +5,8 @@ everolimus_patients,130
 os_events,191
 pfs_events,222
 adjusted_complete_cases,248
-candidates_mapped,27
-os_unadjusted_nominal_interactions,2
+candidates_mapped,23
+os_unadjusted_nominal_interactions,3
 os_unadjusted_fdr_interactions,0
 os_adjusted_nominal_interactions,3
 os_adjusted_fdr_interactions,0

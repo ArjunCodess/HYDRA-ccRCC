@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(AnnotationDbi)
@@ -15,7 +16,7 @@ suppressPackageStartupMessages({
 # It removes the upstream hard LFC gate, models every QC-filtered gene available
 # in the VST matrix, and applies one BH correction across the resulting Cox tests.
 vst_mat <- read_required_rds(FILES$tcga_vst)
-coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+coldata <- read_selected_tcga_coldata(FILES$tcga_coldata, FILES$tcga_counts)
 clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
 deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
 

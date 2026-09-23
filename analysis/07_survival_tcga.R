@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -10,7 +11,7 @@ suppressPackageStartupMessages({
 })
 
 vst_mat <- read_required_rds(FILES$tcga_vst)
-coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+coldata <- read_selected_tcga_coldata(FILES$tcga_coldata, FILES$tcga_counts)
 clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
 deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
 
@@ -30,6 +31,8 @@ tumor_samples <- coldata |>
   mutate(patient_barcode = tcga_patient_barcode(sample_barcode)) |>
   inner_join(clinical_surv, by = "patient_barcode") |>
   filter(!is.na(os_time), os_time > 0, !is.na(os_event))
+if (anyDuplicated(tumor_samples$patient_barcode)) stop("TCGA survival join duplicates patients.")
+if (any(!tumor_samples$os_event %in% c(0L, 1L))) stop("TCGA survival events must be binary.")
 
 repro_path <- file.path(DIRS$tables, "reproducible_deg_tcga_gse40435_gse53757.csv")
 if (file.exists(repro_path)) {

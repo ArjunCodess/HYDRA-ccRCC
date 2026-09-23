@@ -257,7 +257,13 @@ if (small_event_count < 1 || small_event_count > length(event_patients) ||
 }
 
 set.seed(RESAMPLING$seed + 20L)
-repeat_rows <- vector("list", RESAMPLING$tracerx_region_repeats * 2L)
+fixed_patients <- c(
+  sample(event_patients, small_event_count, replace = FALSE),
+  sample(censored_patients, small_censored_count, replace = FALSE)
+)
+write_csv_atomic(patient_status |> filter(patient %in% fixed_patients) |> arrange(patient),
+                 file.path(DIRS$tables, "tracerx_fixed_subset_patients.csv"))
+repeat_rows <- vector("list", RESAMPLING$tracerx_region_repeats * 3L)
 row_index <- 1L
 
 for (repeat_id in seq_len(RESAMPLING$tracerx_region_repeats)) {
@@ -274,7 +280,8 @@ for (repeat_id in seq_len(RESAMPLING$tracerx_region_repeats)) {
   )
   scenario_patients <- list(
     full_cohort = patient_status$patient,
-    size_matched_39 = small_patients
+    size_matched_39 = small_patients,
+    fixed_subset_regions = fixed_patients
   )
 
   for (scenario in names(scenario_patients)) {

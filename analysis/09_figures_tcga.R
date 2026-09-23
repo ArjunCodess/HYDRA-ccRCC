@@ -138,40 +138,26 @@ p_discordance <- ggplot(discordance, aes(abs_log2fc, abs_log_hr)) +
 
 ggsave(file.path(DIRS$figures, "tcga_kirc_discordance.png"), p_discordance, width = 7, height = 5, dpi = 300)
 
-candidate_priority_path <- file.path(DIRS$tables, "manuscript_candidate_prioritization.csv")
+candidate_priority_path <- file.path(DIRS$tables, "candidate_interpretation_context.csv")
 if (file.exists(candidate_priority_path)) {
   candidate_priority <- read_csv(candidate_priority_path, show_col_types = FALSE) |>
+    arrange(main_log_hr) |>
     mutate(
-      manual_tier = factor(
-        manual_tier,
-        levels = c("lead", "supporting", "supporting risk", "interpret cautiously", "composition flag", "do not highlight")
-      ),
-      symbol_label = paste0(symbol, " (", manual_tier, ")"),
-      symbol_label = factor(symbol_label, levels = rev(symbol_label)),
+      symbol_label = factor(symbol, levels = rev(symbol)),
       log_hr_ci_low = log(main_hr_ci_low),
       log_hr_ci_high = log(main_hr_ci_high)
     )
 
-  p_forest <- ggplot(candidate_priority, aes(main_log_hr, symbol_label, color = manual_tier)) +
+  p_forest <- ggplot(candidate_priority, aes(main_log_hr, symbol_label)) +
     geom_vline(xintercept = 0, color = "#555555", linewidth = 0.4) +
     geom_errorbar(aes(xmin = log_hr_ci_low, xmax = log_hr_ci_high), orientation = "y", width = 0, linewidth = 0.45) +
-    geom_point(size = 2.2) +
-    scale_color_manual(values = c(
-      "lead" = "#1B7837",
-      "supporting" = "#0571B0",
-      "supporting risk" = "#B35806",
-      "interpret cautiously" = "#7B3294",
-      "composition flag" = "#777777",
-      "do not highlight" = "#B83232"
-    ), drop = FALSE) +
+    geom_point(size = 2.2, color = "#205D72") +
     labs(
-      title = "High-Confidence Candidates Require Unequal Manuscript Weight",
+      title = "TCGA Associations for High-Confidence Candidates",
       x = "Stage/grade-adjusted Cox log(HR) per SD expression",
-      y = NULL,
-      color = "Manuscript tier"
+      y = NULL
     ) +
-    theme_hydra() +
-    theme(legend.position = "bottom")
+    theme_hydra()
 
   ggsave(file.path(DIRS$figures, "candidate_forest_plot.png"), p_forest, width = 7, height = 6.4, dpi = 300)
 }

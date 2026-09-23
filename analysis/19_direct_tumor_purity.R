@@ -1,6 +1,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
+source("analysis/functions/patient_samples.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -36,14 +37,14 @@ purity <- purity_raw |>
   distinct(sample_key, .keep_all = TRUE)
 
 vst_mat <- read_required_rds(FILES$tcga_vst)
-coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+coldata <- read_selected_tcga_coldata(FILES$tcga_coldata, FILES$tcga_counts)
 clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE)
 candidates <- read_csv(
   file.path(DIRS$tables, "candidate_gene_evidence_table.csv"),
   show_col_types = FALSE
 ) |>
   filter(high_confidence_candidate, tcga_gene_id %in% rownames(vst_mat)) |>
-  select(symbol, tcga_gene_id, original_main_log_hr = main_log_hr)
+  select(symbol, tcga_gene_id)
 
 clinical_surv <- clinical |>
   transmute(
@@ -96,6 +97,10 @@ fit_candidate <- function(gene_id) {
     return(NULL)
   }
 
+  baseline <- tryCatch(
+    coxph(Surv(os_time, os_event) ~ expr + age + sex + stage + grade, data = dat),
+    error = function(e) NULL
+  )
   fit <- tryCatch(
     coxph(
       Surv(os_time, os_event) ~ expr + purity + age + sex + stage + grade,
@@ -103,12 +108,14 @@ fit_candidate <- function(gene_id) {
     ),
     error = function(e) NULL
   )
-  if (is.null(fit)) return(NULL)
+  if (is.null(fit) || is.null(baseline)) return(NULL)
 
   terms <- tidy(fit, conf.int = TRUE)
   gene_term <- terms |> filter(term == "expr")
   purity_term <- terms |> filter(term == "purity")
   if (nrow(gene_term) != 1 || nrow(purity_term) != 1) return(NULL)
+  baseline_term <- tidy(baseline) |> filter(term == "expr")
+  if (nrow(baseline_term) != 1) return(NULL)
 
   zph <- tryCatch(cox.zph(fit), error = function(e) NULL)
   gene_ph_p <- if (is.null(zph) || !"expr" %in% rownames(zph$table)) {
@@ -118,6 +125,7 @@ fit_candidate <- function(gene_id) {
   }
 
   tibble(
+    matched_baseline_log_hr = baseline_term$estimate,
     gene_log_hr = gene_term$estimate,
     gene_hr = exp(gene_term$estimate),
     gene_hr_ci_low = exp(gene_term$conf.low),
@@ -139,11 +147,11 @@ results <- bind_rows(lapply(seq_len(nrow(candidates)), function(i) {
 })) |>
   mutate(
     gene_fdr = p.adjust(gene_p_value, method = "BH"),
-    same_direction_after_purity = sign(gene_log_hr) == sign(original_main_log_hr),
-    absolute_log_hr_attenuation = abs(original_main_log_hr) - abs(gene_log_hr),
+    same_direction_after_purity = sign(gene_log_hr) == sign(matched_baseline_log_hr),
+    absolute_log_hr_attenuation = abs(matched_baseline_log_hr) - abs(gene_log_hr),
     relative_log_hr_attenuation = if_else(
-      abs(original_main_log_hr) > 0,
-      1 - abs(gene_log_hr) / abs(original_main_log_hr),
+      abs(matched_baseline_log_hr) > 0,
+      1 - abs(gene_log_hr) / abs(matched_baseline_log_hr),
       NA_real_
     )
   ) |>

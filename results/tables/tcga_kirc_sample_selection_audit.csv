@@ -1,0 +1,3 @@
+sample_type,shortLetterCode,raw_samples,unique_patients,selected_samples,removed_replicate_samples
+Primary Tumor,TP,541,533,533,8
+Solid Tissue Normal,NT,72,72,72,0

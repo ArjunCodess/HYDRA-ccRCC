@@ -1,5 +1,5 @@
 metric,value
-tcga_symbol_genes,23318
-tcga_significant,8852
-same_direction_both_geo,9149
-reproducible_deg,3304
+tcga_symbol_genes,23010
+tcga_significant,8534
+same_direction_both_geo,9123
+reproducible_deg,3323

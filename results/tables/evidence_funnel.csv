@@ -1,7 +1,7 @@
 step,count
-TCGA significant after symbol mapping,8852
-Reproducible DEG,3304
-Main Cox FDR < 0.05,1176
-Sensitivity pass,1113
-Strict candidate,536
-High-confidence candidate,27
+TCGA significant after symbol mapping,8534
+Reproducible DEG,3323
+Main Cox FDR < 0.05,1186
+Sensitivity pass,1117
+Strict candidate,538
+High-confidence candidate,23

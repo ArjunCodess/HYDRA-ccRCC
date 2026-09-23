@@ -1,0 +1,2 @@
+n_patients,repeats,folds,no_gene_folds,outlier_replacement_fallbacks,mean_delta_c,patient_bootstrap_ci_low,patient_bootstrap_ci_high,mean_delta_brier3,cv_acceptance
+517,10,5,0,2,0.0038847994111151918,-0.008836769260258578,0.017143457038667105,-8.80473967812112e-4,FALSE

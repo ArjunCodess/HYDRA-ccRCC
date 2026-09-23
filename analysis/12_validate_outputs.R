@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
 
 required_files <- c(
   file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"),
+  file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"),
   file.path(DIRS$tables, "gse40435_sample_summary.csv"),
   file.path(DIRS$tables, "gse53757_sample_summary.csv"),
   file.path(DIRS$tables, "gse29609_sample_summary.csv"),
@@ -18,16 +19,18 @@ required_files <- c(
   FILES$tcga_apeglm_survival_summary,
   FILES$tcga_enrichment,
   file.path(DIRS$tables, "candidate_gene_evidence_table.csv"),
+  file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"),
+  file.path(DIRS$tables, "prior_candidate_delta.csv"),
   file.path(DIRS$tables, "strict_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_genes.csv"),
-  file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"),
+  file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"),
   file.path(DIRS$tables, "candidate_survival_report.csv"),
   file.path(DIRS$tables, "threshold_sensitivity.csv"),
   file.path(DIRS$tables, "null_overlap_check.csv"),
   file.path(DIRS$tables, "deg_vs_prognostic_comparison.csv"),
   file.path(DIRS$tables, "cell_type_sanity_check.csv"),
   file.path(DIRS$tables, "high_confidence_literature_table.csv"),
-  file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
+  file.path(DIRS$tables, "candidate_interpretation_context.csv"),
   file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"),
   file.path(DIRS$tables, "composition_marker_score_availability.csv"),
   file.path(DIRS$tables, "external_survival_gse29609.csv"),
@@ -38,15 +41,29 @@ required_files <- c(
   file.path(DIRS$tables, "candidate_cox_bootstrap_summary.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment.csv"),
   file.path(DIRS$tables, "candidate_cv_clinical_increment_repeats.csv"),
+  file.path(DIRS$tables, "nested_cv_predictions.csv"),
+  file.path(DIRS$tables, "nested_cv_folds.csv"),
+  file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"),
+  file.path(DIRS$tables, "nested_cv_patient_bootstrap.csv"),
+  file.path(DIRS$tables, "nested_cv_summary.csv"),
+  file.path(DIRS$tables, "nested_cv_clinical_null.csv"),
+  file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
+  file.path(DIRS$tables, "acceptance_criteria.csv"),
   file.path(DIRS$tables, "hpa_candidate_top_cell_types.csv"),
   file.path(DIRS$tables, "hpa_candidate_cell_source_summary.csv"),
   file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
+  file.path(DIRS$tables, "candidate_survival_shape_sensitivity.csv"),
+  file.path(DIRS$tables, "funnel_matched_lists.csv"),
+  file.path(DIRS$tables, "funnel_external_gene_results.csv"),
+  file.path(DIRS$tables, "funnel_external_summary.csv"),
+  file.path(DIRS$tables, "funnel_external_paired_bootstrap.csv"),
   file.path(DIRS$tables, "tumor_purity_coverage.csv"),
   file.path(DIRS$tables, "tracerx_multiregion_source_files.csv"),
   file.path(DIRS$tables, "tracerx_candidate_patient_region_discordance.csv"),
   file.path(DIRS$tables, "tracerx_candidate_multiregion_summary.csv"),
   file.path(DIRS$tables, "tracerx_one_region_cox_repeats.csv"),
   file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
+  file.path(DIRS$tables, "tracerx_fixed_subset_patients.csv"),
   file.path(DIRS$tables, "tracerx_multiregion_study_summary.csv"),
   file.path(DIRS$tables, "checkmate025_source_file.csv"),
   file.path(DIRS$tables, "checkmate025_candidate_treatment_interactions.csv"),
@@ -63,7 +80,10 @@ required_files <- c(
   file.path(DIRS$figures, "tcga_kirc_discordance.png"),
   file.path(DIRS$figures, "tcga_kirc_directional_discordance.png"),
   file.path(DIRS$figures, "candidate_forest_plot.png"),
-  file.path(DIRS$figures, "evidence_funnel.png")
+  file.path(DIRS$figures, "evidence_funnel.png"),
+  file.path(DIRS$figures, "nested_cv_increment.png"),
+  file.path(DIRS$figures, "funnel_external_comparison.png"),
+  file.path("paper", "results_macros.tex")
 )
 
 missing_files <- required_files[!file.exists(required_files)]
@@ -98,6 +118,36 @@ if (values[["strict_candidate"]] > values[["sensitivity_pass"]]) {
 }
 
 tcga_deg <- read_csv(FILES$tcga_deg, show_col_types = FALSE)
+tcga_samples <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"), show_col_types = FALSE)
+selection_audit <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"),
+                            show_col_types = FALSE)
+if (nrow(selection_audit) != 2L ||
+    !setequal(selection_audit$shortLetterCode, c("TP", "NT")) ||
+    any(selection_audit$selected_samples != selection_audit$unique_patients) ||
+    any(selection_audit$removed_replicate_samples !=
+        selection_audit$raw_samples - selection_audit$selected_samples) ||
+    selection_audit$selected_samples[selection_audit$shortLetterCode == "TP"] != 533L ||
+    selection_audit$raw_samples[selection_audit$shortLetterCode == "TP"] != 541L) {
+  stop("TCGA sample selection audit is inconsistent with the cached cohort.")
+}
+if (tcga_samples$n_samples[tcga_samples$sample_type == "Primary Tumor"] != 533L ||
+    tcga_samples$n_samples[tcga_samples$sample_type == "Solid Tissue Normal"] != 72L) {
+  stop("TCGA selected sample counts differ from the audited cached cohort.")
+}
+paired_summary <- read_csv(file.path(DIRS$tables, "tcga_kirc_paired_deg_summary.csv"), show_col_types = FALSE)
+paired_values <- setNames(paired_summary$value, paired_summary$metric)
+if (paired_values[["paired_samples"]] != 2L * paired_values[["paired_patients"]] ||
+    paired_values[["paired_patients"]] > 72L) {
+  stop("Paired TCGA differential expression has invalid patient coverage.")
+}
+survival <- read_csv(FILES$tcga_survival, show_col_types = FALSE)
+for (model in unique(survival$model_type)) {
+  rows <- survival$model_type == model
+  if (!isTRUE(all.equal(survival$fdr[rows], p.adjust(survival$p_value[rows], "BH"),
+                        tolerance = 1e-12, check.attributes = FALSE))) {
+    stop("TCGA survival FDR differs from BH correction for model: ", model)
+  }
+}
 required_apeglm_columns <- c("log2FoldChange_apeglm", "lfcSE_apeglm")
 if (!all(required_apeglm_columns %in% names(tcga_deg))) {
   stop("TCGA differential-expression output is missing apeglm MAP estimates.")
@@ -192,11 +242,23 @@ for (accession in c("gse40435", "gse53757")) {
       any(geo_summary$adjusted_design_rank < geo_summary$full_design_rank)) {
     stop(accession, " contains invalid SVA design diagnostics.")
   }
+  if (nrow(geo_summary) != 2L || any(geo_summary$n_samples != geo_summary$n_patients)) {
+    stop(accession, " parsed tumor-normal pairs do not cover exactly one sample per condition.")
+  }
 }
 
-ranked <- read_csv(file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"), show_col_types = FALSE)
-if (nrow(ranked) != values[["high_confidence_candidate"]]) {
-  stop("Ranked shortlist row count does not match high-confidence candidate count.")
+candidate_evidence <- read_csv(file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"), show_col_types = FALSE)
+if (nrow(candidate_evidence) != values[["high_confidence_candidate"]] ||
+    anyDuplicated(candidate_evidence$symbol) ||
+    !identical(candidate_evidence$symbol, sort(candidate_evidence$symbol)) ||
+    any(c("manual_tier", "final_rank_score", "rank") %in% names(candidate_evidence))) {
+  stop("Candidate evidence does not cover each high-confidence gene exactly once.")
+}
+paired_candidates <- read_csv(file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"), show_col_types = FALSE)
+if (nrow(paired_candidates) != values[["high_confidence_candidate"]] ||
+    anyDuplicated(paired_candidates$tcga_gene_id) ||
+    any(is.na(paired_candidates$same_direction))) {
+  stop("Paired DE sensitivity lacks complete candidate coverage.")
 }
 
 survival_report <- read_csv(file.path(DIRS$tables, "candidate_survival_report.csv"), show_col_types = FALSE)
@@ -338,6 +400,7 @@ purity <- read_csv(
 )
 required_purity_columns <- c(
   "symbol",
+  "matched_baseline_log_hr",
   "gene_log_hr",
   "gene_p_value",
   "gene_fdr",
@@ -359,6 +422,49 @@ if (nrow(purity) != values[["high_confidence_candidate"]]) {
 }
 if (any(!is.finite(purity$gene_log_hr) | !is.finite(purity$gene_p_value))) {
   stop("Direct tumor-purity output contains non-finite gene estimates.")
+}
+if (any(!is.finite(purity$matched_baseline_log_hr)) ||
+    any(purity$same_direction_after_purity !=
+        (sign(purity$gene_log_hr) == sign(purity$matched_baseline_log_hr)))) {
+  stop("Direct tumor-purity comparisons are inconsistent with matched baseline fits.")
+}
+
+nested_folds <- read_csv(file.path(DIRS$tables, "nested_cv_folds.csv"), show_col_types = FALSE)
+nested_scores <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"), show_col_types = FALSE)
+nested_summary <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"), show_col_types = FALSE)
+nested_predictions <- read_csv(file.path(DIRS$tables, "nested_cv_predictions.csv"), show_col_types = FALSE)
+nested_null <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null.csv"), show_col_types = FALSE)
+nested_boot <- read_csv(file.path(DIRS$tables, "nested_cv_patient_bootstrap.csv"), show_col_types = FALSE)
+null_summary <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
+                         show_col_types = FALSE)
+if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
+    nrow(nested_summary) != 1L || nrow(nested_null) != 200L ||
+    nrow(null_summary) != 1L || null_summary$simulations != nrow(nested_null) ||
+    null_summary$gene_selected != sum(!is.na(nested_null$selected_gene)) ||
+    any(table(nested_predictions$repeat_id) != nested_summary$n_patients) ||
+    anyDuplicated(paste(nested_predictions$repeat_id, nested_predictions$patient_barcode)) ||
+    sum(nested_folds$no_gene_selected) != nested_summary$no_gene_folds ||
+    sum(nested_folds$outlier_replacement_fallback) !=
+      nested_summary$outlier_replacement_fallbacks ||
+    any(!is.finite(nested_scores$delta_c)) ||
+    any(!is.finite(nested_scores$delta_brier3))) {
+  stop("Selection-aware CV or clinical-only null has incomplete coverage.")
+}
+if (!isTRUE(all.equal(nested_summary$mean_delta_c, mean(nested_scores$delta_c),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(nested_summary$mean_delta_brier3, mean(nested_scores$delta_brier3),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    nrow(nested_boot) != 1000L || anyDuplicated(nested_boot$draw) ||
+    !isTRUE(all.equal(nested_summary$patient_bootstrap_ci_low,
+                      as.numeric(quantile(nested_boot$delta_c, 0.025)),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(nested_summary$patient_bootstrap_ci_high,
+                      as.numeric(quantile(nested_boot$delta_c, 0.975)),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(null_summary$selection_fraction,
+                      mean(!is.na(nested_null$selected_gene)),
+                      tolerance = 1e-12, check.attributes = FALSE))) {
+  stop("Nested CV summary differs from its repeat-level metrics.")
 }
 
 tracerx_discordance <- read_csv(
@@ -410,10 +516,10 @@ tracerx_repeats <- read_csv(
   show_col_types = FALSE
 )
 expected_tracerx_rows <- values[["high_confidence_candidate"]] *
-  RESAMPLING$tracerx_region_repeats * 2
+  RESAMPLING$tracerx_region_repeats * 3
 if (nrow(tracerx_repeats) != expected_tracerx_rows ||
     any(!is.finite(tracerx_repeats$log_hr)) ||
-    any(!tracerx_repeats$scenario %in% c("full_cohort", "size_matched_39"))) {
+    any(!tracerx_repeats$scenario %in% c("full_cohort", "size_matched_39", "fixed_subset_regions"))) {
   stop("TRACERx one-region repeat table is incomplete or invalid.")
 }
 if (any(tracerx_repeats$n[tracerx_repeats$scenario == "full_cohort"] !=
@@ -423,6 +529,10 @@ if (any(tracerx_repeats$n[tracerx_repeats$scenario == "full_cohort"] !=
     any(tracerx_repeats$n[tracerx_repeats$scenario == "size_matched_39"] !=
         tracerx_values[["size_matched_patients"]]) ||
     any(tracerx_repeats$events[tracerx_repeats$scenario == "size_matched_39"] !=
+        tracerx_values[["size_matched_events"]]) ||
+    any(tracerx_repeats$n[tracerx_repeats$scenario == "fixed_subset_regions"] !=
+        tracerx_values[["size_matched_patients"]]) ||
+    any(tracerx_repeats$events[tracerx_repeats$scenario == "fixed_subset_regions"] !=
         tracerx_values[["size_matched_events"]])) {
   stop("TRACERx resampling scenarios have inconsistent patient or event counts.")
 }
@@ -431,7 +541,7 @@ tracerx_resampling <- read_csv(
   file.path(DIRS$tables, "tracerx_one_region_cox_summary.csv"),
   show_col_types = FALSE
 )
-if (nrow(tracerx_resampling) != values[["high_confidence_candidate"]] * 2 ||
+if (nrow(tracerx_resampling) != values[["high_confidence_candidate"]] * 3 ||
     any(tracerx_resampling$successful_repeats != RESAMPLING$tracerx_region_repeats)) {
   stop("TRACERx one-region summary has incomplete candidate-by-scenario coverage.")
 }
@@ -533,6 +643,33 @@ if (!all(c(
 manifest <- read_csv(file.path(DIRS$tables, "run_manifest.csv"), show_col_types = FALSE)
 if (any(is.na(manifest$md5) | manifest$md5 == "")) {
   stop("Run manifest contains missing checksums.")
+}
+if (any(!file.exists(manifest$path)) ||
+    any(unname(tools::md5sum(manifest$path)) != manifest$md5)) {
+  stop("Generated output differs from the run manifest.")
+}
+
+funnel_lists <- read_csv(file.path(DIRS$tables, "funnel_matched_lists.csv"), show_col_types = FALSE)
+if (dplyr::n_distinct(funnel_lists$rule) != 6L ||
+    length(unique(table(funnel_lists$rule))) != 1L ||
+    anyDuplicated(paste(funnel_lists$rule, funnel_lists$symbol))) {
+  stop("Funnel ablation lists are not equally sized and gene-unique.")
+}
+funnel_external <- read_csv(file.path(DIRS$tables, "funnel_external_gene_results.csv"), show_col_types = FALSE)
+if (nrow(funnel_external) != nrow(funnel_lists) * 2L ||
+    any(funnel_external$fdr < 0 | funnel_external$fdr > 1, na.rm = TRUE)) {
+  stop("Funnel external evaluation has incomplete coverage or invalid FDR.")
+}
+acceptance <- read_csv(file.path(DIRS$tables, "acceptance_criteria.csv"), show_col_types = FALSE)
+funnel_test <- read_csv(file.path(DIRS$tables, "funnel_external_paired_bootstrap.csv"), show_col_types = FALSE)
+expected_cv <- nested_summary$mean_delta_c >= 0.01 &&
+  nested_summary$patient_bootstrap_ci_low > 0 && nested_summary$mean_delta_brier3 <= 0
+if (!identical(nested_summary$cv_acceptance, expected_cv) ||
+    acceptance$status[acceptance$criterion == "selection_aware_cv"] !=
+      ifelse(expected_cv, "pass", "fail") ||
+    acceptance$status[acceptance$criterion == "external_funnel_vs_survival_only"] !=
+      ifelse(all(funnel_test$ci_low > 0), "pass", "fail")) {
+  stop("Scientific acceptance rows disagree with the underlying results.")
 }
 
 funnel <- read_csv(file.path(DIRS$tables, "evidence_funnel.csv"), show_col_types = FALSE)

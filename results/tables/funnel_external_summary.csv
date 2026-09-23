@@ -1,0 +1,13 @@
+rule,cohort,list_size,present,directional_rate,same_direction_fdr,opposite_direction_fdr,same_direction
+complete_rule,E-MTAB-1980,22,21,1,13,0,21
+complete_rule,GSE29609,22,20,0.2,0,2,4
+de_only,E-MTAB-1980,22,20,0.9,3,0,18
+de_only,GSE29609,22,16,0.3125,0,0,5
+expression_matched_control,E-MTAB-1980,22,22,0.5,2,5,11
+expression_matched_control,GSE29609,22,21,0.42857142857142855,0,0,9
+leave_out_gse40435,E-MTAB-1980,22,21,1,14,0,21
+leave_out_gse40435,GSE29609,22,20,0.25,0,3,5
+leave_out_gse53757,E-MTAB-1980,22,21,0.9523809523809523,16,0,20
+leave_out_gse53757,GSE29609,22,21,0.14285714285714285,0,2,3
+survival_only,E-MTAB-1980,22,18,1,11,0,18
+survival_only,GSE29609,22,19,0.15789473684210525,0,3,3
