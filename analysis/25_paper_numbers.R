@@ -46,6 +46,24 @@ shape <- tab("candidate_survival_shape_sensitivity.csv")
 overlap <- tab("null_overlap_check.csv")
 checkmate <- tab("checkmate025_study_summary.csv")
 cv_conditional <- tab("candidate_cv_clinical_increment.csv")
+benchmark <- tab("nested_benchmark_summary.csv")
+benchmark_folds <- tab("nested_benchmark_folds.csv")
+bench <- function(strategy) {
+  row <- benchmark[benchmark$strategy == strategy, ]
+  if (nrow(row) != 1L) stop("Missing nested-benchmark strategy: ", strategy)
+  row
+}
+dec4 <- function(x) sprintf("%.4f", x)
+if (any(benchmark$primary_hydra_mismatches != 0L) || nrow(benchmark) != 6L) {
+  stop("Nested benchmark did not reproduce the primary HYDRA genes.")
+}
+ridge_sizes <- benchmark_folds$n_model_genes[benchmark_folds$strategy == "ridge_eligible"]
+hydra_b <- bench("hydra")
+survival_b <- bench("survival_only")
+de_b <- bench("de_only")
+control_b <- bench("matched_control")
+ridge_b <- bench("ridge_eligible")
+clinical_b <- bench("clinical")
 
 items <- c(
   macro("OriginalTumorSamples", number(sample_audit$raw_samples[sample_audit$shortLetterCode == "TP"])),
@@ -112,7 +130,36 @@ items <- c(
   macro("CheckmatePatients", number(checkmate$value[checkmate$metric == "checkmate025_rna_linked_patients"])),
   macro("CheckmateNivolumab", number(checkmate$value[checkmate$metric == "nivolumab_patients"])),
   macro("CheckmateEverolimus", number(checkmate$value[checkmate$metric == "everolimus_patients"])),
-  macro("CheckmateCandidates", number(checkmate$value[checkmate$metric == "candidates_mapped"]))
+  macro("CheckmateCandidates", number(checkmate$value[checkmate$metric == "candidates_mapped"])),
+  macro("BenchHydraDelta", dec4(hydra_b$mean_delta_c)),
+  macro("BenchHydraCiLow", dec4(hydra_b$patient_bootstrap_ci_low)),
+  macro("BenchHydraCiHigh", dec4(hydra_b$patient_bootstrap_ci_high)),
+  macro("BenchHydraSlope", sprintf("%.2f", hydra_b$mean_calibration_slope)),
+  macro("BenchHydraGenes", number(hydra_b$distinct_genes)),
+  macro("BenchSurvivalDelta", dec4(survival_b$mean_delta_c)),
+  macro("BenchSurvivalCiLow", dec4(survival_b$patient_bootstrap_ci_low)),
+  macro("BenchSurvivalCiHigh", dec4(survival_b$patient_bootstrap_ci_high)),
+  macro("BenchSurvivalGenes", number(survival_b$distinct_genes)),
+  macro("BenchDeDelta", dec4(de_b$mean_delta_c)),
+  macro("BenchDeCiLow", dec4(de_b$patient_bootstrap_ci_low)),
+  macro("BenchDeCiHigh", dec4(de_b$patient_bootstrap_ci_high)),
+  macro("BenchDeGenes", number(de_b$distinct_genes)),
+  macro("BenchControlDelta", dec4(control_b$mean_delta_c)),
+  macro("BenchControlCiLow", dec4(control_b$patient_bootstrap_ci_low)),
+  macro("BenchControlCiHigh", dec4(control_b$patient_bootstrap_ci_high)),
+  macro("BenchControlGenes", number(control_b$distinct_genes)),
+  macro("BenchRidgeDelta", dec4(ridge_b$mean_delta_c)),
+  macro("BenchRidgeCiLow", dec4(ridge_b$patient_bootstrap_ci_low)),
+  macro("BenchRidgeCiHigh", dec4(ridge_b$patient_bootstrap_ci_high)),
+  macro("BenchRidgeBrier", dec4(ridge_b$mean_delta_brier3)),
+  macro("BenchRidgeBrierCiLow", dec4(ridge_b$patient_bootstrap_brier_ci_low)),
+  macro("BenchRidgeBrierCiHigh", dec4(ridge_b$patient_bootstrap_brier_ci_high)),
+  macro("BenchRidgeSlope", sprintf("%.2f", ridge_b$mean_calibration_slope)),
+  macro("BenchRidgeGenes", number(round(mean(ridge_sizes)))),
+  macro("BenchRidgeGenesMin", number(min(ridge_sizes))),
+  macro("BenchRidgeGenesMax", number(max(ridge_sizes))),
+  macro("BenchClinicalC", sprintf("%.3f", clinical_b$mean_c)),
+  macro("BenchClinicalSlope", sprintf("%.2f", clinical_b$mean_calibration_slope))
 )
 writeLines(c("% Generated from committed result tables by analysis/25_paper_numbers.R.", items),
            "paper/results_macros.tex")

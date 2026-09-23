@@ -114,7 +114,8 @@ CRAN_PACKAGES <- c(
   "ggrepel",
   "patchwork",
   "pheatmap",
-  "UpSetR"
+  "UpSetR",
+  "glmnet"
 )
 
 TCGA_SAMPLE_TYPES <- c("Primary Tumor", "Solid Tissue Normal")

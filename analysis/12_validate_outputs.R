@@ -83,6 +83,12 @@ required_files <- c(
   file.path(DIRS$figures, "evidence_funnel.png"),
   file.path(DIRS$figures, "nested_cv_increment.png"),
   file.path(DIRS$figures, "funnel_external_comparison.png"),
+  file.path(DIRS$figures, "nested_selection_benchmark.png"),
+  file.path(DIRS$tables, "nested_benchmark_summary.csv"),
+  file.path(DIRS$tables, "nested_benchmark_folds.csv"),
+  file.path(DIRS$tables, "nested_benchmark_repeat_metrics.csv"),
+  file.path(DIRS$tables, "nested_benchmark_predictions.csv"),
+  file.path(DIRS$tables, "nested_benchmark_patient_bootstrap.csv"),
   file.path("paper", "results_macros.tex")
 )
 
@@ -465,6 +471,22 @@ if (!isTRUE(all.equal(nested_summary$mean_delta_c, mean(nested_scores$delta_c),
                       mean(!is.na(nested_null$selected_gene)),
                       tolerance = 1e-12, check.attributes = FALSE))) {
   stop("Nested CV summary differs from its repeat-level metrics.")
+}
+benchmark <- read_csv(file.path(DIRS$tables, "nested_benchmark_summary.csv"), show_col_types = FALSE)
+benchmark_folds <- read_csv(file.path(DIRS$tables, "nested_benchmark_folds.csv"), show_col_types = FALSE)
+benchmark_repeats <- read_csv(file.path(DIRS$tables, "nested_benchmark_repeat_metrics.csv"),
+                              show_col_types = FALSE)
+benchmark_predictions <- read_csv(file.path(DIRS$tables, "nested_benchmark_predictions.csv"),
+                                  show_col_types = FALSE)
+expected_arms <- c("clinical", "hydra", "survival_only", "de_only",
+                   "ridge_eligible", "matched_control")
+if (!setequal(benchmark$strategy, expected_arms) ||
+    any(benchmark$primary_hydra_mismatches != 0L) ||
+    nrow(benchmark_folds) != 300L || nrow(benchmark_repeats) != 60L ||
+    nrow(benchmark_predictions) != 6L * nested_summary$n_patients * 10L ||
+    anyDuplicated(paste(benchmark_predictions$repeat_id, benchmark_predictions$strategy,
+                        benchmark_predictions$patient_barcode))) {
+  stop("Nested selection benchmark outputs are incomplete or do not match the primary HYDRA genes.")
 }
 
 tracerx_discordance <- read_csv(
