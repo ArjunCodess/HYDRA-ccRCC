@@ -50,7 +50,7 @@ writeLines(
   "environment/sessionInfo.txt"
 )
 
-roots <- c("analysis", "results/tables", "results/figures")
+roots <- c("analysis", "results")
 files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
 }))
