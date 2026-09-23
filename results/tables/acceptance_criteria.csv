@@ -1,0 +1,6 @@
+criterion,status,evidence,rule
+selection_aware_cv,fail,nested_cv_summary.csv; nested_cv_patient_bootstrap.csv,mean delta C >= 0.01; patient bootstrap lower 95% > 0; mean delta Brier <= 0
+external_funnel_vs_survival_only,fail,funnel_external_paired_bootstrap.csv,complete minus survival-only directional rate lower paired 95% > 0 in both inspected cohorts
+untouched_external_patients,unavailable,previously inspected cohorts only,new patients not yet inspected
+tumor_single_cell_evidence,unavailable,HPA normal tissue only,ccRCC tumor-cell-resolved expression
+independent_randomized_treatment_cohort,unavailable,CheckMate 025 is post hoc and already inspected,prespecified independent treatment interaction
