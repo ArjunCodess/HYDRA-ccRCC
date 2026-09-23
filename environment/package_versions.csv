@@ -127,6 +127,7 @@ ggrepel,0.9.8,R 4.6.1; x86_64-w64-mingw32; 2026-07-21 02:50:55 UTC; windows
 ggsci,5.1.0,R 4.6.1; ; 2026-07-21 02:50:57 UTC; windows
 ggsignif,0.6.4,R 4.6.1; ; 2026-07-21 02:50:57 UTC; windows
 ggtext,0.1.2,R 4.6.1; ; 2026-07-11 04:04:19 UTC; windows
+glmnet,5.0,R 4.6.1; x86_64-w64-mingw32; 2026-09-02 03:15:13 UTC; windows
 glue,1.8.1,R 4.6.1; x86_64-w64-mingw32; 2026-07-21 01:02:02 UTC; windows
 googledrive,2.1.2,R 4.6.1; ; 2026-07-21 03:09:45 UTC; windows
 googlesheets4,1.1.2,R 4.6.1; ; 2026-07-21 03:29:57 UTC; windows
