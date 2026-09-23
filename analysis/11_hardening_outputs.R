@@ -18,19 +18,6 @@ suppressPackageStartupMessages({
 candidates <- read_csv(file.path(DIRS$tables, "candidate_gene_evidence_table.csv"), show_col_types = FALSE)
 summary_counts <- read_csv(file.path(DIRS$tables, "candidate_summary.csv"), show_col_types = FALSE)
 
-safe_neglog10 <- function(x) {
-  out <- -log10(pmax(x, .Machine$double.xmin, na.rm = TRUE))
-  out[!is.finite(out)] <- NA_real_
-  out
-}
-
-rescale01 <- function(x) {
-  if (all(is.na(x))) return(rep(NA_real_, length(x)))
-  rng <- range(x, na.rm = TRUE)
-  if (!is.finite(rng[1]) || !is.finite(rng[2]) || rng[1] == rng[2]) return(rep(1, length(x)))
-  (x - rng[1]) / (rng[2] - rng[1])
-}
-
 gene_descriptions <- AnnotationDbi::select(
   org.Hs.eg.db,
   keys = unique(candidates$symbol),
@@ -77,42 +64,19 @@ high_conf <- candidates |>
   left_join(gene_descriptions, by = "symbol") |>
   left_join(manual_context, by = "symbol") |>
   mutate(
-    reproducibility_component = rescale01(
-      pmin(abs(tcga_log2fc), 5) / 5 +
-        pmin(abs(gse40435_log2fc), 3) / 3 +
-        pmin(abs(gse53757_log2fc), 3) / 3 +
-        nominal_support_count / 2
-    ),
-    survival_strength_component = rescale01(safe_neglog10(main_fdr) + abs(main_log_hr)),
-    sensitivity_component = as.numeric(stage_sensitivity_same_direction & grade_sensitivity_same_direction) +
-      as.numeric(stage_sensitivity_nominal & grade_sensitivity_nominal),
-    pathway_component = if_else(pathway_class != "Unclassified", 1, 0),
-    literature_component = case_when(
-      grepl("Strong kidney biology prior|Angiogenesis prior|Immune literature strong", literature_prior) ~ 1,
-      grepl("likely", literature_prior, ignore.case = TRUE) ~ 0.5,
-      TRUE ~ 0
-    ),
-    final_rank_score =
-      0.35 * reproducibility_component +
-      0.35 * survival_strength_component +
-      0.15 * sensitivity_component / 2 +
-      0.10 * pathway_component +
-      0.05 * literature_component,
     pubmed_ccrcc_query = paste0(
       "https://pubmed.ncbi.nlm.nih.gov/?term=",
       utils::URLencode(paste0(symbol, " (ccRCC OR clear cell renal cell carcinoma OR kidney cancer)"), reserved = TRUE)
     ),
     interpretation_status = "candidate prognostic association; requires manual literature and biology review"
   ) |>
-  arrange(desc(final_rank_score), main_fdr)
+  arrange(symbol)
 
-ranked_shortlist <- high_conf |>
+candidate_evidence <- high_conf |>
   transmute(
-    rank = row_number(),
     symbol,
     gene_name,
     pathway_class,
-    final_rank_score,
     evidence_score,
     tcga_log2fc,
     gse40435_log2fc,
@@ -132,53 +96,48 @@ ranked_shortlist <- high_conf |>
     interpretation_status
   )
 
-write_csv_atomic(ranked_shortlist, file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"))
+write_csv_atomic(candidate_evidence, file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"))
 
 manual_priority <- tribble(
-  ~symbol, ~manual_tier, ~manuscript_role,
-  "KL", "lead", "renal epithelial/metabolic retention",
-  "ACADM", "lead", "fatty-acid oxidation and mitochondrial metabolism",
-  "CRYL1", "lead", "renal metabolic differentiation",
-  "ACAT1", "lead", "ketone, acetyl-CoA, and mitochondrial metabolism",
-  "DDC", "lead", "amino-acid and biogenic-amine metabolism",
-  "PANK1", "supporting", "CoA metabolism and mitochondrial function",
-  "DBT", "supporting", "branched-chain amino-acid metabolism",
-  "CLCN5", "supporting", "proximal-tubule endosomal/metabolic differentiation",
-  "TCIRG1", "supporting risk", "lysosomal acidification, glycolytic/immune risk",
-  "HHLA2", "interpret cautiously", "immune-checkpoint paradox",
-  "GRAMD1A", "interpret cautiously", "cholesterol-contact-site biology",
-  "C1QTNF6", "interpret cautiously", "secreted inflammatory/metabolic risk",
-  "CYFIP2", "interpret cautiously", "cytoskeletal and broad tumor-suppressor-like signal",
-  "IQGAP2", "interpret cautiously", "cytoskeletal scaffold signal",
-  "TEK", "composition flag", "endothelial/vascular composition",
-  "EMCN", "composition flag", "endothelial/vascular composition",
-  "PODXL", "composition flag", "podocyte/endothelial/renal compartment signal",
-  "FHOD1", "composition flag", "stromal/EMT and actin-remodeling signal",
-  "IFFO1", "do not highlight", "weak ccRCC-specific biological support",
-  "CADPS2", "do not highlight", "weak ccRCC-specific biological support",
-  "LRBA", "do not highlight", "immune-composition signal",
-  "FUT6", "do not highlight", "weak and directionally fragile glycosylation signal",
-  "HIBCH", "do not highlight", "plausible but under-validated metabolic signal",
-  "TNFAIP2", "do not highlight", "non-specific inflammatory signal",
-  "RBM47", "interpret cautiously", "RNA-binding and immune-composition-sensitive association",
-  "GJB1", "interpret cautiously", "gap-junction and epithelial-compartment association",
-  "LTB4R", "composition flag", "inflammatory and renal-compartment association"
+  ~symbol, ~manuscript_role,
+  "KL", "renal epithelial/metabolic retention",
+  "ACADM", "fatty-acid oxidation and mitochondrial metabolism",
+  "CRYL1", "renal metabolic differentiation",
+  "ACAT1", "ketone, acetyl-CoA, and mitochondrial metabolism",
+  "DDC", "amino-acid and biogenic-amine metabolism",
+  "PANK1", "CoA metabolism and mitochondrial function",
+  "DBT", "branched-chain amino-acid metabolism",
+  "CLCN5", "proximal-tubule endosomal/metabolic differentiation",
+  "TCIRG1", "lysosomal acidification, glycolytic/immune risk",
+  "HHLA2", "immune-checkpoint paradox",
+  "GRAMD1A", "cholesterol-contact-site biology",
+  "C1QTNF6", "secreted inflammatory/metabolic risk",
+  "CYFIP2", "cytoskeletal and broad tumor-suppressor-like signal",
+  "IQGAP2", "cytoskeletal scaffold signal",
+  "TEK", "endothelial/vascular composition",
+  "EMCN", "endothelial/vascular composition",
+  "PODXL", "podocyte/endothelial/renal compartment signal",
+  "FHOD1", "stromal/EMT and actin-remodeling signal",
+  "IFFO1", "weak ccRCC-specific biological support",
+  "CADPS2", "weak ccRCC-specific biological support",
+  "LRBA", "immune-composition signal",
+  "FUT6", "weak and directionally fragile glycosylation signal",
+  "HIBCH", "plausible but under-validated metabolic signal",
+  "TNFAIP2", "non-specific inflammatory signal",
+  "RBM47", "RNA-binding and immune-composition-sensitive association",
+  "GJB1", "gap-junction and epithelial-compartment association",
+  "LTB4R", "inflammatory and renal-compartment association"
 )
 
-manuscript_candidates <- ranked_shortlist |>
+manuscript_candidates <- candidate_evidence |>
   left_join(manual_priority, by = "symbol") |>
   mutate(
-    manual_tier = replace_na(manual_tier, "interpret cautiously"),
     manuscript_role = replace_na(manuscript_role, "candidate prognostic association requiring validation"),
     survival_direction = if_else(main_hr < 1, "higher expression associated with lower hazard", "higher expression associated with higher hazard"),
     tumor_direction = if_else(tcga_log2fc < 0, "lower in tumor", "higher in tumor")
-  ) |>
-  arrange(
-    factor(manual_tier, levels = c("lead", "supporting", "supporting risk", "interpret cautiously", "composition flag", "do not highlight")),
-    main_fdr
-  )
+  ) |> arrange(symbol)
 
-write_csv_atomic(manuscript_candidates, file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"))
+write_csv_atomic(manuscript_candidates, file.path(DIRS$tables, "candidate_interpretation_context.csv"))
 
 fit_composition_sensitivity <- function(high_conf_symbols) {
   vst_mat <- read_required_rds(FILES$tcga_vst)
@@ -325,7 +284,7 @@ fit_composition_sensitivity <- function(high_conf_symbols) {
   write_csv_atomic(marker_availability, file.path(DIRS$tables, "composition_marker_score_availability.csv"))
 }
 
-fit_composition_sensitivity(ranked_shortlist$symbol)
+fit_composition_sensitivity(candidate_evidence$symbol)
 
 survival_report <- candidates |>
   filter(strict_candidate | high_confidence_candidate) |>
@@ -456,19 +415,18 @@ dossier_lines <- c(
   "# HYDRA-ccRCC High-Confidence Gene Dossiers",
   "",
   "These dossiers are generated from the reproducible pipeline. They are interpretation scaffolds, not final biological claims.",
-  "The rank score summarizes discovery, expression replication, TCGA survival strength, and sensitivity models only; it excludes proportional-hazards diagnostics and should not be read as an integrated external-validation or composition score.",
+  "Candidates are listed alphabetically. The discovery evidence score is a selection heuristic, not an external-validation or biological rank.",
   ""
 )
 
-for (i in seq_len(nrow(ranked_shortlist))) {
-  row <- ranked_shortlist[i, ]
+for (i in seq_len(nrow(candidate_evidence))) {
+  row <- candidate_evidence[i, ]
   dossier_lines <- c(
     dossier_lines,
-    paste0("## ", row$rank, ". ", row$symbol),
+    paste0("## ", row$symbol),
     "",
     paste0("- Gene name: ", ifelse(is.na(row$gene_name), "not available", row$gene_name)),
     paste0("- Pathway class: ", row$pathway_class),
-    paste0("- Final rank score: ", round(row$final_rank_score, 3)),
     paste0("- Tumor-normal signal: TCGA log2FC ", round(row$tcga_log2fc, 3),
            ", GSE40435 log2FC ", round(row$gse40435_log2fc, 3),
            ", GSE53757 log2FC ", round(row$gse53757_log2fc, 3)),

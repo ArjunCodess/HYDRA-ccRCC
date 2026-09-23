@@ -143,16 +143,15 @@ expression_gene <- expression_raw |>
   summarise(across(all_of(sample_columns), ~ mean(.x, na.rm = TRUE)), .groups = "drop")
 
 candidate_priority <- read_csv(
-  file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
+  file.path(DIRS$tables, "candidate_interpretation_context.csv"),
   show_col_types = FALSE
 )
 
-fit_external_gene <- function(symbol, tcga_log_hr, manual_tier) {
+fit_external_gene <- function(symbol, tcga_log_hr) {
   row <- expression_gene |> filter(SYMBOL == symbol)
   if (nrow(row) == 0) {
     return(tibble(
       symbol = symbol,
-      manual_tier = manual_tier,
       external_present = FALSE,
       external_n = nrow(clinical),
       external_events = sum(clinical$os_event),
@@ -222,7 +221,6 @@ fit_external_gene <- function(symbol, tcga_log_hr, manual_tier) {
 
   tibble(
     symbol = symbol,
-    manual_tier = manual_tier,
     external_present = TRUE,
     external_n = unadjusted_fit$n,
     external_events = unadjusted_fit$nevent,
@@ -247,8 +245,7 @@ fit_external_gene <- function(symbol, tcga_log_hr, manual_tier) {
 external_results <- bind_rows(lapply(seq_len(nrow(candidate_priority)), function(i) {
   fit_external_gene(
     symbol = candidate_priority$symbol[i],
-    tcga_log_hr = candidate_priority$main_log_hr[i],
-    manual_tier = candidate_priority$manual_tier[i]
+    tcga_log_hr = candidate_priority$main_log_hr[i]
   )
 })) |>
   mutate(
@@ -293,20 +290,7 @@ external_results <- bind_rows(lapply(seq_len(nrow(candidate_priority)), function
       ),
     by = "symbol"
   ) |>
-  arrange(
-    factor(
-      manual_tier,
-      levels = c(
-        "lead",
-        "supporting",
-        "supporting risk",
-        "interpret cautiously",
-        "composition flag",
-        "do not highlight"
-      )
-    ),
-    external_p_value
-  )
+  arrange(symbol)
 
 write_csv_atomic(
   external_results,

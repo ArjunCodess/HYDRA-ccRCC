@@ -116,10 +116,10 @@ if (!identical(sort(unique(clinical$arm)), c("EVEROLIMUS", "NIVOLUMAB"))) {
 }
 
 candidates <- read_csv(
-  file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
+  file.path(DIRS$tables, "candidate_interpretation_context.csv"),
   show_col_types = FALSE
 ) |>
-  select(symbol, manual_tier, manuscript_role)
+  select(symbol, manuscript_role)
 
 expression_raw <- read_excel(
   workbook_path,

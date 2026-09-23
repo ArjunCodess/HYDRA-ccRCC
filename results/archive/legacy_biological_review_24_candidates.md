@@ -1,5 +1,7 @@
 # HYDRA-ccRCC Manual Biological Review of 24 High-Confidence Candidate Genes
 
+**Historical review, superseded.** This 2026-05-31 document evaluated a prior 24-gene set. Its rankings, confidence scores, and validation language are not supported by the corrected patient-level analysis. The current 23-gene results and contradictory external findings are reported in the development manuscript and regenerated tables; this file is retained only to preserve the earlier interpretation record.
+
 Date: 2026-05-31
 
 Scope: This is a literature-anchored biological review of the 24 final candidate prognostic associations. It does not add new analyses. The review uses the existing HYDRA-ccRCC outputs, especially `high_confidence_ranked_shortlist.csv`, and evaluates whether each association is biologically plausible enough to discuss in a manuscript.

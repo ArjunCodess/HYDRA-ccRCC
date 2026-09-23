@@ -23,14 +23,14 @@ required_files <- c(
   file.path(DIRS$tables, "prior_candidate_delta.csv"),
   file.path(DIRS$tables, "strict_candidate_genes.csv"),
   file.path(DIRS$tables, "high_confidence_candidate_genes.csv"),
-  file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"),
+  file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"),
   file.path(DIRS$tables, "candidate_survival_report.csv"),
   file.path(DIRS$tables, "threshold_sensitivity.csv"),
   file.path(DIRS$tables, "null_overlap_check.csv"),
   file.path(DIRS$tables, "deg_vs_prognostic_comparison.csv"),
   file.path(DIRS$tables, "cell_type_sanity_check.csv"),
   file.path(DIRS$tables, "high_confidence_literature_table.csv"),
-  file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"),
+  file.path(DIRS$tables, "candidate_interpretation_context.csv"),
   file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"),
   file.path(DIRS$tables, "composition_marker_score_availability.csv"),
   file.path(DIRS$tables, "external_survival_gse29609.csv"),
@@ -247,9 +247,10 @@ for (accession in c("gse40435", "gse53757")) {
   }
 }
 
-ranked <- read_csv(file.path(DIRS$tables, "high_confidence_ranked_shortlist.csv"), show_col_types = FALSE)
-if (nrow(ranked) != values[["high_confidence_candidate"]]) {
-  stop("Ranked shortlist row count does not match high-confidence candidate count.")
+candidate_evidence <- read_csv(file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"), show_col_types = FALSE)
+if (nrow(candidate_evidence) != values[["high_confidence_candidate"]] ||
+    anyDuplicated(candidate_evidence$symbol)) {
+  stop("Candidate evidence does not cover each high-confidence gene exactly once.")
 }
 paired_candidates <- read_csv(file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"), show_col_types = FALSE)
 if (nrow(paired_candidates) != values[["high_confidence_candidate"]] ||

@@ -32,11 +32,10 @@ collapse_gse29609_to_gene <- function(expr, feature_data) {
     as.matrix()
 }
 
-fit_external_gene <- function(symbol, gene_expr, clinical, tcga_direction, manual_tier) {
+fit_external_gene <- function(symbol, gene_expr, clinical, tcga_direction) {
   if (!symbol %in% rownames(gene_expr)) {
     return(tibble(
       symbol = symbol,
-      manual_tier = manual_tier,
       external_present = FALSE,
       external_n = nrow(clinical),
       external_events = sum(clinical$os_event == 1, na.rm = TRUE),
@@ -74,7 +73,6 @@ fit_external_gene <- function(symbol, gene_expr, clinical, tcga_direction, manua
 
   tibble(
     symbol = symbol,
-    manual_tier = manual_tier,
     external_present = TRUE,
     external_n = fit$n,
     external_events = fit$nevent,
@@ -127,15 +125,14 @@ write_csv_atomic(
   file.path(DIRS$tables, "gse29609_sample_summary.csv")
 )
 
-candidate_priority <- read_csv(file.path(DIRS$tables, "manuscript_candidate_prioritization.csv"), show_col_types = FALSE)
+candidate_priority <- read_csv(file.path(DIRS$tables, "candidate_interpretation_context.csv"), show_col_types = FALSE)
 
 external_results <- bind_rows(lapply(seq_len(nrow(candidate_priority)), function(i) {
   fit_external_gene(
     symbol = candidate_priority$symbol[i],
     gene_expr = gene_expr,
     clinical = clinical,
-    tcga_direction = candidate_priority$main_log_hr[i],
-    manual_tier = candidate_priority$manual_tier[i]
+    tcga_direction = candidate_priority$main_log_hr[i]
   )
 })) |>
   mutate(
@@ -157,10 +154,7 @@ external_results <- bind_rows(lapply(seq_len(nrow(candidate_priority)), function
       select(symbol, main_log_hr, main_hr, main_fdr, manuscript_role, survival_direction, tumor_direction),
     by = "symbol"
   ) |>
-  arrange(
-    factor(manual_tier, levels = c("lead", "supporting", "supporting risk", "interpret cautiously", "composition flag", "do not highlight")),
-    external_p_value
-  )
+  arrange(symbol)
 
 write_csv_atomic(external_results, file.path(DIRS$tables, "external_survival_gse29609.csv"))
 
