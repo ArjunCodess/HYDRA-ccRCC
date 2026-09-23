@@ -36,7 +36,8 @@ line <- paste0(
   " for the selected-gene models, so discrimination and calibration did not move together. ",
   "The [200 clinical-only null simulations](results/tables/nested_cv_clinical_null_summary.csv) ",
   "selected a gene in ", null$gene_selected,
-  " single-fold runs. The patient bootstrap keeps the fitted fold models fixed, ",
+  " single-fold runs under their simulated clinical-risk model. The patient ",
+  "bootstrap keeps the fitted fold models fixed, ",
   "so its interval omits training-set and split uncertainty."
 )
 

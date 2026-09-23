@@ -249,7 +249,9 @@ for (accession in c("gse40435", "gse53757")) {
 
 candidate_evidence <- read_csv(file.path(DIRS$tables, "high_confidence_candidate_evidence.csv"), show_col_types = FALSE)
 if (nrow(candidate_evidence) != values[["high_confidence_candidate"]] ||
-    anyDuplicated(candidate_evidence$symbol)) {
+    anyDuplicated(candidate_evidence$symbol) ||
+    !identical(candidate_evidence$symbol, sort(candidate_evidence$symbol)) ||
+    any(c("manual_tier", "final_rank_score", "rank") %in% names(candidate_evidence))) {
   stop("Candidate evidence does not cover each high-confidence gene exactly once.")
 }
 paired_candidates <- read_csv(file.path(DIRS$tables, "candidate_paired_de_sensitivity.csv"), show_col_types = FALSE)
@@ -432,6 +434,7 @@ nested_scores <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv")
 nested_summary <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"), show_col_types = FALSE)
 nested_predictions <- read_csv(file.path(DIRS$tables, "nested_cv_predictions.csv"), show_col_types = FALSE)
 nested_null <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null.csv"), show_col_types = FALSE)
+nested_boot <- read_csv(file.path(DIRS$tables, "nested_cv_patient_bootstrap.csv"), show_col_types = FALSE)
 null_summary <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
                          show_col_types = FALSE)
 if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
@@ -450,6 +453,16 @@ if (nrow(nested_folds) != 50L || nrow(nested_scores) != 10L ||
 if (!isTRUE(all.equal(nested_summary$mean_delta_c, mean(nested_scores$delta_c),
                       tolerance = 1e-12, check.attributes = FALSE)) ||
     !isTRUE(all.equal(nested_summary$mean_delta_brier3, mean(nested_scores$delta_brier3),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    nrow(nested_boot) != 1000L || anyDuplicated(nested_boot$draw) ||
+    !isTRUE(all.equal(nested_summary$patient_bootstrap_ci_low,
+                      as.numeric(quantile(nested_boot$delta_c, 0.025)),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(nested_summary$patient_bootstrap_ci_high,
+                      as.numeric(quantile(nested_boot$delta_c, 0.975)),
+                      tolerance = 1e-12, check.attributes = FALSE)) ||
+    !isTRUE(all.equal(null_summary$selection_fraction,
+                      mean(!is.na(nested_null$selected_gene)),
                       tolerance = 1e-12, check.attributes = FALSE))) {
   stop("Nested CV summary differs from its repeat-level metrics.")
 }
@@ -646,6 +659,17 @@ funnel_external <- read_csv(file.path(DIRS$tables, "funnel_external_gene_results
 if (nrow(funnel_external) != nrow(funnel_lists) * 2L ||
     any(funnel_external$fdr < 0 | funnel_external$fdr > 1, na.rm = TRUE)) {
   stop("Funnel external evaluation has incomplete coverage or invalid FDR.")
+}
+acceptance <- read_csv(file.path(DIRS$tables, "acceptance_criteria.csv"), show_col_types = FALSE)
+funnel_test <- read_csv(file.path(DIRS$tables, "funnel_external_paired_bootstrap.csv"), show_col_types = FALSE)
+expected_cv <- nested_summary$mean_delta_c >= 0.01 &&
+  nested_summary$patient_bootstrap_ci_low > 0 && nested_summary$mean_delta_brier3 <= 0
+if (!identical(nested_summary$cv_acceptance, expected_cv) ||
+    acceptance$status[acceptance$criterion == "selection_aware_cv"] !=
+      ifelse(expected_cv, "pass", "fail") ||
+    acceptance$status[acceptance$criterion == "external_funnel_vs_survival_only"] !=
+      ifelse(all(funnel_test$ci_low > 0), "pass", "fail")) {
+  stop("Scientific acceptance rows disagree with the underlying results.")
 }
 
 funnel <- read_csv(file.path(DIRS$tables, "evidence_funnel.csv"), show_col_types = FALSE)
