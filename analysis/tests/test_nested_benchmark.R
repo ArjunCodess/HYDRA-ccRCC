@@ -110,6 +110,7 @@ ridge <- fit_ridge_cox(x[1:56, ], x[57:70, ], time[1:56], event_r[1:56], foldid,
                         n_unpenalized = 2L, horizon = 0.5)
 stopifnot(ridge$n_genes == 4L, is.finite(ridge$lambda),
           length(ridge$lp_test) == 14L, all(is.finite(ridge$risk_test)),
-          all(ridge$risk_test > 0), all(ridge$risk_test < 1))
+          all(ridge$risk_test > 0), all(ridge$risk_test < 1),
+          length(foldid) == 56L, all(foldid %in% 1:5))
 
 message("Nested benchmark helper tests passed.")

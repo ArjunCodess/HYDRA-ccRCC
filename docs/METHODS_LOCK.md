@@ -24,6 +24,8 @@ The stage sensitivity is `expr + age + sex + stage`. The grade sensitivity is `e
 
 Strict candidates also require main-model FDR < 0.05, absolute log hazard ratio at least log(1.25), absolute GEO log2 fold change at least 0.25 in each cohort, and nominal same-direction support in both sensitivity fits. High-confidence candidates also require FDR < 0.01 and absolute log hazard ratio at least log(1.5). These cutoffs are prespecified project thresholds in `analysis/00_config.R`. They are not a cited minimal clinically important difference.
 
+The ridge arm is a training-fold glmnet Cox model. Clinical covariates are unpenalized. Every training-fold reproducible gene with a nonzero training standard deviation gets an L2 penalty (`alpha = 0`), so the fit does not select a sparse subset. `lambda.min` is chosen by partial-likelihood deviance on five event-stratified inner folds of the training patients. glmnet standardizes columns using the training matrix and applies those moments to the test rows. Expression is log2(count / size factor + 1). Training size factors come from the training DESeq2 fit. Test size factors use the training geometric-mean reference. The inner-fold seed is `RESAMPLING$seed + 31000 + repeat_id * 10 + fold`. Test outcomes are not an input. This arm is not the acceptance test.
+
 The top gene is the highest evidence score:
 
 `-log10(FDR) + |log HR| + min(|TCGA log2FC|, 5) / 5 + min(|GSE40435 log2FC|, 3) / 3 + min(|GSE53757 log2FC|, 3) / 3`

@@ -203,6 +203,12 @@ select_matched_control <- function(mean_expr, abs_cor, target, excluded) {
   pool[which.min(abs(mean_expr[pool] - target))]
 }
 
+# Training-only ridge Cox. The caller must pass training rows only.
+# Clinical columns come first and are unpenalized. Gene columns are ridge
+# (alpha = 0), so this arm does not zero coefficients or pick a subset.
+# lambda.min minimizes inner-fold partial-likelihood deviance, not the C-index
+# and not the 1-se rule. glmnet standardizes every column from x_train and
+# applies those means and sds to x_test. Test outcomes are not arguments.
 fit_ridge_cox <- function(x_train, x_test, time, event, foldid, n_unpenalized, horizon = 1095) {
   if (!requireNamespace("glmnet", quietly = TRUE)) stop("Package glmnet is required for the ridge arm.")
   if (nrow(x_train) != length(time) || nrow(x_train) != length(event) || nrow(x_train) != length(foldid)) {
@@ -210,6 +216,7 @@ fit_ridge_cox <- function(x_train, x_test, time, event, foldid, n_unpenalized, h
   }
   if (ncol(x_train) != ncol(x_test)) stop("Ridge design matrices differ.")
   if (n_unpenalized < 1L || n_unpenalized >= ncol(x_train)) stop("Ridge penalty split is invalid.")
+  if (length(unique(foldid)) < 2L || any(foldid < 1L)) stop("Ridge inner folds must be a training-only partition.")
   penalty <- c(rep(0, n_unpenalized), rep(1, ncol(x_train) - n_unpenalized))
   fit <- glmnet::cv.glmnet(
     x = x_train,
