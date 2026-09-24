@@ -5,7 +5,7 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{graphicx,booktabs,amsmath,hyperref,url}
+\usepackage{graphicx,booktabs,amsmath,caption,hyperref,url}
 \usepackage[expansion=false]{microtype}
 \input{results_macros.tex}
 \title{Auditing a Transcriptomic Prognostic Funnel in Clear Cell Renal Cell Carcinoma}
@@ -19,6 +19,11 @@
 \begin{abstract}
 The one-gene HYDRA funnel fails its prespecified held-out test, while the broader reproducible gene set still carries ranking information. On one TCGA-KIRC tumor per patient, the selection-aware ten-repeat, five-fold analysis changed concordance by \NestedDelta\ (patient-bootstrap 95\% interval \NestedCiLow\ to \NestedCiHigh, conditional on the saved out-of-fold predictions). A training-only ridge Cox model of the reproducible genes on those same splits changed concordance by \BenchRidgeDelta\ (interval \BenchRidgeCiLow\ to \BenchRidgeCiHigh). The ridge penalty was chosen inside each training fold by partial-likelihood deviance; the median selected $\lambda$ was \RidgeLambdaMedian. That arm was not the acceptance test, it does not freeze a signature, and its three-year Brier interval still crossed zero. The ridge increment was estimated only on these TCGA splits and was not fit on GSE29609 or E-MTAB-1980. Survival-only and differential-expression-only single genes stayed within about 0.002 of the clinical concordance. The corrected funnel, from \OriginalTumorSamples\ aliquots to \TumorPatients\ patients, retained \ReproDeg\ reproducible differentially expressed genes, \StrictGenes\ strict candidates, and \HighGenes\ high-confidence candidates. A published 34-gene score on the same splits changed concordance by \ClearcodeDelta\ (interval \ClearcodeCiLow\ to \ClearcodeCiHigh). Alternate aliquot rules and an unpaired GSE53757 fit did not replace the primary shortlist. A matched-list comparison did not establish superiority over survival-only selection (GSE29609 directional-rate difference \GseFunnelDelta; 95\% bootstrap interval \GseFunnelCiLow\ to \GseFunnelCiHigh). E-MTAB-1980 gave strict same-direction support to \EmStrict\ of \EmMapped\ mapped candidates, while GSE29609 retained the TCGA direction for only \GseSame\ of \GseMapped\ and showed FDR-significant reversals for DDC and TCIRG1. No candidate-by-treatment interaction survived FDR correction in the CheckMate 025 RNA subset. These are candidate prognostic associations and audit findings, not a validated biomarker panel.
 \end{abstract}
+
+\begin{center}
+\includegraphics[width=\linewidth]{figures/hydra_evidence_overview.pdf}
+\captionof{figure}{Overview of the audit. The funnel reduces 541 tumor aliquots to 23 high-confidence candidates. Held-out concordance changes are relative to a clinical model; the marked threshold is the prespecified +0.01 gain. The one-gene rule does not meet that criterion. The ridge model on the reproducible genes does on these TCGA splits, and it was not the acceptance test. External survival, composition, TRACERx, and CheckMate 025 checks are exploratory. This is not a validated biomarker panel.}
+\end{center}
 
 \section{Introduction}
 Clear cell renal cell carcinoma (ccRCC) has broad metabolic, vascular, and immune transcriptional changes \cite{tcga_kirc_2013,vhl_hif_review_2024}. A tumor--normal expression difference does not establish independent prognostic value: a signal can arise from the composition of the tissue, and repeated samples from one patient can make survival evidence appear more precise. We audited the public-data HYDRA-ccRCC funnel for these failure modes. The question is whether the one-gene rule generalizes, and whether the broader reproducible set still ranks patients when that rule does not.
