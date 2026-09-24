@@ -57,6 +57,7 @@ files <- unlist(lapply(roots, function(root) {
 files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1",
            "environment/sessionInfo.txt", "environment/package_versions.csv",
            "paper/main.tex", "paper/results_macros.tex", "paper/evidence_matrix.tex",
+           "paper/benchmark_table.tex", "paper/ridge_spec_table.tex",
            "paper/main.pdf", "paper/figures/hydra_evidence_overview.pdf",
            "paper/figures/hydra_evidence_overview.svg")
 files <- files[file.exists(files) & !dir.exists(files)]

@@ -8,7 +8,7 @@ HYDRA-ccRCC tests whether genes dysregulated between clear cell renal cell carci
 
 ## What the results say
 
-- The one-gene rule failed. On 517 patients, concordance changed by +0.0039. The interval is conditional on the saved predictions, runs from −0.0088 to +0.0171, and stays below the prespecified +0.01 bar.
+- The one-gene rule failed. On 517 patients, the point estimate is +0.0039. The interval, conditional on the saved predictions, runs from −0.0088 to +0.0171. The estimate is below +0.01. The interval is not. Ridge is a separate benchmark. It does not pass this test.
 - Ridge ranks patients inside these TCGA splits (+0.0257) and is not a validated signature. Its Brier interval crosses zero. It was not taken to GSE29609 or E-MTAB-1980. The largest bar in the figure is not the acceptance test.
 - The external cohorts disagree. GSE29609 is 5/21 in the same direction, and DDC and TCIRG1 reverse. E-MTAB-1980 is 21/22 in the same direction, with 12 strict. Both cohorts were inspected before this reanalysis. That is not external validation.
 - Nothing here is a clinical action. Alternate aliquot rules keep 23, 19, 20, and 19 high-confidence genes. TRACERx agreement across genes is 98.5% [76.6–100] with patients fixed and 86.3% [77.8–93.1] when membership is redrawn, on subsets with nine deaths. The GSE53757 Jaccard of 0.998 does not prove that the adjacent-row pairs are real patients.
@@ -51,7 +51,7 @@ All 32,192 count-QC genes were fit in the age-, sex-, stage-, and grade-adjusted
 
 ### External survival checks
 
-GSE29609 has 39 patients and 17 deaths. Of 23 candidates, 21 mapped, five kept the TCGA hazard direction, none had same-direction nominal support, and four had nominal opposite-direction associations. `DDC` and `TCIRG1` reversed with FDR below 0.05. The small event count limits individual estimates, but these [contradictory results](results/tables/external_survival_gse29609_summary.csv) rule out uniform external replication.
+GSE29609 has 39 patients and 17 deaths. Of 23 candidates, 21 mapped, five kept the TCGA hazard direction, none had same-direction nominal support, and four had nominal opposite-direction associations. `DDC` and `TCIRG1` reversed with FDR below 0.05. The small event count limits individual estimates, but these [contradictory results](results/tables/external_survival_gse29609_summary.csv) do not support a claim of uniform external replication. GSE29609 has 17 deaths.
 
 E-MTAB-1980 has 101 patients and 23 deaths. Of 23 candidates, 22 mapped, 21 kept the TCGA direction, 13 had same-direction FDR support, and 12 met the strict unadjusted and limited-adjustment rule. This [more favorable cohort](results/tables/external_survival_emtab1980_summary.csv) does not cancel the GSE29609 reversals. Both cohorts were inspected before the present rule was finalized and are exploratory. The counts are in [the direction figure](results/figures/external_direction_comparison.png): 5/21 on GSE29609 and 21/22 on E-MTAB-1980, with 12 strict. DDC and TCIRG1 are the GSE29609 reversals.
 

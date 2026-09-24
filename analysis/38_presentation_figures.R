@@ -175,17 +175,8 @@ draw_master <- function() {
 }
 
 save_master <- function() {
-  dir.create("paper/figures", recursive = TRUE, showWarnings = FALSE)
   grDevices::png(file.path(DIRS$figures, "master_funnel_benchmark.png"),
                  width = 16.4, height = 7.1, units = "in", res = 220)
-  draw_master()
-  grDevices::dev.off()
-  grDevices::pdf(file.path("paper/figures", "hydra_evidence_overview.pdf"),
-                 width = 16.4, height = 7.1)
-  draw_master()
-  grDevices::dev.off()
-  grDevices::svg(file.path("paper/figures", "hydra_evidence_overview.svg"),
-                 width = 16.4, height = 7.1)
   draw_master()
   grDevices::dev.off()
 }
@@ -271,6 +262,8 @@ draw_pairing <- function() {
     grid::grid.text(panel$sub, x = panel$x, y = 0.34,
                     gp = grid::gpar(cex = 0.9, col = muted))
   }
+  grid::grid.text("Paired versus unpaired. Adjacent rows do not prove patient identity.",
+                  x = 0.50, y = 0.10, gp = grid::gpar(cex = 0.85, col = ink))
 }
 
 draw_aliquot <- function() {
@@ -393,7 +386,7 @@ evidence_tex <- function() {
     "\\centering",
     "\\scriptsize",
     "\\setlength{\\tabcolsep}{3.5pt}",
-    "\\caption{Evidence matrix for the 23 high-confidence candidates. Every row uses the same columns. Bold marks the GSE29609 reversals DDC and TCIRG1. An asterisk marks a gene lost under every alternate aliquot rule. Direction is relative to the TCGA hazard. Nested folds count how often the gene was the selected gene. TRACERx is the fraction of fixed-patient region draws that kept the TCGA direction.}",
+    "\\caption{Supplementary Table 1. Evidence matrix for the 23 high-confidence candidates. Every row uses the same columns. Bold marks the GSE29609 reversals DDC and TCIRG1. An asterisk marks a gene lost under every alternate aliquot rule. Direction is relative to the TCGA hazard. Nested folds count how often the gene was the selected gene. TRACERx is the fraction of fixed-patient region draws that kept the TCGA direction.}",
     "\\label{tab:evidence}",
     "\\resizebox{\\linewidth}{!}{%",
     "\\begin{tabular}{lrrcccccccrr}",
@@ -407,6 +400,78 @@ evidence_tex <- function() {
     sep = "\n"
   )
   writeLines(header, "paper/evidence_matrix.tex")
+}
+
+signed_cell <- function(x) sprintf("%+.4f", x)
+slope_cell <- function(x) sprintf("%.2f", x)
+write_benchmark_table <- function() {
+  clear <- clearcode
+  rows <- list(
+    list("HYDRA", hydra$mean_delta_c, hydra$patient_bootstrap_ci_low, hydra$patient_bootstrap_ci_high, hydra$mean_delta_brier3, hydra$mean_calibration_slope),
+    list("Survival-only", survival_only$mean_delta_c, survival_only$patient_bootstrap_ci_low, survival_only$patient_bootstrap_ci_high, survival_only$mean_delta_brier3, survival_only$mean_calibration_slope),
+    list("DE-only", de_only$mean_delta_c, de_only$patient_bootstrap_ci_low, de_only$patient_bootstrap_ci_high, de_only$mean_delta_brier3, de_only$mean_calibration_slope),
+    list("Matched control", matched$mean_delta_c, matched$patient_bootstrap_ci_low, matched$patient_bootstrap_ci_high, matched$mean_delta_brier3, matched$mean_calibration_slope),
+    list("ClearCode34", clear$delta_c, clear$delta_c_ci_low, clear$delta_c_ci_high, clear$delta_brier3, clear$calibration_slope),
+    list("Ridge", ridge$mean_delta_c, ridge$patient_bootstrap_ci_low, ridge$patient_bootstrap_ci_high, ridge$mean_delta_brier3, ridge$mean_calibration_slope)
+  )
+  body <- vapply(rows, function(row) {
+    paste0(row[[1]], " & ", signed_cell(row[[2]]), " & ",
+           signed_cell(row[[3]]), " to ", signed_cell(row[[4]]), " & ",
+           signed_cell(row[[5]]), " & ", slope_cell(row[[6]]), " \\\\")
+  }, character(1))
+  writeLines(paste(
+    "\\begin{table}[htbp]",
+    "\\centering",
+    "\\caption{Held-out benchmark on the same 517 patients and splits. Changes are versus a separately fit clinical model. The one-gene acceptance test is the HYDRA row only. Ridge is a description of ranking information in the reproducible set. ClearCode34 is a published comparator. It was not scored against the one-gene acceptance rule.}",
+    "\\label{tab:benchmark}",
+    "\\begin{tabular}{lrrrr}",
+    "\\toprule",
+    "Arm & $\\Delta$C & 95\\% interval & $\\Delta$Brier & Slope \\\\",
+    "\\midrule",
+    paste(body, collapse = "\n"),
+    "\\bottomrule",
+    "\\end{tabular}",
+    "\\end{table}",
+    sep = "\n"
+  ), "paper/benchmark_table.tex")
+}
+write_ridge_table <- function() {
+  spec <- tab("ridge_specification.csv")
+  pick <- c(
+    "gene_columns", "alpha", "inner_folds", "lambda_rule",
+    "inner_criterion", "preprocessing_before_inner_cv", "clinical_columns"
+  )
+  labels <- c(
+    gene_columns = "Predictor set",
+    alpha = "L2 penalty",
+    inner_folds = "Inner CV",
+    lambda_rule = "Lambda selection",
+    inner_criterion = "Tuning metric",
+    preprocessing_before_inner_cv = "Training-only preprocessing",
+    clinical_columns = "Unpenalized clinical covariates"
+  )
+  body <- vapply(pick, function(item) {
+    hit <- spec$definition[spec$item == item]
+    if (length(hit) != 1L) stop("Missing ridge spec row: ", item)
+    paste0(labels[[item]], " & ", hit, " \\\\")
+  }, character(1))
+  writeLines(paste(
+    "\\begin{table}[htbp]",
+    "\\centering",
+    "\\small",
+    "\\caption{Supplementary Table 2. Ridge specification. This fit is not the one-gene acceptance test. The penalty does not select a gene list.}",
+    "\\label{tab:ridge}",
+    "\\resizebox{\\linewidth}{!}{%",
+    "\\begin{tabular}{lp{0.72\\linewidth}}",
+    "\\toprule",
+    "Item & Definition \\\\",
+    "\\midrule",
+    paste(body, collapse = "\n"),
+    "\\bottomrule",
+    "\\end{tabular}}",
+    "\\end{table}",
+    sep = "\n"
+  ), "paper/ridge_spec_table.tex")
 }
 
 save_png <- function(path, width, height, draw) {
@@ -423,4 +488,6 @@ save_png(file.path(DIRS$figures, "aliquot_sensitivity.png"), 9.0, 4.2, draw_aliq
 ggplot2::ggsave(file.path(DIRS$figures, "tracerx_sampling_distributions.png"),
                 draw_tracerx(), width = 7.6, height = 5.4, dpi = 220)
 evidence_tex()
+write_benchmark_table()
+write_ridge_table()
 message("Presentation figures written.")

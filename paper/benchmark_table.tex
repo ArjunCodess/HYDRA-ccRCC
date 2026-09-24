@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Held-out benchmark on the same 517 patients and splits. Changes are versus a separately fit clinical model. The one-gene acceptance test is the HYDRA row only. Ridge is a description of ranking information in the reproducible set. ClearCode34 is a published comparator. It was not scored against the one-gene acceptance rule.}
+\label{tab:benchmark}
+\begin{tabular}{lrrrr}
+\toprule
+Arm & $\Delta$C & 95\% interval & $\Delta$Brier & Slope \\
+\midrule
+HYDRA & +0.0039 & -0.0081 to +0.0183 & -0.0009 & 0.76 \\
+Survival-only & -0.0011 & -0.0151 to +0.0139 & +0.0029 & 0.71 \\
+DE-only & -0.0015 & -0.0120 to +0.0079 & +0.0025 & 0.81 \\
+Matched control & +0.0019 & +0.0001 to +0.0039 & -0.0006 & 0.86 \\
+ClearCode34 & +0.0129 & -0.0018 to +0.0287 & -0.0046 & 0.83 \\
+Ridge & +0.0257 & +0.0116 to +0.0413 & -0.0063 & 0.87 \\
+\bottomrule
+\end{tabular}
+\end{table}

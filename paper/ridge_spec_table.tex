@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\small
+\caption{Supplementary Table 2. Ridge specification. This fit is not the one-gene acceptance test. The penalty does not select a gene list.}
+\label{tab:ridge}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lp{0.72\linewidth}}
+\toprule
+Item & Definition \\
+\midrule
+Predictor set & training-fold reproducible DEGs with nonzero training standard deviation; penalty factor 1; none are removed by the penalty \\
+L2 penalty & 0 \\
+Inner CV & five event-stratified folds of the training patients only \\
+Lambda selection & lambda.min \\
+Tuning metric & partial-likelihood deviance inside the training fold; not the C-index and not the one-standard-error rule \\
+Training-only preprocessing & outer-training DESeq2 size factors, log2(count / size factor + 1), and the nonzero training-SD gene filter are fixed before cv.glmnet \\
+Unpenalized clinical covariates & age, sex, stage, and grade; penalty factor 0; factor levels from the complete-case cohort; values from the training rows only \\
+\bottomrule
+\end{tabular}}
+\end{table}
