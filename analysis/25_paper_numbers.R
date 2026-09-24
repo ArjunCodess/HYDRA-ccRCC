@@ -42,6 +42,13 @@ funnel_present <- function(rule, cohort) {
   if (length(x) != 1L) stop("Missing matched-list coverage: ", rule, ", ", cohort)
   number(x)
 }
+cohort_dict <- tab("cohort_dictionary.csv")
+tracerx_dispersion <- tab("tracerx_direction_dispersion.csv")
+dispersion_value <- function(scenario, column) {
+  value <- tracerx_dispersion[[column]][tracerx_dispersion$scenario == scenario]
+  if (length(value) != 1L || !is.finite(value)) stop("Missing TRACERx dispersion: ", scenario)
+  value
+}
 shape <- tab("candidate_survival_shape_sensitivity.csv")
 overlap <- tab("null_overlap_check.csv")
 checkmate <- tab("checkmate025_study_summary.csv")
@@ -211,7 +218,13 @@ items <- c(
   macro("EmPanelDelta", dec4(em_panel$delta_c)),
   macro("EmPanelGenes", number(em_panel$genes_used)),
   macro("PermSelected", number(perm_summary$value[perm_summary$metric == "gene_selected"])),
-  macro("FoldTestEvents", number(fold_event_summary$value[fold_event_summary$metric == "test_events_min"]))
+  macro("FoldTestEvents", number(fold_event_summary$value[fold_event_summary$metric == "test_events_min"])),
+  macro("TracerxFixedIqrLow", percent(dispersion_value("fixed_subset_regions", "iqr_low"))),
+  macro("TracerxFixedIqrHigh", percent(dispersion_value("fixed_subset_regions", "iqr_high"))),
+  macro("TracerxChangingIqrLow", percent(dispersion_value("size_matched_39", "iqr_low"))),
+  macro("TracerxChangingIqrHigh", percent(dispersion_value("size_matched_39", "iqr_high"))),
+  macro("CompositionFailedSymbols", paste(sort(composition$symbol[composition$composition_adjusted_fdr >= 0.05]), collapse = ", ")),
+  macro("TcgaTumorEvents", number(cohort_dict$events[cohort_dict$dataset == "TCGA-KIRC tumors"]))
 )
 writeLines(c("% Generated from committed result tables by analysis/25_paper_numbers.R.", items),
            "paper/results_macros.tex")

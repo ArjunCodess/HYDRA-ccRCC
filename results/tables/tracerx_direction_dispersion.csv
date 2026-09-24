@@ -1,0 +1,3 @@
+scenario,median,iqr_low,iqr_high
+fixed_subset_regions,0.985,0.766,1
+size_matched_39,0.863,0.7775000000000001,0.931

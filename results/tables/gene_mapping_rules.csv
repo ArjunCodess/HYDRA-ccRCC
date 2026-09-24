@@ -1,0 +1,8 @@
+dataset,identifier,collapse,script
+TCGA-KIRC,versioned Ensembl gene id,"strip the version, map with org.Hs.eg.db SYMBOL, and keep the first symbol for each Ensembl id",analysis/22_nested_cv.R
+GSE40435,platform gene-symbol column,"take the first token, then average probes that share a symbol",analysis/05_deg_geo.R
+GSE53757,platform gene-symbol column,"take the first token, then average probes that share a symbol",analysis/05_deg_geo.R
+GSE29609,platform gene-symbol column,"take the first token, then average probes that share a symbol",analysis/13_external_survival_gse29609.R
+E-MTAB-1980,RefSeq SystematicName,"strip the RefSeq version, map with org.Hs.eg.db, and average rows that share a symbol",analysis/14_external_survival_emtab1980.R
+TRACERx Renal,gene symbol,match the candidate symbol to expression rownames; no probe collapse,analysis/20_tracerx_multiregion_transportability.R
+CheckMate 025,gene_name,average rows that share gene_name,analysis/21_checkmate025_treatment_interaction.R

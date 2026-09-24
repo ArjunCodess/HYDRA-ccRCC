@@ -61,6 +61,18 @@ p <- ggplot(forest, aes(log_hr, label, color = cohort)) +
   theme_hydra()
 ggsave(file.path(DIRS$figures, "external_log_hr_forest.png"), p, width = 8, height = 7, dpi = 300)
 
+tumor_patients <- read_csv(FILES$tcga_coldata, show_col_types = FALSE) |>
+  filter(shortLetterCode == "TP") |>
+  distinct(patient_barcode)
+clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE) |>
+  distinct(bcr_patient_barcode, .keep_all = TRUE)
+tumor_survival <- tumor_patients |>
+  left_join(clinical, by = c("patient_barcode" = "bcr_patient_barcode"))
+if (nrow(tumor_patients) != 533L || any(is.na(tumor_survival$os_event))) {
+  stop("Every selected TCGA tumor patient needs a survival event code.")
+}
+tcga_tumor_events <- sum(tumor_survival$os_event == 1L)
+
 sample <- read_csv(file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"), show_col_types = FALSE)
 paired <- read_csv(file.path(DIRS$tables, "tcga_kirc_paired_deg_summary.csv"), show_col_types = FALSE)
 gse_s <- read_csv(file.path(DIRS$tables, "external_survival_gse29609_summary.csv"), show_col_types = FALSE)
@@ -93,11 +105,18 @@ cohort <- tibble(
                          value_of(gse_s, "gse29609_samples"), value_of(em_s, "emtab1980_samples"),
                          value_of(tx, "tracerx_primary_regions"),
                          value_of(cm, "checkmate025_rna_linked_patients")),
-  events = c(NA, NA, NA, NA, NA,
+  events = c(tcga_tumor_events, NA, NA, NA, NA,
              value_of(gse_s, "gse29609_events"), value_of(em_s, "emtab1980_events"),
              value_of(tx, "tracerx_survival_events"),
              value_of(cm, "os_events")),
-  platform = c("TCGA STAR counts", "TCGA STAR counts", "TCGA STAR counts",
+  tissue = c("primary tumor", "adjacent normal kidney",
+             "paired primary tumor and adjacent normal",
+             "paired tumor and adjacent normal kidney",
+             "paired tumor and adjacent normal kidney",
+             "tumor", "tumor", "primary tumor regions",
+             "tumor RNA, primary or metastasis"),
+  platform = c("TCGA STAR unstranded counts", "TCGA STAR unstranded counts",
+               "TCGA STAR unstranded counts",
                "GPL570", "GPL570", "GEO expression array", "Illumina HumanHT-12",
                "TRACERx TPM", "CheckMate 025 RNA"),
   previously_inspected = c("no", "no", "no", "no", "no", "yes", "yes", "yes", "yes"),
@@ -107,4 +126,118 @@ cohort <- tibble(
              "analysis/21_checkmate025_treatment_interaction.R")
 )
 write_csv_atomic(cohort, file.path(DIRS$tables, "cohort_dictionary.csv"))
-message("Evidence display tables and forest written.")
+
+write_csv_atomic(tibble(
+  dataset = c("TCGA-KIRC", "GSE40435", "GSE53757", "GSE29609", "E-MTAB-1980",
+              "TRACERx Renal", "CheckMate 025"),
+  identifier = c("versioned Ensembl gene id", "platform gene-symbol column",
+                 "platform gene-symbol column", "platform gene-symbol column",
+                 "RefSeq SystematicName", "gene symbol", "gene_name"),
+  collapse = c(
+    "strip the version, map with org.Hs.eg.db SYMBOL, and keep the first symbol for each Ensembl id",
+    "take the first token, then average probes that share a symbol",
+    "take the first token, then average probes that share a symbol",
+    "take the first token, then average probes that share a symbol",
+    "strip the RefSeq version, map with org.Hs.eg.db, and average rows that share a symbol",
+    "match the candidate symbol to expression rownames; no probe collapse",
+    "average rows that share gene_name"
+  ),
+  script = c("analysis/22_nested_cv.R", "analysis/05_deg_geo.R", "analysis/05_deg_geo.R",
+             "analysis/13_external_survival_gse29609.R", "analysis/14_external_survival_emtab1980.R",
+             "analysis/20_tracerx_multiregion_transportability.R",
+             "analysis/21_checkmate025_treatment_interaction.R")
+), file.path(DIRS$tables, "gene_mapping_rules.csv"))
+
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+folds <- read_csv(file.path(DIRS$tables, "nested_cv_folds.csv"), show_col_types = FALSE)
+selection <- folds |>
+  count(tcga_gene_id = selected_gene, name = "folds") |>
+  mutate(ensembl = sub("\\..*$", "", tcga_gene_id))
+symbol_map <- AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = selection$ensembl,
+  keytype = "ENSEMBL",
+  columns = "SYMBOL"
+) |>
+  dplyr::filter(!is.na(SYMBOL)) |>
+  dplyr::arrange(ENSEMBL, SYMBOL) |>
+  dplyr::distinct(ENSEMBL, .keep_all = TRUE)
+selection <- selection |>
+  dplyr::left_join(symbol_map, by = c("ensembl" = "ENSEMBL")) |>
+  dplyr::rename(symbol = SYMBOL)
+if (any(is.na(selection$symbol)) || sum(selection$folds) != nrow(folds)) {
+  stop("Nested selection frequency could not be mapped to gene symbols.")
+}
+selection <- selection |> arrange(desc(folds), symbol)
+write_csv_atomic(selection, file.path(DIRS$tables, "nested_gene_selection_frequency.csv"))
+selection$symbol <- factor(selection$symbol, levels = rev(selection$symbol))
+p_sel <- ggplot(selection, aes(folds, symbol)) +
+  geom_col(fill = "#205D72", width = 0.7) +
+  labs(x = "training folds", y = NULL,
+       title = "Genes selected inside the nested folds",
+       subtitle = "Fifty training folds. The acceptance test adds only the top gene.") +
+  theme_hydra()
+ggsave(file.path(DIRS$figures, "nested_gene_selection_frequency.png"), p_sel,
+       width = 7, height = 4.5, dpi = 300)
+
+composition <- read_csv(file.path(DIRS$tables, "candidate_clinical_composition_sensitivity.csv"),
+                        show_col_types = FALSE) |>
+  transmute(symbol, adjustment = "marker scores", fdr = composition_adjusted_fdr,
+            log_hr = composition_adjusted_log_hr)
+purity <- read_csv(file.path(DIRS$tables, "candidate_direct_tumor_purity_sensitivity.csv"),
+                   show_col_types = FALSE) |>
+  transmute(symbol, adjustment = "consensus purity", fdr = gene_fdr, log_hr = gene_log_hr)
+composition_plot <- bind_rows(composition, purity) |>
+  mutate(failed_marker = symbol %in% composition$symbol[composition$fdr >= 0.05])
+if (n_distinct(composition$symbol[composition$fdr >= 0.05]) != 6L) {
+  stop("Expected six candidates to lose marker-score FDR support.")
+}
+write_csv_atomic(composition_plot, file.path(DIRS$tables, "composition_adjustment_display.csv"))
+comp_order <- composition |> arrange(fdr, symbol) |> pull(symbol)
+composition_plot$symbol <- factor(composition_plot$symbol, levels = rev(comp_order))
+p_comp <- ggplot(composition_plot, aes(fdr, symbol, color = adjustment, shape = failed_marker)) +
+  geom_vline(xintercept = 0.05, linewidth = 0.3) +
+  geom_point(size = 2.2, position = position_dodge(width = 0.5)) +
+  scale_x_log10() +
+  scale_color_manual(values = c("marker scores" = "#B85C38", "consensus purity" = "#205D72")) +
+  scale_shape_manual(values = c(`TRUE` = 17, `FALSE` = 16), guide = "none") +
+  labs(x = "FDR", y = NULL, color = NULL,
+       title = "Composition adjustment of the 23 candidates",
+       subtitle = "Triangles lose FDR support after marker-score adjustment. The line is 0.05.") +
+  theme_hydra()
+ggsave(file.path(DIRS$figures, "composition_marker_fdr.png"), p_comp,
+       width = 7.5, height = 6.5, dpi = 300)
+
+repeats <- read_csv(file.path(DIRS$tables, "tracerx_one_region_cox_repeats.csv"), show_col_types = FALSE) |>
+  filter(scenario %in% c("fixed_subset_regions", "size_matched_39"))
+gene_agreement <- repeats |>
+  group_by(scenario, symbol) |>
+  summarise(agreement = mean(same_tcga_direction), .groups = "drop")
+dispersion <- gene_agreement |>
+  group_by(scenario) |>
+  summarise(
+    median = median(agreement),
+    iqr_low = unname(quantile(agreement, 0.25)),
+    iqr_high = unname(quantile(agreement, 0.75)),
+    .groups = "drop"
+  )
+if (nrow(dispersion) != 2L) stop("TRACERx direction dispersion is missing a scenario.")
+write_csv_atomic(dispersion, file.path(DIRS$tables, "tracerx_direction_dispersion.csv"))
+draw_agreement <- repeats |>
+  group_by(scenario, repeat_id) |>
+  summarise(agreement = mean(same_tcga_direction), .groups = "drop") |>
+  mutate(scenario = recode(scenario,
+                           fixed_subset_regions = "39 patients fixed; region changes",
+                           size_matched_39 = "39 patients redrawn; region changes"))
+p_tx <- ggplot(draw_agreement, aes(agreement)) +
+  geom_histogram(bins = 30, fill = "#205D72", color = "white", linewidth = 0.1) +
+  facet_wrap(~ scenario, ncol = 1) +
+  scale_x_continuous(labels = function(x) paste0(round(100 * x), "%"), limits = c(0, 1)) +
+  labs(x = "candidates agreeing with the TCGA hazard direction", y = "draws",
+       title = "TRACERx sampling variation",
+       subtitle = "Each draw keeps one region per patient. Both subsets have 39 patients and 9 deaths.") +
+  theme_hydra()
+ggsave(file.path(DIRS$figures, "tracerx_sampling_distributions.png"), p_tx,
+       width = 7.5, height = 4.8, dpi = 300)
+
+message("Evidence display tables and figures written.")

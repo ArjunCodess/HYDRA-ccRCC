@@ -102,7 +102,14 @@ required_files <- c(
   file.path(DIRS$tables, "nested_cv_fold_events.csv"),
   file.path(DIRS$tables, "cohort_dictionary.csv"),
   file.path(DIRS$tables, "clinical_factor_counts.csv"),
-  file.path(DIRS$figures, "external_log_hr_forest.png")
+  file.path(DIRS$figures, "external_log_hr_forest.png"),
+  file.path(DIRS$tables, "gene_mapping_rules.csv"),
+  file.path(DIRS$tables, "nested_gene_selection_frequency.csv"),
+  file.path(DIRS$tables, "composition_adjustment_display.csv"),
+  file.path(DIRS$tables, "tracerx_direction_dispersion.csv"),
+  file.path(DIRS$figures, "nested_gene_selection_frequency.png"),
+  file.path(DIRS$figures, "composition_marker_fdr.png"),
+  file.path(DIRS$figures, "tracerx_sampling_distributions.png")
 )
 
 missing_files <- required_files[!file.exists(required_files)]

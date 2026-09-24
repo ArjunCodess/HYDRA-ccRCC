@@ -22,7 +22,7 @@ line <- paste0(
   " folds required a DESeq2 no-replacement retry. The top-ranked gene varied ",
   "across ", dplyr::n_distinct(folds$selected_gene, na.rm = TRUE),
   " genes, with the most frequent selected in ", max(table(folds$selected_gene)),
-  " folds. The mean selected-gene minus ",
+  " folds. The [selection-frequency figure](results/figures/nested_gene_selection_frequency.png) shows those ten genes. The mean selected-gene minus ",
   "clinical concordance was ", sprintf("%+.4f", nested$mean_delta_c),
   " (patient-resampled 95% interval ",
   sprintf("%+.4f", nested$patient_bootstrap_ci_low), " to ",

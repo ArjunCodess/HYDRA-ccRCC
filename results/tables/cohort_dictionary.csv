@@ -1,10 +1,10 @@
-dataset,role,patients,samples_or_regions,events,platform,previously_inspected,script
-TCGA-KIRC tumors,discovery expression and survival,533,533,NA,TCGA STAR counts,no,analysis/04_deg_tcga.R
-TCGA-KIRC normals,discovery normals,72,72,NA,TCGA STAR counts,no,analysis/03_qc_tcga.R
-TCGA-KIRC pairs,paired tumor-normal sensitivity,72,144,NA,TCGA STAR counts,no,analysis/04b_paired_deg_tcga.R
-GSE40435,paired expression replication,101,202,NA,GPL570,no,analysis/05_deg_geo.R
-GSE53757,paired expression replication,72,144,NA,GPL570,no,analysis/05_deg_geo.R
-GSE29609,previously inspected survival check,39,39,17,GEO expression array,yes,analysis/13_external_survival_gse29609.R
-E-MTAB-1980,previously inspected survival check,101,101,23,Illumina HumanHT-12,yes,analysis/14_external_survival_emtab1980.R
-TRACERx Renal,region sampling sensitivity,73,186,16,TRACERx TPM,yes,analysis/20_tracerx_multiregion_transportability.R
-CheckMate 025,treatment-interaction check,250,250,191,CheckMate 025 RNA,yes,analysis/21_checkmate025_treatment_interaction.R
+dataset,role,patients,samples_or_regions,events,tissue,platform,previously_inspected,script
+TCGA-KIRC tumors,discovery expression and survival,533,533,175,primary tumor,TCGA STAR unstranded counts,no,analysis/04_deg_tcga.R
+TCGA-KIRC normals,discovery normals,72,72,NA,adjacent normal kidney,TCGA STAR unstranded counts,no,analysis/03_qc_tcga.R
+TCGA-KIRC pairs,paired tumor-normal sensitivity,72,144,NA,paired primary tumor and adjacent normal,TCGA STAR unstranded counts,no,analysis/04b_paired_deg_tcga.R
+GSE40435,paired expression replication,101,202,NA,paired tumor and adjacent normal kidney,GPL570,no,analysis/05_deg_geo.R
+GSE53757,paired expression replication,72,144,NA,paired tumor and adjacent normal kidney,GPL570,no,analysis/05_deg_geo.R
+GSE29609,previously inspected survival check,39,39,17,tumor,GEO expression array,yes,analysis/13_external_survival_gse29609.R
+E-MTAB-1980,previously inspected survival check,101,101,23,tumor,Illumina HumanHT-12,yes,analysis/14_external_survival_emtab1980.R
+TRACERx Renal,region sampling sensitivity,73,186,16,primary tumor regions,TRACERx TPM,yes,analysis/20_tracerx_multiregion_transportability.R
+CheckMate 025,treatment-interaction check,250,250,191,"tumor RNA, primary or metastasis",CheckMate 025 RNA,yes,analysis/21_checkmate025_treatment_interaction.R
