@@ -51,3 +51,21 @@ False-discovery correction is within one family at a time: TCGA differential-exp
 ## Language
 
 Prognostic means an association with outcome. Predictive is reserved for a treatment interaction. Tumor-normal differential expression is a disease-versus-kidney filter. It is not itself a prognostic discovery step. Their intersection can drop a prognostic gene that is not strongly differentially expressed. The all-gene Cox sensitivity, 12,630 associations at FDR < 0.05 among 32,192 genes, is that contrast.
+
+## Marker scores
+
+Each score is the mean of sample-standardized marker expression, then standardized across samples. Proximal-tubule markers are AQP1, LRP2, CUBN, SLC5A2, and ALDOB. Endothelial markers are PECAM1, VWF, KDR, EMCN, and TEK. Immune markers are PTPRC, CD3D, CD8A, MS4A1, and CD68. Stromal markers are COL1A1, COL1A2, DCN, LUM, and ACTA2. A candidate that is itself a marker is omitted from that score. These are bulk marker scores, not cell proportions. Consensus purity is an inferred bulk estimate. The six candidates that lose FDR support after marker adjustment are CLCN5, DDC, GJB1, HIBCH, KL, and PODXL. Purity adjustment does not remove those six.
+
+## Gene mapping
+
+| Dataset | Rule |
+| --- | --- |
+| TCGA-KIRC | Strip the Ensembl version, map with org.Hs.eg.db, keep the first symbol |
+| GSE40435, GSE53757, GSE29609 | First token of the platform gene-symbol field, then the mean of probes that share it |
+| E-MTAB-1980 | Strip the RefSeq version, map with org.Hs.eg.db, then the mean of rows that share a symbol |
+| TRACERx Renal | Match the candidate symbol to expression rownames |
+| CheckMate 025 | Mean of rows that share `gene_name` |
+
+## TRACERx subset
+
+The 39-patient subset is size-matched to GSE29609. It has 9 deaths. The reported percentages are medians across the 23 genes of each gene's direction-agreement rate. The interquartile ranges of those gene-level rates are part of the same summary. The histogram is the per-draw fraction of the 23 genes, which is a different summary of the same 1,000 draws.
