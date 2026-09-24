@@ -1,0 +1,5 @@
+metric,value
+simulations,200
+folds_cycled,5
+gene_selected,0
+seed,20260758
