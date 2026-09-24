@@ -1,0 +1,16 @@
+item,definition
+model,"glmnet Cox, clinical covariates unpenalized, genes ridge-penalized"
+alpha,0
+lambda_rule,lambda.min
+inner_criterion,partial-likelihood deviance inside the training fold
+ties,efron
+standardize,glmnet standardizes every training column and applies those moments to the test rows
+clinical_columns,"age, sex, stage, and grade; penalty factor 0; factor levels from the complete-case cohort; values from the training rows only"
+gene_columns,training-fold reproducible DEGs with nonzero training standard deviation; penalty factor 1; none are removed by the penalty
+expression,"log2(count / size factor + 1), not the full-data variance-stabilizing transform"
+size_factors,training DESeq2 size factors; test size factors use the training geometric-mean reference
+inner_folds,five event-stratified folds of the training patients only
+inner_seed,"RESAMPLING$seed + 31000 + repeat_id * 10 + fold, drawn before cv.glmnet"
+outer_folds,the saved ten-by-five patient splits; test outcomes are not an input
+geo_gate,fixed full GEO tables; GEO cohorts are not re-split
+what_this_does_not_do,not the prespecified one-gene acceptance test; not a sparse gene selection; patient bootstrap does not refit lambda

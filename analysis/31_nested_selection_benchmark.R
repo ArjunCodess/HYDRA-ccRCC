@@ -519,6 +519,6 @@ figure <- ggplot(plot_df, aes(strategy, delta_c)) +
        subtitle = "Same outer splits. Dashed line: prespecified 0.01 increment. Points are repeats.") +
   theme_minimal(base_size = 12) +
   theme(axis.text.x = element_text(angle = 18, hjust = 1))
-ggsave(file.path(DIRS$figures, "nested_selection_benchmark.png"), figure,
+ggsave(file.path(DIRS$figures, "nested_selection_benchmark_five_arm.png"), figure,
        width = 8.4, height = 4.8, dpi = 180)
 say("Nested selection benchmark complete.")
