@@ -89,7 +89,20 @@ required_files <- c(
   file.path(DIRS$tables, "nested_benchmark_repeat_metrics.csv"),
   file.path(DIRS$tables, "nested_benchmark_predictions.csv"),
   file.path(DIRS$tables, "nested_benchmark_patient_bootstrap.csv"),
-  file.path("paper", "results_macros.tex")
+  file.path("paper", "results_macros.tex"),
+  file.path(DIRS$tables, "gse53757_pair_audit.csv"),
+  file.path(DIRS$tables, "gse53757_unpaired_summary.csv"),
+  file.path(DIRS$tables, "gse53757_unpaired_sensitivity.csv"),
+  file.path(DIRS$tables, "tcga_aliquot_selection_audit.csv"),
+  file.path(DIRS$tables, "tcga_aliquot_arithmetic.csv"),
+  file.path(DIRS$tables, "aliquot_sensitivity_summary.csv"),
+  file.path(DIRS$tables, "published_signature_summary.csv"),
+  file.path(DIRS$tables, "clearcode34_symbol_map.csv"),
+  file.path(DIRS$tables, "survival_permutation_null_summary.csv"),
+  file.path(DIRS$tables, "nested_cv_fold_events.csv"),
+  file.path(DIRS$tables, "cohort_dictionary.csv"),
+  file.path(DIRS$tables, "clinical_factor_counts.csv"),
+  file.path(DIRS$figures, "external_log_hr_forest.png")
 )
 
 missing_files <- required_files[!file.exists(required_files)]

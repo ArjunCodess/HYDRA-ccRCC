@@ -20,14 +20,14 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - TCGA uses DESeq2 on raw STAR unstranded counts. Significance requires FDR below 0.05 and absolute log2 fold change of at least 1.
 - A separate sensitivity analysis estimates TCGA MAP log2 fold changes with `lfcShrink(type = "apeglm")`, applies no absolute fold-change inclusion threshold, and preserves the original MLE-based rule as the primary analysis.
 - Each GEO cohort uses limma with patient-pair blocking. SVA protects the tumor-normal contrast using a full `patient + condition` model and a null `patient` model; estimated surrogate variables are added to the limma design.
-- GSE53757 pair IDs are inferred from alternating row order. A condition-alternation assertion detects misordered rows, but it cannot independently establish patient identity without explicit subject identifiers.
+- GSE53757 has no metadata field with a shared patient id for every pair. Adjacent rows are opposite tissues and the same stage in all 72 pairs, and four pairs also share a title token. Primary pair ids follow that adjacent order. An unpaired `~ condition` limma fit is a sensitivity and does not replace the paired table.
 - GEO tables report log2 fold-change confidence intervals and SVA design diagnostics. Zero estimated surrogate variables is retained as a valid result.
 - A reproducible DEG must be TCGA-significant, have the same effect direction in both GEO cohorts, and have nominal p below 0.05 in at least one GEO cohort.
 
 ## Survival selection
 
 - The outcome is overall survival, and expression is continuous and standardized.
-- The main Cox model adjusts for age, sex, stage, and collapsed grade. Stage-complete and grade-complete models provide sensitivity checks.
+- The main Cox model adjusts for age, sex, categorical AJCC stage (reference Stage I), and grade collapsed to G1+G2 versus G3+G4 because G1 has 14 patients. The stage sensitivity is expression plus age, sex, and stage. The grade sensitivity is expression plus age, sex, and grade. The absolute log hazard-ratio gates log(1.25) and log(1.5), and the GEO absolute log2 fold-change gate of 0.25, are prespecified project thresholds.
 - A strict candidate requires reproducible differential expression, main-model FDR below 0.05, absolute log hazard ratio of at least log(1.25), non-trivial GEO effects, and same-direction nominal support in both sensitivity models.
 - A high-confidence candidate additionally requires main-model FDR below 0.01 and absolute log hazard ratio of at least log(1.5).
 - `cox.zph` results are reported diagnostically. They do not exclude candidates, determine external support, or contribute to ranking; coefficients with diagnostic non-proportionality are interpreted as average hazard effects.
@@ -41,7 +41,11 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Twenty repeats of five-fold event-stratified cross-validation compare clinical-only and clinical-plus-one-gene models on held-out patients. Cross-validation is used only to estimate prediction discrimination.
 - The 20-by-five-fold per-gene analysis above is conditional on the full-data candidate set and is descriptive. A separate 10-by-five-fold patient-level outer CV reruns TCGA DE, both-GEO replication, and all candidate gates on the 517 patients with complete clinical covariates, with training-only normalization and expression scaling. The full-data stage-only and grade-only sensitivities can use additional patients with one missing covariate, so the nested fits use a narrower common analytic population. The nested fit chooses the highest evidence-score gene, uses clinical-only predictions if none qualifies, and reports the mean of per-repeat concordance, three-year IPCW Brier score, risk-score calibration slope, and a patient-resampled interval for the concordance increment. DESeq2 Cook outlier replacement follows the primary setting; any runtime failure triggers a logged no-replacement retry for that fold.
 - Two hundred clinical-only null simulations repeat the fold-level selection on event times from an exponential baseline calibrated to the fitted clinical Cox cumulative hazard, with resampled censoring. One of the five fixed outer folds is assessed per simulation, cycling folds, so this null distribution estimates selection behavior under that specific clinical-only data-generating process rather than another 10-by-five-fold CV interval.
-- The patient bootstrap resamples the saved out-of-fold predictions with patient identity linked across repeats. It does not refit selection or redraw folds, so its interval omits training-set and split uncertainty.
+- The patient bootstrap resamples the saved out-of-fold predictions with patient identity linked across repeats. It does not refit selection or redraw folds, so its interval is conditional on those saved predictions.
+- Folds are redrawn at each repeat with `set.seed(RESAMPLING$seed + 22 + repeat)`. Event-stratified assignment shuffles deaths and censored patients separately. Every saved outer test fold contains 34 deaths.
+- A permutation null shuffles training survival pairs, reuses the five repeat-1 differential-expression fits, and does not replace the exponential null. Seed `RESAMPLING$seed + 33`.
+- Aliquot-rule fits that drop the four multi-aliquot patients, keep the first barcode, or sum tumor counts are sensitivities. They do not replace the deepest-library primary rule.
+- ClearCode34, with published ccA/ccB signs from Brooks et al. 2014 Table 1, is scored on the same nested folds. E-MTAB-1980 ccA/ccB labels are an in-sample comparison on a previously inspected cohort. Neither replaces the one-gene acceptance test.
 
 ## Nested selection benchmark
 

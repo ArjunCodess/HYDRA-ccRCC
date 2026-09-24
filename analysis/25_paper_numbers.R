@@ -64,6 +64,37 @@ de_b <- bench("de_only")
 control_b <- bench("matched_control")
 ridge_b <- bench("ridge_eligible")
 clinical_b <- bench("clinical")
+aliquot <- tab("aliquot_sensitivity_summary.csv")
+aliquot_n <- function(rule) {
+  value <- aliquot$n_high_confidence[aliquot$rule == rule]
+  if (length(value) != 1L) stop("Missing aliquot rule: ", rule)
+  value
+}
+unpaired_summary <- tab("gse53757_unpaired_summary.csv")
+unpaired_value <- function(metric) {
+  value <- unpaired_summary$value[unpaired_summary$metric == metric]
+  if (length(value) != 1L) stop("Missing unpaired metric: ", metric)
+  value
+}
+pair_audit <- tab("gse53757_pair_audit_summary.csv")
+pair_value <- function(metric) pair_audit$value[pair_audit$metric == metric][1]
+signature <- tab("published_signature_summary.csv")
+sig_row <- function(cohort, arm) {
+  row <- signature[signature$cohort == cohort & signature$arm == arm, ]
+  if (nrow(row) != 1L) stop("Missing signature arm: ", cohort, " ", arm)
+  row
+}
+clearcode <- sig_row("TCGA-KIRC", "clinical_plus_clearcode34")
+em_subtype <- sig_row("E-MTAB-1980", "clinical_plus_subtype")
+em_top <- sig_row("E-MTAB-1980", "clinical_plus_top_gene")
+em_panel <- sig_row("E-MTAB-1980", "clinical_plus_signed_panel")
+perm_summary <- tab("survival_permutation_null_summary.csv")
+fold_event_summary <- tab("nested_cv_fold_event_summary.csv")
+fold_min <- fold_event_summary$value[fold_event_summary$metric == "test_events_min"]
+fold_max <- fold_event_summary$value[fold_event_summary$metric == "test_events_max"]
+if (length(fold_min) != 1L || fold_min != fold_max) {
+  stop("Outer test folds do not share one event count.")
+}
 
 items <- c(
   macro("OriginalTumorSamples", number(sample_audit$raw_samples[sample_audit$shortLetterCode == "TP"])),
@@ -159,7 +190,28 @@ items <- c(
   macro("BenchRidgeGenesMin", number(min(ridge_sizes))),
   macro("BenchRidgeGenesMax", number(max(ridge_sizes))),
   macro("BenchClinicalC", sprintf("%.3f", clinical_b$mean_c)),
-  macro("BenchClinicalSlope", sprintf("%.2f", clinical_b$mean_calibration_slope))
+  macro("BenchClinicalSlope", sprintf("%.2f", clinical_b$mean_calibration_slope)),
+  macro("AliquotDrop", number(aliquot_n("drop_multi"))),
+  macro("AliquotFirst", number(aliquot_n("first_barcode"))),
+  macro("AliquotSum", number(aliquot_n("sum_counts"))),
+  macro("UnpairedHigh", number(unpaired_value("high_confidence_still_reproducible"))),
+  macro("UnpairedJaccard", sprintf("%.3f", unpaired_value("reproducible_jaccard"))),
+  macro("PairSameToken", number(pair_value("same_title_token_pairs"))),
+  macro("PairSameStage", number(pair_value("same_stage_pairs"))),
+  macro("ClearcodeDelta", dec4(clearcode$delta_c)),
+  macro("ClearcodeCiLow", dec4(clearcode$delta_c_ci_low)),
+  macro("ClearcodeCiHigh", dec4(clearcode$delta_c_ci_high)),
+  macro("ClearcodeBrier", dec4(clearcode$delta_brier3)),
+  macro("ClearcodeSlope", sprintf("%.2f", clearcode$calibration_slope)),
+  macro("ClearcodeGenes", number(clearcode$genes_used)),
+  macro("EmSubtypeDelta", dec4(em_subtype$delta_c)),
+  macro("EmSubtypeCiLow", dec4(em_subtype$delta_c_ci_low)),
+  macro("EmSubtypeCiHigh", dec4(em_subtype$delta_c_ci_high)),
+  macro("EmTopDelta", dec4(em_top$delta_c)),
+  macro("EmPanelDelta", dec4(em_panel$delta_c)),
+  macro("EmPanelGenes", number(em_panel$genes_used)),
+  macro("PermSelected", number(perm_summary$value[perm_summary$metric == "gene_selected"])),
+  macro("FoldTestEvents", number(fold_event_summary$value[fold_event_summary$metric == "test_events_min"]))
 )
 writeLines(c("% Generated from committed result tables by analysis/25_paper_numbers.R.", items),
            "paper/results_macros.tex")
