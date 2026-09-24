@@ -114,6 +114,9 @@ From the repository root on Windows with R 4.6.1 and MiKTeX:
 - The all-gene `apeglm` analysis is a sensitivity, not a retrospectively expanded candidate set.
 - The funnel and nested-CV scientific acceptance criteria both failed; neither is described as confirmed superiority.
 - The ridge comparison is a separate statement about the eligible gene set. It does not replace the failed one-gene criterion or freeze a signature.
+- The permutation null selected a gene in 0 of 200 simulations. That frequency is not a p-value for the nested concordance increment.
+- ClearCode34's nested concordance interval includes zero. It does not replace the failed one-gene criterion.
+- GRAMD1A, IFFO1, LTB4R, and RBM47 leave the high-confidence set under every alternate aliquot rule. The deepest-library set remains primary.
 - Consensus purity is an estimate, marker scores are proxies, and HPA normal-tissue cells are not tumor single-cell validation.
 - RNA associations establish neither protein effects nor mechanisms, therapeutic targets, causation, or clinical utility.
 - The strongest supported gene-level label is **candidate prognostic association**.
@@ -124,4 +127,4 @@ The earlier development draft acknowledged Levi Waldron, Michael Love, Philip Sa
 
 ## Completion state
 
-The corrected cached-input pipeline, output checks, and development PDF build complete with the recorded R 4.6.1 environment. The input manifest pins the cached files, but their original retrieval dates are unavailable. The prespecified prediction and external-funnel criteria failed. On the same splits, one-gene alternatives also stayed near the clinical model, while a training-fold ridge model on the reproducible set cleared the 0.01 concordance line and still had a Brier interval that crossed zero. Untouched external patients, ccRCC tumor single-cell and protein evidence, and an independent randomized treatment cohort remain unavailable for stronger validation claims.
+The corrected cached-input pipeline, output checks, and development PDF build complete with the recorded R 4.6.1 environment. The input manifest pins the cached files, but their original retrieval dates are unavailable. The prespecified prediction and external-funnel criteria failed. On the same splits, one-gene alternatives also stayed near the clinical model, while a training-fold ridge model on the reproducible set cleared the 0.01 concordance line and still had a Brier interval that crossed zero. A permutation of training survival selected a gene in 0 of 200 simulations. ClearCode34 changed nested concordance by +0.0129, and its interval from -0.0018 to +0.0287 still includes zero. Four high-confidence genes depend on the aliquot rule. Untouched external patients, ccRCC tumor single-cell and protein evidence, and an independent randomized treatment cohort remain unavailable for stronger validation claims.
