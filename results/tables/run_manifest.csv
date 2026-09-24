@@ -1,5 +1,5 @@
 path,bytes,md5
-README.md,19977,51340b3cd810b71e540130c45c5fb915
+README.md,21188,9504706b9a8b93b7b3dd85dd6b8e6de9
 analysis/00_check_environment.R,700,26efa664a578454de80f3e5a8a1536f1
 analysis/00_config.R,4030,c8cf52378f0a6acd643c6a79ed22c97a
 analysis/00_install_packages.R,695,5b0cf5d27bd6147bb7f73a0422c1971b
@@ -55,8 +55,8 @@ analysis/tests/test_identity_and_endpoints.R,1433,2845600c5dc04c6e33bc1960b2e58c
 analysis/tests/test_nested_benchmark.R,4596,bc332383bce26d5f80d93f215c7a43d8
 environment/package_versions.csv,17591,067e2a27692802538010e1b3b4dd104b
 environment/sessionInfo.txt,934,b43881226f76b42df3bb7147227b0663
-paper/main.pdf,872528,e8bc6bb71bfda0e26be87124a30baf2a
-paper/main.tex,30813,15cdbffad26524639435e8f92c57dd04
+paper/main.pdf,873403,6c716061160485f0b312b8b8445b10a7
+paper/main.tex,31962,d3ef281253cd80e168975be0894ec77d
 paper/results_macros.tex,4527,b31a4845be8ce139c58f7e45259b1d43
 protocol.md,14899,0dd676fe485e864e5fbe667813b45048
 results/archive/legacy_biological_review_24_candidates.md,41307,93f60cbe03345d942944b3c9a5457d86
