@@ -1,0 +1,6 @@
+metric,value
+adjacent_pairs,72
+opposite_tissue_pairs,72
+same_title_token_pairs,4
+same_stage_pairs,72
+shared_patient_field,0

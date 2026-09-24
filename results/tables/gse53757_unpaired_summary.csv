@@ -1,0 +1,7 @@
+metric,value
+high_confidence_genes,23
+high_confidence_still_reproducible,23
+high_confidence_same_sign,23
+paired_reproducible_deg,3323
+unpaired_gate_reproducible_deg,3319
+reproducible_jaccard,0.997593984962406

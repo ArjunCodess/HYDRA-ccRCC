@@ -33,7 +33,7 @@ collapse_to_gene <- function(expr, feature_data, accession) {
     as.matrix()
 }
 
-run_geo_limma <- function(accession) {
+run_geo_limma <- function(accession, paired = TRUE) {
   series <- readRDS(file.path(DIRS$processed, paste0(tolower(accession), "_series_matrix.rds")))
   eset <- series[[1]]
   expr <- Biobase::exprs(eset)
@@ -83,8 +83,13 @@ run_geo_limma <- function(accession) {
     stop(accession, " condition parsing failed. Parsed levels: ", paste(levels(droplevels(condition)), collapse = ", "), call. = FALSE)
   }
 
-  full_design <- model.matrix(~ patient + condition)
-  null_design <- model.matrix(~ patient)
+  if (paired) {
+    full_design <- model.matrix(~ patient + condition)
+    null_design <- model.matrix(~ patient)
+  } else {
+    full_design <- model.matrix(~ condition)
+    null_design <- model.matrix(~ 1, data = data.frame(condition = condition))
+  }
   n_sv <- sva::num.sv(gene_expr, full_design, method = "leek")
   sv_object <- if (n_sv > 0) {
     sva::sva(gene_expr, full_design, null_design, n.sv = n_sv)
@@ -133,18 +138,21 @@ run_geo_limma <- function(accession) {
       significant
     )
 
-  out_path <- file.path(DIRS$tables, paste0(tolower(accession), "_limma_tumor_vs_normal.csv"))
+  suffix <- if (paired) "_limma_tumor_vs_normal.csv" else "_unpaired_limma_tumor_vs_normal.csv"
+  out_path <- file.path(DIRS$tables, paste0(tolower(accession), suffix))
   write_csv_atomic(result, out_path)
 
-  sample_summary <- tibble(accession = accession, condition = condition, patient = patient) |>
-    count(accession, condition, name = "n_samples") |>
-    mutate(
-      n_patients = length(unique(patient)),
-      n_surrogate_variables = n_sv,
-      full_design_rank = qr(full_design)$rank,
-      adjusted_design_rank = qr(design)$rank
-    )
-  write_csv_atomic(sample_summary, file.path(DIRS$tables, paste0(tolower(accession), "_sample_summary.csv")))
+  if (paired) {
+    sample_summary <- tibble(accession = accession, condition = condition, patient = patient) |>
+      count(accession, condition, name = "n_samples") |>
+      mutate(
+        n_patients = length(unique(patient)),
+        n_surrogate_variables = n_sv,
+        full_design_rank = qr(full_design)$rank,
+        adjusted_design_rank = qr(design)$rank
+      )
+    write_csv_atomic(sample_summary, file.path(DIRS$tables, paste0(tolower(accession), "_sample_summary.csv")))
+  }
 
   message(
     accession,
@@ -155,9 +163,11 @@ run_geo_limma <- function(accession) {
   )
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-accessions <- if (length(args) > 0) toupper(args) else c("GSE40435", "GSE53757")
-for (accession in accessions) {
-  run_geo_limma(accession)
-  gc()
+if (sys.nframe() == 0L) {
+  args <- commandArgs(trailingOnly = TRUE)
+  accessions <- if (length(args) > 0) toupper(args) else c("GSE40435", "GSE53757")
+  for (accession in accessions) {
+    run_geo_limma(accession)
+    gc()
+  }
 }

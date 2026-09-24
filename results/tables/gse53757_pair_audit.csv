@@ -1,0 +1,73 @@
+pair_index,left_title,right_title,left_source,right_source,left_tissue,right_tissue,left_token,right_token,same_title_token,left_stage,right_stage,same_stage,opposite_tissue
+1,102T,103N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,102,103,FALSE,Stage 1,Stage 1,TRUE,TRUE
+2,104T,105N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,104,105,FALSE,Stage 1,Stage 1,TRUE,TRUE
+3,106T,107N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,106,107,FALSE,Stage 1,Stage 1,TRUE,TRUE
+4,108T,109N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,108,109,FALSE,Stage 1,Stage 1,TRUE,TRUE
+5,110T,111N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,110,111,FALSE,Stage 1,Stage 1,TRUE,TRUE
+6,112T,113N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,112,113,FALSE,Stage 1,Stage 1,TRUE,TRUE
+7,114T,115N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,114,115,FALSE,Stage 1,Stage 1,TRUE,TRUE
+8,116T,117N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,116,117,FALSE,Stage 1,Stage 1,TRUE,TRUE
+9,120T,121N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,120,121,FALSE,Stage 1,Stage 1,TRUE,TRUE
+10,122T,123N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,122,123,FALSE,Stage 1,Stage 1,TRUE,TRUE
+11,124T,125N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,124,125,FALSE,Stage 1,Stage 1,TRUE,TRUE
+12,128T,129N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,128,129,FALSE,Stage 1,Stage 1,TRUE,TRUE
+13,130T,131N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,130,131,FALSE,Stage 1,Stage 1,TRUE,TRUE
+14,136T,137N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,136,137,FALSE,Stage 1,Stage 1,TRUE,TRUE
+15,138T,139N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,138,139,FALSE,Stage 1,Stage 1,TRUE,TRUE
+16,140T,141N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,140,141,FALSE,Stage 1,Stage 1,TRUE,TRUE
+17,146T,147N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,146,147,FALSE,Stage 1,Stage 1,TRUE,TRUE
+18,150T,151N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,150,151,FALSE,Stage 1,Stage 1,TRUE,TRUE
+19,152T,153N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,152,153,FALSE,Stage 1,Stage 1,TRUE,TRUE
+20,154T,155N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,154,155,FALSE,Stage 1,Stage 1,TRUE,TRUE
+21,156T,157N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,156,157,FALSE,Stage 1,Stage 1,TRUE,TRUE
+22,158T,159N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,158,159,FALSE,Stage 1,Stage 1,TRUE,TRUE
+23,160T,161N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,160,161,FALSE,Stage 1,Stage 1,TRUE,TRUE
+24,162T,163N,Stage 1 ccRCC,normal match to Stage 1 ccRCC,clear cell renal cell carcinoma,normal kidney,162,163,FALSE,Stage 1,Stage 1,TRUE,TRUE
+25,200T,201N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,200,201,FALSE,Stage 2,Stage 2,TRUE,TRUE
+26,202T,203N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,202,203,FALSE,Stage 2,Stage 2,TRUE,TRUE
+27,204T,205N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,204,205,FALSE,Stage 2,Stage 2,TRUE,TRUE
+28,206T,207N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,206,207,FALSE,Stage 2,Stage 2,TRUE,TRUE
+29,208T,209N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,208,209,FALSE,Stage 2,Stage 2,TRUE,TRUE
+30,210T,211N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,210,211,FALSE,Stage 2,Stage 2,TRUE,TRUE
+31,216T,217N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,216,217,FALSE,Stage 2,Stage 2,TRUE,TRUE
+32,218T,219N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,218,219,FALSE,Stage 2,Stage 2,TRUE,TRUE
+33,220T,221N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,220,221,FALSE,Stage 2,Stage 2,TRUE,TRUE
+34,222T,223N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,222,223,FALSE,Stage 2,Stage 2,TRUE,TRUE
+35,224T,225N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,224,225,FALSE,Stage 2,Stage 2,TRUE,TRUE
+36,226T,227N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,226,227,FALSE,Stage 2,Stage 2,TRUE,TRUE
+37,228T,229N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,228,229,FALSE,Stage 2,Stage 2,TRUE,TRUE
+38,230T,231N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,230,231,FALSE,Stage 2,Stage 2,TRUE,TRUE
+39,232T,233N,Stage 2 ccRCC,normal match to Stage 2 ccRCC,clear cell renal cell carcinoma,normal kidney,232,233,FALSE,Stage 2,Stage 2,TRUE,TRUE
+40,HRE92N,HRE93T,normal match to Stage 2 ccRCC,Stage 2 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE92,HRE93,FALSE,Stage 2,Stage 2,TRUE,TRUE
+41,HRE114N,HRE115T,normal match to Stage 2 ccRCC,Stage 2 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE114,HRE115,FALSE,Stage 2,Stage 2,TRUE,TRUE
+42,HRE148N,HRE149T,normal match to Stage 2 ccRCC,Stage 2 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE148,HRE149,FALSE,Stage 2,Stage 2,TRUE,TRUE
+43,HRE221N,HRE222T,normal match to Stage 2 ccRCC,Stage 2 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE221,HRE222,FALSE,Stage 2,Stage 2,TRUE,TRUE
+44,306T,307N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,306,307,FALSE,Stage 3,Stage 3,TRUE,TRUE
+45,318T,319N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,318,319,FALSE,Stage 3,Stage 3,TRUE,TRUE
+46,322T,323N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,322,323,FALSE,Stage 3,Stage 3,TRUE,TRUE
+47,324T,325N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,324,325,FALSE,Stage 3,Stage 3,TRUE,TRUE
+48,332T,333N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,332,333,FALSE,Stage 3,Stage 3,TRUE,TRUE
+49,336T,337N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,336,337,FALSE,Stage 3,Stage 3,TRUE,TRUE
+50,340T,341N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,340,341,FALSE,Stage 3,Stage 3,TRUE,TRUE
+51,342T,343N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,342,343,FALSE,Stage 3,Stage 3,TRUE,TRUE
+52,344T,345N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,344,345,FALSE,Stage 3,Stage 3,TRUE,TRUE
+53,346T,347N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,346,347,FALSE,Stage 3,Stage 3,TRUE,TRUE
+54,348T,349N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,348,349,FALSE,Stage 3,Stage 3,TRUE,TRUE
+55,354T,355N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,354,355,FALSE,Stage 3,Stage 3,TRUE,TRUE
+56,356T,357N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,356,357,FALSE,Stage 3,Stage 3,TRUE,TRUE
+57,358T,359N,Stage 3 ccRCC,normal match to Stage 3 ccRCC,clear cell renal cell carcinoma,normal kidney,358,359,FALSE,Stage 3,Stage 3,TRUE,TRUE
+58,408T,409N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,408,409,FALSE,Stage 4,Stage 4,TRUE,TRUE
+59,410T,411N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,410,411,FALSE,Stage 4,Stage 4,TRUE,TRUE
+60,412T,413N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,412,413,FALSE,Stage 4,Stage 4,TRUE,TRUE
+61,414T,415N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,414,415,FALSE,Stage 4,Stage 4,TRUE,TRUE
+62,430T,431N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,430,431,FALSE,Stage 4,Stage 4,TRUE,TRUE
+63,432T,433N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,432,433,FALSE,Stage 4,Stage 4,TRUE,TRUE
+64,438T,439N,Stage 4 ccRCC,normal match to Stage 4 ccRCC,clear cell renal cell carcinoma,normal kidney,438,439,FALSE,Stage 4,Stage 4,TRUE,TRUE
+65,HRE83N,HRE 84T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE83,HRE84,FALSE,Stage 4,Stage 4,TRUE,TRUE
+66,HRE 86N,HRE 87T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE86,HRE87,FALSE,Stage 4,Stage 4,TRUE,TRUE
+67,HRE 101N,HRE 101T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE101,HRE101,TRUE,Stage 4,Stage 4,TRUE,TRUE
+68,HRE 104N,HRE 105T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE104,HRE105,FALSE,Stage 4,Stage 4,TRUE,TRUE
+69,HRE 242N,HRE 243T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HRE242,HRE243,FALSE,Stage 4,Stage 4,TRUE,TRUE
+70,HKT 2N,HKT 2T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HKT2,HKT2,TRUE,Stage 4,Stage 4,TRUE,TRUE
+71,HKT 7N,HKT 7T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HKT7,HKT7,TRUE,Stage 4,Stage 4,TRUE,TRUE
+72,HKT 28N,HKT 28T,normal match to Stage 4 ccRCC,Stage 4 ccRCC,normal kidney,clear cell renal cell carcinoma,HKT28,HKT28,TRUE,Stage 4,Stage 4,TRUE,TRUE
