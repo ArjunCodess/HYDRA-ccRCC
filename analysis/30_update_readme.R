@@ -104,8 +104,9 @@ benchmark_line <- paste0(
   "The ridge result means the eligible set still carries held-out ranking information ",
   "when those genes are used together and the penalty is chosen inside the training fold. ",
   "It was not the prespecified acceptance test, GEO evidence stayed fixed, and the ",
-  "patient bootstrap does not refit selection. Repeat-level increments are in ",
-  "[the benchmark figure](results/figures/nested_selection_benchmark.png)."
+  "patient bootstrap does not refit selection. The side-by-side comparison, including ",
+  "ClearCode34, is in [the master figure](results/figures/master_funnel_benchmark.png). ",
+  "Repeat-level increments are in [the benchmark figure](results/figures/nested_selection_benchmark.png)."
 )
 lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
 b_start <- which(lines == "<!-- benchmark-results:start -->")

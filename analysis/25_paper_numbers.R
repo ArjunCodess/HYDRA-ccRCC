@@ -196,6 +196,10 @@ items <- c(
   macro("BenchRidgeGenes", number(round(mean(ridge_sizes)))),
   macro("BenchRidgeGenesMin", number(min(ridge_sizes))),
   macro("BenchRidgeGenesMax", number(max(ridge_sizes))),
+  macro("RidgeLambdaMedian", sprintf("%.4g", {
+    ridge_audit <- tab("ridge_multigene_summary.csv")
+    ridge_audit$value[ridge_audit$metric == "lambda_median"]
+  })),
   macro("BenchClinicalC", sprintf("%.3f", clinical_b$mean_c)),
   macro("BenchClinicalSlope", sprintf("%.2f", clinical_b$mean_calibration_slope)),
   macro("AliquotDrop", number(aliquot_n("drop_multi"))),

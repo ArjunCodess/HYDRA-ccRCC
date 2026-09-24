@@ -109,7 +109,14 @@ required_files <- c(
   file.path(DIRS$tables, "tracerx_direction_dispersion.csv"),
   file.path(DIRS$figures, "nested_gene_selection_frequency.png"),
   file.path(DIRS$figures, "composition_marker_fdr.png"),
-  file.path(DIRS$figures, "tracerx_sampling_distributions.png")
+  file.path(DIRS$figures, "tracerx_sampling_distributions.png"),
+  file.path(DIRS$tables, "candidate_evidence_matrix.csv"),
+  file.path(DIRS$tables, "ridge_specification.csv"),
+  file.path(DIRS$tables, "ridge_fold_audit.csv"),
+  file.path(DIRS$tables, "ridge_multigene_summary.csv"),
+  file.path(DIRS$tables, "numerical_consistency.csv"),
+  file.path(DIRS$figures, "master_funnel_benchmark.png"),
+  file.path(DIRS$figures, "gse53757_pairing_sensitivity.png")
 )
 
 missing_files <- required_files[!file.exists(required_files)]

@@ -133,6 +133,7 @@ $steps += @(
   "analysis/33_survival_permutation_null.R",
   "analysis/32_published_signature_benchmark.R",
   "analysis/34_evidence_display.R",
+  "analysis/37_central_results.R",
   "analysis/23_survival_shape.R",
   "analysis/24_funnel_ablations.R",
   "analysis/26_acceptance_report.R",
