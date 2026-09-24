@@ -4,6 +4,7 @@
 source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/plotting.R")
+source("analysis/functions/tcga_metadata.R")
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -119,6 +120,7 @@ if (abs(hydra$mean_delta_c - nested$mean_delta_c) > 1e-12) {
 spec <- tibble(
   item = c(
     "model", "alpha", "lambda_rule", "inner_criterion", "ties", "standardize",
+    "lambda_path", "inner_standardize", "preprocessing_before_inner_cv",
     "clinical_columns", "gene_columns", "expression", "size_factors",
     "inner_folds", "inner_seed", "outer_folds", "geo_gate", "what_this_does_not_do"
   ),
@@ -126,9 +128,12 @@ spec <- tibble(
     "glmnet Cox, clinical covariates unpenalized, genes ridge-penalized",
     "0",
     "lambda.min",
-    "partial-likelihood deviance inside the training fold",
+    "partial-likelihood deviance inside the training fold; not the C-index and not the one-standard-error rule",
     "efron",
-    "glmnet standardizes every training column and applies those moments to the test rows",
+    "the coefficients used on the outer test rows are standardized on the full outer-training matrix; those moments are applied to the test rows",
+    "cv.glmnet first fits the lambda path on all outer-training rows, then scores that fixed path on the inner folds",
+    "each inner glmnet fit standardizes its own training rows",
+    "outer-training DESeq2 size factors, log2(count / size factor + 1), and the nonzero training-SD gene filter are fixed before cv.glmnet",
     "age, sex, stage, and grade; penalty factor 0; factor levels from the complete-case cohort; values from the training rows only",
     "training-fold reproducible DEGs with nonzero training standard deviation; penalty factor 1; none are removed by the penalty",
     "log2(count / size factor + 1), not the full-data variance-stabilizing transform",
@@ -137,7 +142,7 @@ spec <- tibble(
     "RESAMPLING$seed + 31000 + repeat_id * 10 + fold, drawn before cv.glmnet",
     "the saved ten-by-five patient splits; test outcomes are not an input",
     "fixed full GEO tables; GEO cohorts are not re-split",
-    "not the prespecified one-gene acceptance test; not a sparse gene selection; patient bootstrap does not refit lambda"
+    "not the prespecified one-gene acceptance test; not a sparse gene selection; not a frozen biomarker panel; patient bootstrap does not refit lambda"
   )
 )
 write_csv_atomic(spec, file.path(DIRS$tables, "ridge_specification.csv"))
@@ -266,6 +271,98 @@ grid::grid.newpage()
 grid::pushViewport(grid::viewport(layout = grid::grid.layout(1, 2, widths = grid::unit(c(1, 1.25), "null"))))
 print(p_spine, vp = grid::viewport(layout.pos.col = 1))
 print(p_bench, vp = grid::viewport(layout.pos.col = 2))
+dev.off()
+
+coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
+tumors <- coldata |>
+  filter(shortLetterCode == "TP") |>
+  distinct(patient_barcode)
+clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE) |>
+  transmute(
+    patient_barcode = submitter_id,
+    os_time, os_event,
+    age = suppressWarnings(as.numeric(age_at_diagnosis)) / 365.25,
+    sex = factor(gender),
+    stage = factor(normalize_stage(ajcc_pathologic_stage)),
+    grade = factor(case_when(
+      normalize_grade(tumor_grade) %in% c("G1", "G2") ~ "Low grade",
+      normalize_grade(tumor_grade) %in% c("G3", "G4") ~ "High grade",
+      TRUE ~ NA_character_
+    ))
+  )
+cohort <- tumors |>
+  left_join(clinical, by = "patient_barcode") |>
+  mutate(
+    reason = case_when(
+      !(is.finite(os_time) & os_time > 0) ~ "zero_or_nonpositive_survival_time",
+      !is.finite(age) ~ "missing_age",
+      is.na(sex) ~ "missing_sex",
+      is.na(stage) ~ "missing_stage",
+      is.na(grade) ~ "missing_grade",
+      TRUE ~ "complete_case"
+    )
+  )
+if (nrow(cohort) != 533L || any(cohort$reason == "missing_sex") ||
+    sum(cohort$reason != "complete_case") != 16L) {
+  stop("Complete-case exclusion does not match the locked 533-to-517 drop.")
+}
+reason_order <- c(
+  "complete_case", "missing_grade", "missing_stage", "missing_age",
+  "zero_or_nonpositive_survival_time"
+)
+exclusions <- cohort |>
+  group_by(reason) |>
+  summarise(n = n(), deaths = sum(os_event == 1), .groups = "drop") |>
+  mutate(reason = factor(reason, levels = reason_order)) |>
+  arrange(reason)
+if (!identical(exclusions$n, c(517L, 8L, 3L, 1L, 4L)) ||
+    sum(exclusions$deaths[exclusions$reason != "complete_case"]) != 5L ||
+    exclusions$deaths[exclusions$reason == "complete_case"] != 170L) {
+  stop("Complete-case exclusion counts changed.")
+}
+cox_models <- tab("tcga_kirc_cox_models.csv")
+cox_n <- function(model) unique(cox_models$n[cox_models$model_type == model])
+if (!identical(cox_n("stage_grade_complete"), 517) ||
+    !identical(cox_n("stage_complete"), 525) ||
+    !identical(cox_n("grade_complete"), 520)) {
+  stop("Cox complete-case sizes do not match the exclusion accounting.")
+}
+write_csv_atomic(exclusions |> mutate(reason = as.character(reason)),
+                 file.path(DIRS$tables, "nested_cohort_exclusions.csv"))
+
+flow <- tibble(
+  x = c(1, 2.35, 3.7),
+  label = c("541 tumor aliquots", "533 patients\n175 deaths", "517 complete cases\n170 deaths"),
+  sub = c("four patients\nwith three aliquots", "one selected\ntumor each", "nested splits and\nprimary Cox model")
+)
+png(file.path(DIRS$figures, "cohort_flow.png"), width = 8.4, height = 3.15, units = "in", res = 300)
+grid::grid.newpage()
+grid::pushViewport(grid::viewport(width = 0.96, height = 0.92))
+grid::grid.rect(gp = grid::gpar(col = NA, fill = "white"))
+grid::grid.text("From aliquots to the nested cohort", x = 0.02, y = 0.94,
+                just = c("left", "top"), gp = grid::gpar(fontface = "bold", cex = 1.05, col = "#1c1c1c"))
+centers <- c(0.16, 0.50, 0.84)
+for (i in seq_len(nrow(flow))) {
+  xi <- centers[i]
+  grid::grid.roundrect(x = xi, y = 0.54, width = 0.26, height = 0.36, r = grid::unit(0.04, "snpc"),
+                       gp = grid::gpar(fill = "#E7F0F3", col = "#205D72", lwd = 1.4))
+  grid::grid.text(flow$label[i], x = xi, y = 0.58, gp = grid::gpar(fontface = "bold", cex = 0.85, col = "#163844"))
+  grid::grid.text(flow$sub[i], x = xi, y = 0.45, gp = grid::gpar(cex = 0.68, col = "#3d5c68"))
+}
+grid::grid.text("8 extra aliquots", x = 0.33, y = 0.78, gp = grid::gpar(cex = 0.62, col = "#5c5c5c"))
+grid::grid.lines(x = c(0.29, 0.37), y = 0.54, arrow = grid::arrow(length = grid::unit(0.12, "inches")),
+                 gp = grid::gpar(col = "#205D72", lwd = 1.2))
+grid::grid.text("16 excluded", x = 0.67, y = 0.78, gp = grid::gpar(cex = 0.62, col = "#5c5c5c"))
+grid::grid.lines(x = c(0.63, 0.71), y = 0.54, arrow = grid::arrow(length = grid::unit(0.12, "inches")),
+                 gp = grid::gpar(col = "#205D72", lwd = 1.2))
+grid::grid.text(
+  "Each of the 16 fails one field:  8 lack grade   ·   3 lack stage   ·   1 lacks age   ·   4 have survival time 0     (5 of the 16 are deaths)",
+  x = 0.5, y = 0.16, gp = grid::gpar(cex = 0.72, col = "#1c1c1c")
+)
+grid::grid.text(
+  "Stage-only sensitivity restores the 8 without grade (525). Grade-only sensitivity restores the 3 without stage (520).",
+  x = 0.5, y = 0.06, gp = grid::gpar(cex = 0.68, col = "#3d5c68")
+)
 dev.off()
 
 message("Central evidence table, ridge audit, and figures written.")

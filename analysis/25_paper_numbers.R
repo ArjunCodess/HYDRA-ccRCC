@@ -97,6 +97,12 @@ em_top <- sig_row("E-MTAB-1980", "clinical_plus_top_gene")
 em_panel <- sig_row("E-MTAB-1980", "clinical_plus_signed_panel")
 perm_summary <- tab("survival_permutation_null_summary.csv")
 fold_event_summary <- tab("nested_cv_fold_event_summary.csv")
+exclusions <- tab("nested_cohort_exclusions.csv")
+exclusion_n <- function(reason) {
+  hit <- exclusions$n[exclusions$reason == reason]
+  if (length(hit) != 1L) stop("Missing cohort exclusion: ", reason)
+  hit
+}
 fold_min <- fold_event_summary$value[fold_event_summary$metric == "test_events_min"]
 fold_max <- fold_event_summary$value[fold_event_summary$metric == "test_events_max"]
 if (length(fold_min) != 1L || fold_min != fold_max) {
@@ -228,7 +234,17 @@ items <- c(
   macro("TracerxChangingIqrLow", percent(dispersion_value("size_matched_39", "iqr_low"))),
   macro("TracerxChangingIqrHigh", percent(dispersion_value("size_matched_39", "iqr_high"))),
   macro("CompositionFailedSymbols", paste(sort(composition$symbol[composition$composition_adjusted_fdr >= 0.05]), collapse = ", ")),
-  macro("TcgaTumorEvents", number(cohort_dict$events[cohort_dict$dataset == "TCGA-KIRC tumors"]))
+  macro("TcgaTumorEvents", number(cohort_dict$events[cohort_dict$dataset == "TCGA-KIRC tumors"])),
+  macro("NestedPatients", number(exclusion_n("complete_case"))),
+  macro("NestedEvents", number(exclusions$deaths[exclusions$reason == "complete_case"])),
+  macro("NestedExcluded", number(sum(exclusions$n[exclusions$reason != "complete_case"]))),
+  macro("ExcludeGrade", number(exclusion_n("missing_grade"))),
+  macro("ExcludeStage", number(exclusion_n("missing_stage"))),
+  macro("ExcludeAge", number(exclusion_n("missing_age"))),
+  macro("ExcludeTime", number(exclusion_n("zero_or_nonpositive_survival_time"))),
+  macro("ExcludeDeaths", number(sum(exclusions$deaths[exclusions$reason != "complete_case"]))),
+  macro("StageOnlyPatients", number(exclusion_n("complete_case") + exclusion_n("missing_grade"))),
+  macro("GradeOnlyPatients", number(exclusion_n("complete_case") + exclusion_n("missing_stage")))
 )
 writeLines(c("% Generated from committed result tables by analysis/25_paper_numbers.R.", items),
            "paper/results_macros.tex")
