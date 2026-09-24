@@ -4,7 +4,7 @@ This is an outreach briefing, not an IRIS/ISEF submission document.
 
 ## Project in one paragraph
 
-HYDRA-ccRCC is a reproducible public-data computational oncology project asking whether genes consistently dysregulated between clear cell renal cell carcinoma and adjacent kidney also carry credible prognostic associations. The pipeline analyzes TCGA-KIRC, validates tumor-normal direction in GSE40435 and GSE53757, and stress-tests survival associations across clinical adjustment, composition, external cohorts, multiregion sampling, and a randomized treatment comparison. It narrows 8,852 TCGA-significant genes to 3,304 cross-cohort reproducible DEGs, 536 strict candidates, and 27 high-confidence TCGA-derived associations. GSE29609 is largely contradictory, E-MTAB-1980 supports 13 candidates under the revised rule, and CheckMate 025 supplies no multiplicity-controlled evidence that any candidate modifies nivolumab benefit. These checks keep the result framed as a prioritized set of candidate prognostic associations rather than a validated biomarker panel.
+HYDRA-ccRCC is a reproducible public-data computational oncology project asking whether genes consistently dysregulated between clear cell renal cell carcinoma and adjacent kidney also carry credible prognostic associations. The pipeline analyzes TCGA-KIRC, validates tumor-normal direction in GSE40435 and GSE53757, and stress-tests survival associations across clinical adjustment, composition, external cohorts, multiregion sampling, and a randomized treatment comparison. Patient-level correction of duplicated aliquots leaves 533 tumors and 23 high-confidence candidates. A 10-by-5 nested evaluation of the full selection rule does not meet the prespecified concordance increment. GSE29609 is largely contradictory, E-MTAB-1980 supports a subset under the revised rule, and CheckMate 025 supplies no multiplicity-controlled evidence that any candidate modifies nivolumab benefit. These checks keep the result framed as a prioritized set of candidate prognostic associations rather than a validated biomarker panel.
 
 ## What has already been built
 
@@ -14,9 +14,10 @@ HYDRA-ccRCC is a reproducible public-data computational oncology project asking 
 - Continuous-expression Cox models adjusted for age, sex, stage, and grade.
 - Proportional-hazards, threshold-sensitivity, null-overlap, and composition screens.
 - A complete negative-result-preserving output trail, manuscript draft, and generated figures.
-- A verified E-MTAB-1980 test with 101 patients and 23 deaths. Twenty-six candidates mapped, 23 preserved the TCGA direction, and 13 retained same-direction FDR support in both the unadjusted and limited-adjustment models.
-- A TRACERx Renal sensitivity that measures regional readout discordance and one-region-per-patient Cox instability for all 27 candidates.
+- A verified E-MTAB-1980 test with 101 patients and 23 deaths.
+- A TRACERx Renal sensitivity that measures regional readout discordance and one-region-per-patient Cox instability for all 23 candidates.
 - A CheckMate 025 interaction analysis in 250 RNA-profiled patients. No candidate-by-treatment interaction survived FDR correction for overall or progression-free survival.
+- Nested selection, a ridge comparison on the same splits, an aliquot-rule sensitivity, an unpaired GSE53757 check, a survival-permutation null, and a ClearCode34 comparison. See `protocol.md` and `docs/METHODS_LOCK.md`.
 
 ## Where expert help matters
 
