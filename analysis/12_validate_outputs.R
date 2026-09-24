@@ -118,7 +118,11 @@ required_files <- c(
   file.path(DIRS$figures, "master_funnel_benchmark.png"),
   file.path(DIRS$figures, "gse53757_pairing_sensitivity.png"),
   file.path(DIRS$tables, "nested_cohort_exclusions.csv"),
-  file.path(DIRS$figures, "cohort_flow.png")
+  file.path(DIRS$figures, "cohort_flow.png"),
+  file.path(DIRS$figures, "external_direction_comparison.png"),
+  file.path(DIRS$figures, "aliquot_sensitivity.png"),
+  file.path("paper", "figures", "hydra_evidence_overview.pdf"),
+  file.path("paper", "evidence_matrix.tex")
 )
 
 missing_files <- required_files[!file.exists(required_files)]

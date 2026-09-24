@@ -237,7 +237,6 @@ p_tx <- ggplot(draw_agreement, aes(agreement)) +
        title = "TRACERx sampling variation",
        subtitle = "Each draw keeps one region per patient. Both subsets have 39 patients and 9 deaths.") +
   theme_hydra()
-ggsave(file.path(DIRS$figures, "tracerx_sampling_distributions.png"), p_tx,
-       width = 7.5, height = 4.8, dpi = 300)
+# TRACERx figure is drawn by analysis/38_presentation_figures.R.
 
 message("Evidence display tables and figures written.")

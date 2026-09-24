@@ -237,8 +237,7 @@ p_pair <- ggplot(pairing, aes(paired_log2fc, unpaired_log2fc)) +
        title = "GSE53757 pairing sensitivity",
        subtitle = "All 23 high-confidence genes. Jaccard overlap of the reproducible lists is 0.998.") +
   theme_hydra(base_size = 11)
-ggsave(file.path(DIRS$figures, "gse53757_pairing_sensitivity.png"), p_pair,
-       width = 6.2, height = 5.4, dpi = 300)
+# Pairing figure is drawn by analysis/38_presentation_figures.R.
 
 forest <- tab("external_log_hr_forest.csv")
 forest$reversal <- forest$symbol %in% c("DDC", "TCIRG1")
@@ -266,12 +265,7 @@ p_forest <- ggplot(forest, aes(log_hr, label, color = cohort)) +
 ggsave(file.path(DIRS$figures, "external_log_hr_forest.png"), p_forest,
        width = 8.2, height = 7.2, dpi = 300)
 
-png(file.path(DIRS$figures, "master_funnel_benchmark.png"), width = 11.4, height = 5.6, units = "in", res = 300)
-grid::grid.newpage()
-grid::pushViewport(grid::viewport(layout = grid::grid.layout(1, 2, widths = grid::unit(c(1, 1.25), "null"))))
-print(p_spine, vp = grid::viewport(layout.pos.col = 1))
-print(p_bench, vp = grid::viewport(layout.pos.col = 2))
-dev.off()
+# The master figure is drawn by analysis/38_presentation_figures.R.
 
 coldata <- read_csv(FILES$tcga_coldata, show_col_types = FALSE)
 tumors <- coldata |>
@@ -330,39 +324,5 @@ if (!identical(cox_n("stage_grade_complete"), 517) ||
 write_csv_atomic(exclusions |> mutate(reason = as.character(reason)),
                  file.path(DIRS$tables, "nested_cohort_exclusions.csv"))
 
-flow <- tibble(
-  x = c(1, 2.35, 3.7),
-  label = c("541 tumor aliquots", "533 patients\n175 deaths", "517 complete cases\n170 deaths"),
-  sub = c("four patients\nwith three aliquots", "one selected\ntumor each", "nested splits and\nprimary Cox model")
-)
-png(file.path(DIRS$figures, "cohort_flow.png"), width = 8.4, height = 3.15, units = "in", res = 300)
-grid::grid.newpage()
-grid::pushViewport(grid::viewport(width = 0.96, height = 0.92))
-grid::grid.rect(gp = grid::gpar(col = NA, fill = "white"))
-grid::grid.text("From aliquots to the nested cohort", x = 0.02, y = 0.94,
-                just = c("left", "top"), gp = grid::gpar(fontface = "bold", cex = 1.05, col = "#1c1c1c"))
-centers <- c(0.16, 0.50, 0.84)
-for (i in seq_len(nrow(flow))) {
-  xi <- centers[i]
-  grid::grid.roundrect(x = xi, y = 0.54, width = 0.26, height = 0.36, r = grid::unit(0.04, "snpc"),
-                       gp = grid::gpar(fill = "#E7F0F3", col = "#205D72", lwd = 1.4))
-  grid::grid.text(flow$label[i], x = xi, y = 0.58, gp = grid::gpar(fontface = "bold", cex = 0.85, col = "#163844"))
-  grid::grid.text(flow$sub[i], x = xi, y = 0.45, gp = grid::gpar(cex = 0.68, col = "#3d5c68"))
-}
-grid::grid.text("8 extra aliquots", x = 0.33, y = 0.78, gp = grid::gpar(cex = 0.62, col = "#5c5c5c"))
-grid::grid.lines(x = c(0.29, 0.37), y = 0.54, arrow = grid::arrow(length = grid::unit(0.12, "inches")),
-                 gp = grid::gpar(col = "#205D72", lwd = 1.2))
-grid::grid.text("16 excluded", x = 0.67, y = 0.78, gp = grid::gpar(cex = 0.62, col = "#5c5c5c"))
-grid::grid.lines(x = c(0.63, 0.71), y = 0.54, arrow = grid::arrow(length = grid::unit(0.12, "inches")),
-                 gp = grid::gpar(col = "#205D72", lwd = 1.2))
-grid::grid.text(
-  "Each of the 16 fails one field:  8 lack grade   ·   3 lack stage   ·   1 lacks age   ·   4 have survival time 0     (5 of the 16 are deaths)",
-  x = 0.5, y = 0.16, gp = grid::gpar(cex = 0.72, col = "#1c1c1c")
-)
-grid::grid.text(
-  "Stage-only sensitivity restores the 8 without grade (525). Grade-only sensitivity restores the 3 without stage (520).",
-  x = 0.5, y = 0.06, gp = grid::gpar(cex = 0.68, col = "#3d5c68")
-)
-dev.off()
-
-message("Central evidence table, ridge audit, and figures written.")
+# Cohort and master figures are drawn by analysis/38_presentation_figures.R.
+message("Central evidence table and ridge audit written.")
