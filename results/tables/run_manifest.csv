@@ -1,5 +1,5 @@
 path,bytes,md5
-README.md,23349,bc35e7fc8831761a82d5da1c86ad6361
+README.md,23611,5fe169c9262659639cc42a31da30e726
 analysis/00_check_environment.R,700,26efa664a578454de80f3e5a8a1536f1
 analysis/00_config.R,4030,c8cf52378f0a6acd643c6a79ed22c97a
 analysis/00_install_packages.R,695,5b0cf5d27bd6147bb7f73a0422c1971b
@@ -38,7 +38,7 @@ analysis/25_paper_numbers.R,15971,14ab1548a0682a11ede1d06aa1d0c7dd
 analysis/26_acceptance_report.R,1673,58f6471e2694eca053138e7331527b79
 analysis/27_audit_figures.R,2317,7c6419edd2a001d3b3ae579c1084065c
 analysis/28_null_summary.R,869,6c86ca39ca5fba740a8f50fca4ffd5ed
-analysis/30_update_readme.R,7181,5d996f174743c9b23fa5d92cc6c20d79
+analysis/30_update_readme.R,7280,ad61af3f8a59dd78f198bb858f6df95a
 analysis/31_nested_selection_benchmark.R,23755,bb375f4f4b99ac6f643fea435f443f9a
 analysis/32_published_signature_benchmark.R,14538,ae7c6c36c263301f100152ff1b8ddcd4
 analysis/33_survival_permutation_null.R,6432,605fa59919d1e973059819ff3d059bfc
@@ -56,8 +56,8 @@ analysis/tests/test_identity_and_endpoints.R,1433,2845600c5dc04c6e33bc1960b2e58c
 analysis/tests/test_nested_benchmark.R,4652,3967cf0a8129de892559e949585df9f2
 environment/package_versions.csv,17591,067e2a27692802538010e1b3b4dd104b
 environment/sessionInfo.txt,934,b43881226f76b42df3bb7147227b0663
-paper/main.pdf,1115023,0329b36896ced0677aceba3cd0b208a8
-paper/main.tex,36967,e186853979fff09672da8e4e02a9e6aa
+paper/main.pdf,1115835,4d3ea7af1674c6b01433704dd09f946c
+paper/main.tex,37236,0967c1143f0f0a5a16e580164f4279c5
 paper/results_macros.tex,4898,c63632d853f3d756610d2d4b17262b7c
 protocol.md,14899,0dd676fe485e864e5fbe667813b45048
 results/archive/legacy_biological_review_24_candidates.md,41307,93f60cbe03345d942944b3c9a5457d86
