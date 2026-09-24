@@ -1,5 +1,5 @@
 path,bytes,md5
-README.md,24616,0f8af820cb4676e0e038c95765a589b0
+README.md,25753,718f12d61edfb6b37e95df8e47d4bd21
 analysis/00_check_environment.R,700,26efa664a578454de80f3e5a8a1536f1
 analysis/00_config.R,4030,c8cf52378f0a6acd643c6a79ed22c97a
 analysis/00_install_packages.R,695,5b0cf5d27bd6147bb7f73a0422c1971b
@@ -60,8 +60,8 @@ environment/sessionInfo.txt,934,b43881226f76b42df3bb7147227b0663
 paper/evidence_matrix.tex,2722,1bb1da8a2648f0545db8f0e376e8e17a
 paper/figures/hydra_evidence_overview.pdf,7470,da452787a23b5a556c52cc4668637a76
 paper/figures/hydra_evidence_overview.svg,145594,28c1795108e2989a672fcae4e52e0521
-paper/main.pdf,1044462,33351c9703ba94f10e4915cc83356d9e
-paper/main.tex,39001,29a173f51dd00b1e4512282981b759db
+paper/main.pdf,1044458,b197770a516b185683d207523015e1ae
+paper/main.tex,39066,8ddbd6b52496017d0248f86c99a74e10
 paper/results_macros.tex,4898,c63632d853f3d756610d2d4b17262b7c
 protocol.md,14899,0dd676fe485e864e5fbe667813b45048
 results/archive/legacy_biological_review_24_candidates.md,41307,93f60cbe03345d942944b3c9a5457d86
