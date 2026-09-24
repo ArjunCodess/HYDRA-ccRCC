@@ -1,0 +1,37 @@
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\caption{Evidence matrix for the 23 high-confidence candidates. Every row uses the same columns. Bold marks the GSE29609 reversals DDC and TCIRG1. An asterisk marks a gene lost under every alternate aliquot rule. Direction is relative to the TCGA hazard. Nested folds count how often the gene was the selected gene. TRACERx is the fraction of fixed-patient region draws that kept the TCGA direction.}
+\label{tab:evidence}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrcccccccrr}
+\toprule
+Gene & TCGA log$_2$FC & TCGA HR & GSE40435 & GSE53757 & GSE29609 & E-MTAB-1980 & Marker & Purity & Folds & TRACERx & Aliquot \\
+\midrule
+CYFIP2 & -2.28 & 0.64 & yes & yes & opposite & absent & yes & yes & 22 & 94\% & yes \\
+CRYL1 & -1.07 & 0.63 & yes & yes & opposite & same & yes & yes &  9 & 100\% & yes \\
+HHLA2 & 3.12 & 0.63 & yes & yes & opposite & same & yes & yes & 11 & 100\% & yes \\
+\textbf{DDC} & -1.70 & 0.66 & yes & yes & opposite & same & no & yes &  1 & 96\% & yes \\
+KL & -1.64 & 0.66 & yes & yes & absent & same & no & yes &  1 & 37\% & yes \\
+RBM47$^{*}$ & -1.10 & 0.67 & yes & yes & opposite & same & yes & yes &  0 & 100\% & no \\
+PANK1 & -1.49 & 0.62 & yes & yes & opposite & same & yes & yes &  0 & 84\% & yes \\
+GJB1 & -1.47 & 0.65 & yes & yes & same & same & no & yes &  0 & 97\% & yes \\
+ACADM & -1.54 & 0.64 & yes & yes & opposite & same & yes & yes &  0 & 100\% & yes \\
+CLCN5 & -1.43 & 0.66 & yes & yes & opposite & same & no & yes &  0 & 60\% & yes \\
+TMEM140 & 1.39 & 0.67 & yes & yes & opposite & same & yes & yes &  0 & 100\% & yes \\
+C1QTNF6 & 2.33 & 1.55 & yes & yes & opposite & same & yes & yes &  0 & 93\% & yes \\
+CADPS2 & -1.63 & 0.66 & yes & yes & same & same & yes & yes &  0 & 100\% & no \\
+KNTC1 & 1.16 & 1.51 & yes & yes & opposite & same & yes & yes &  0 & 100\% & yes \\
+PODXL & -1.37 & 0.66 & yes & yes & opposite & same & no & yes &  0 & 100\% & yes \\
+HIBCH & -1.29 & 0.66 & yes & yes & opposite & same & no & yes &  0 & 99\% & yes \\
+TNIP1 & 1.05 & 0.66 & yes & yes & opposite & same & yes & yes &  0 & 69\% & yes \\
+\textbf{TCIRG1} & 1.46 & 1.53 & yes & yes & opposite & same & yes & yes &  0 & 99\% & yes \\
+LTB4R$^{*}$ & 2.59 & 1.51 & yes & yes & same & same & yes & yes &  0 & 39\% & no \\
+LRBA & -1.25 & 0.65 & yes & yes & opposite & same & yes & yes &  0 & 100\% & yes \\
+GRAMD1A$^{*}$ & 1.32 & 1.50 & yes & yes & same & same & yes & yes &  0 & 98\% & no \\
+IFFO1$^{*}$ & 1.78 & 1.50 & yes & yes & absent & same & yes & yes &  0 & 57\% & no \\
+TNFAIP2 & 1.29 & 1.53 & yes & yes & same & opposite & yes & yes &  0 & 64\% & no \\
+\bottomrule
+\end{tabular}}
+\end{table}

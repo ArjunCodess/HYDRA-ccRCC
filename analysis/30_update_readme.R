@@ -103,7 +103,7 @@ benchmark_line <- paste0(
   " after the ridge model. The one-gene rules stayed near the clinical model. ",
   "The ridge result means the eligible set still carries held-out ranking information ",
   "when those genes are used together and the penalty is chosen inside the training fold. ",
-  "It does not replace the failed one-gene criterion or freeze a signature. ",
+  "The ridge arm is not a validated signature. It does not replace the failed one-gene criterion. ",
   "It was fit only on the TCGA nested splits and was not evaluated on GSE29609 or E-MTAB-1980. ",
   "It was not the prespecified acceptance test, GEO evidence stayed fixed, and the ",
   "patient bootstrap does not refit selection. The side-by-side comparison, including ",
