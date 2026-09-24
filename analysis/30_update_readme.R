@@ -104,6 +104,7 @@ benchmark_line <- paste0(
   "The ridge result means the eligible set still carries held-out ranking information ",
   "when those genes are used together and the penalty is chosen inside the training fold. ",
   "It does not replace the failed one-gene criterion or freeze a signature. ",
+  "It was fit only on the TCGA nested splits and was not evaluated on GSE29609 or E-MTAB-1980. ",
   "It was not the prespecified acceptance test, GEO evidence stayed fixed, and the ",
   "patient bootstrap does not refit selection. The side-by-side comparison, including ",
   "ClearCode34, is in [the master figure](results/figures/master_funnel_benchmark.png). ",
