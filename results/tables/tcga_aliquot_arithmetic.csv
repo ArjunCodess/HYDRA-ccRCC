@@ -1,0 +1,8 @@
+metric,value
+tumor_aliquots,541
+tumor_patients,533
+excess_tumor_aliquots,8
+patients_with_three_tumor_aliquots,4
+normal_aliquots,72
+normal_patients,72
+patients_with_multiple_normals,0
