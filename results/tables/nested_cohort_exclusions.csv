@@ -1,0 +1,6 @@
+reason,n,deaths
+complete_case,517,170
+missing_grade,8,1
+missing_stage,3,1
+missing_age,1,1
+zero_or_nonpositive_survival_time,4,2
