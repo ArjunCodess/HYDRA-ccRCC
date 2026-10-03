@@ -18,6 +18,14 @@
 Which tumor--normal transcriptomic associations in clear cell renal cell carcinoma (ccRCC) retain prognostic support under stronger validation? We used TCGA-KIRC for discovery and GSE40435 and GSE53757 for expression replication. Previously inspected GSE29609 and E-MTAB-1980 supplied external survival assessments. Expression replication, clinically adjusted survival models, and stricter sensitivity and effect gates reduced \MappedDeg\ discovery genes to \HighGenes\ priority associations. These \HighGenes\ retained conditional bootstrap support, but adding a gene selected within training folds changed held-out concordance by only \NestedDelta\ in \NestedPatients\ patients, with a conditional 95\% interval of \NestedCiLow\ to \NestedCiHigh. Survival direction agreed for \GseSame/\GseMapped\ mapped candidates in GSE29609 versus \EmSame/\EmMapped\ in E-MTAB-1980; two associations reversed with false-discovery-rate support in GSE29609. Marker-score adjustment removed support for \CompositionFailures\ associations, whereas consensus-purity adjustment retained all \HighGenes. The workflow exposes disagreement between expression reproducibility, prognostic association, and prediction. It supplies auditable evidence for follow-up, without establishing a transportable prognostic panel or clinical utility.
 \end{abstract}
 
+\begin{figure}[!ht]
+\centering\includegraphics[width=\linewidth]{figures/hydra_evidence_overview.pdf}
+\caption{HYDRA evidence overview. Six selection gates yield \HighGenes\ priority associations. Downstream assessments answer distinct questions rather than defining further exclusions. All \HighGenes\ shortlisted coefficients retain conditional bootstrap support; held-out prediction instead reruns selection within training folds. Its interval conditions on saved predictions. The exploratory ridge benchmark uses a separate bootstrap seed and has no external prediction validation. Neither association nor biological context establishes clinical utility.}
+\label{fig:funnel}
+\end{figure}
+\clearpage
+
+
 \section{Introduction}
 A gene can distinguish a ccRCC tumor from normal kidney without improving prognosis beyond clinical stage and grade. HYDRA asks one primary question: \emph{which tumor--normal transcriptomic associations retain prognostic support as replication, clinical adjustment, held-out evaluation, and tissue-composition checks strengthen the evidence?} Three secondary questions ask whether survival associations agree across cohorts, whether the selection procedure improves prediction beyond clinical variables, and whether composition changes the interpretation of the associations.
 
@@ -41,11 +49,7 @@ For prediction, ten repeats of five patient folds rerun TCGA selection and train
 \subsection{Discovery contracts to a small association shortlist}
 The funnel contracts from \MappedDeg\ mapped TCGA discovery genes to \ReproDeg\ expression-reproducible genes, \MainSurvival\ adjusted survival associations, \SensitivityPass\ passing covariate sensitivity, \StrictGenes\ strict candidates, and \HighGenes\ priority associations. Figure~\ref{fig:funnel} separates these selection counts from downstream assessments. The ledger records each mapped gene, including failed gates and explicit missing downstream evidence, so favorable candidates cannot conceal the denominator.
 
-\begin{figure}[htbp]
-\centering\includegraphics[width=\linewidth]{../results/figures/review_evidence_funnel.pdf}
-\caption{Selection attrition and downstream evidence. The six gates reduce discovery associations to \HighGenes\ priority genes. Subsequent boxes describe distinct assessments of that set; their counts do not define a new shortlist or a sequence of exclusions. External coverage differs by platform. Bootstrap support conditions on full-data selection, and held-out prediction evaluates the selection procedure.}
-\label{fig:funnel}
-\end{figure}
+
 
 Changing aliquot rules leaves \AliquotDrop, \AliquotFirst, or \AliquotSum\ priority genes instead of \HighGenes. This sensitivity shows that the shortlist boundary depends on sample handling. The unpaired GSE53757 analysis retains all \HighGenes\ genes, but agreement between fits cannot verify the assumed patient pairs. Full gene tables and both sensitivities are reported in the supplement.
 

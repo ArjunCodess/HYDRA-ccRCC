@@ -28,6 +28,10 @@ assert not re.search(r"\\(?:Review\w+|MappedDeg|ReproDeg|MainSurvival|Sensitivit
 for target in re.findall(r"\\(?:input|includegraphics)(?:\[[^]]*\])?\{([^}]+)\}", main + supplement):
     assert (root / "paper" / target).is_file(), f"Missing LaTeX dependency: {target}"
 assert main.count(r"\includegraphics") == 3, "The main manuscript must contain exactly three figures."
+assert re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", main)[0] == "figures/hydra_evidence_overview.pdf"
+assert main.index("figures/hydra_evidence_overview.pdf") < main.index(r"\section{Introduction}")
+readme = (root / "README.md").read_text(encoding="utf-8")
+assert re.findall(r"!\[[^]]*\]\(([^)]+)\)", readme)[0] == "paper/figures/hydra_evidence_overview.svg"
 assert "primary question" in main and "Three secondary questions" in main
 assert "validated panel" in main and "Clinical utility is not evaluated" in main
 assert "no funding and no conflicts" in main

@@ -12,6 +12,7 @@ reader = PdfReader(root / "paper/main.pdf")
 pages = [page.extract_text() or "" for page in reader.pages]
 text = "\n".join(pages).replace("\u2212", "-")
 plain = re.sub(r"\s+", " ", text)
+assert plain.index("Figure 1: HYDRA evidence overview") < plain.index("1 Introduction")
 assert "Arjun Vijay Prakash" in plain
 assert "Hardening Transcriptomic Prognostic Evidence" in plain
 assert "Development draft" not in plain and "??" not in plain
