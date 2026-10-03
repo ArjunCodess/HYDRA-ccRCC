@@ -1,121 +1,34 @@
+# Regenerate the concise project summary from audited tables.
 source("analysis/00_config.R")
 suppressPackageStartupMessages(library(readr))
-
-nested <- read_csv(file.path(DIRS$tables, "nested_cv_summary.csv"),
-                   show_col_types = FALSE)
-null <- read_csv(file.path(DIRS$tables, "nested_cv_clinical_null_summary.csv"),
-                 show_col_types = FALSE)
-folds <- read_csv(file.path(DIRS$tables, "nested_cv_folds.csv"),
-                  show_col_types = FALSE)
-repeats <- read_csv(file.path(DIRS$tables, "nested_cv_repeat_metrics.csv"),
-                    show_col_types = FALSE)
-if (nrow(nested) != 1L || nested$repeats != 10L || nested$folds != 5L ||
-    nrow(null) != 1L || null$simulations != 200L ||
-    nrow(folds) != 50L || nrow(repeats) != 10L) {
-  stop("Final nested CV and null summaries are required before updating README.")
-}
-
-line <- paste0(
-  "The [selection-aware nested CV](results/tables/nested_cv_summary.csv) used ",
-  nested$n_patients, " patients across ten repeats of five folds. It selected no gene in ",
-  nested$no_gene_folds, " folds; ", nested$outlier_replacement_fallbacks,
-  " folds required a DESeq2 no-replacement retry. The top-ranked gene varied ",
-  "across ", dplyr::n_distinct(folds$selected_gene, na.rm = TRUE),
-  " genes, with the most frequent selected in ", max(table(folds$selected_gene)),
-  " folds. The [selection-frequency figure](results/figures/nested_gene_selection_frequency.png) shows those ten genes. The mean selected-gene minus ",
-  "clinical concordance was ", sprintf("%+.4f", nested$mean_delta_c),
-  " (patient-resampled 95% interval ",
-  sprintf("%+.4f", nested$patient_bootstrap_ci_low), " to ",
-  sprintf("%+.4f", nested$patient_bootstrap_ci_high),
-  "), and the three-year Brier-score difference was ",
-  sprintf("%+.4f", nested$mean_delta_brier3), ". The prespecified CV criterion **",
-  ifelse(nested$cv_acceptance, "passed", "failed"),
-  "**. Mean risk-score calibration slopes were ",
-  sprintf("%.2f", mean(repeats$clinical_calibration_slope)), " for clinical-only and ",
-  sprintf("%.2f", mean(repeats$gene_calibration_slope)),
-  " for the selected-gene models, so discrimination and calibration did not move together. ",
-  "The [200 clinical-only null simulations](results/tables/nested_cv_clinical_null_summary.csv) ",
-  "selected a gene in ", null$gene_selected,
-  " single-fold runs under their simulated clinical-risk model. The patient ",
-  "bootstrap keeps the fitted fold models fixed, ",
-  "so its interval omits training-set and split uncertainty."
+tab <- function(name) read_csv(file.path(DIRS$tables, paste0(name, ".csv")), show_col_types = FALSE)
+f <- tab("candidate_summary"); repro <- tab("reproducibility_summary")
+nested <- tab("nested_cv_summary"); gse <- tab("external_survival_gse29609_summary"); em <- tab("external_survival_emtab1980_summary")
+v <- function(x, metric) { out <- x$value[x$metric == metric]; stopifnot(length(out) == 1); out }
+selection <- c(v(repro, "tcga_significant"), f$value)
+stopifnot(nrow(nested) == 1, length(selection) == 6, all(diff(selection) <= 0))
+lines <- c(
+  "# HYDRA-ccRCC", "",
+  "HYDRA is a computational-genomics evidence-hardening study. It asks which tumor-normal transcriptomic associations in clear cell renal cell carcinoma retain prognostic support under expression replication, clinical adjustment, held-out evaluation, and tissue-composition checks. It contributes a reproducible workflow and evidence audit, not a new statistical algorithm or a validated clinical panel.", "",
+  sprintf("The discovery funnel is %s genes. External survival, coefficient uncertainty, prediction, purity, and cell-source analyses assess the shortlist; they are not further exclusion gates.", paste(format(selection, big.mark = ",", trim = TRUE), collapse = " -> ")), "",
+  sprintf("Survival direction agrees for %d/%d mapped genes in GSE29609 and %d/%d in E-MTAB-1980. Both cohorts were previously inspected. The selection-aware one-gene procedure changes held-out concordance by %.4f in %d patients, with a conditional patient-bootstrap 95%% interval of %.4f to %.4f, and fails the project's prediction criterion. These results do not establish clinical utility.",
+    v(gse, "same_direction_candidates"), v(gse, "platform_present_candidates"), v(em, "same_direction_candidates"), v(em, "platform_present_candidates"),
+    nested$mean_delta_c, nested$n_patients, nested$patient_bootstrap_ci_low, nested$patient_bootstrap_ci_high), "",
+  "![Selection funnel and downstream evidence](results/figures/review_evidence_funnel.png)", "",
+  "## Manuscript and evidence", "",
+  "- [Revised manuscript](paper/main.pdf) and [LaTeX source](paper/main.tex), with procedural details and complete tables in [the supplement](paper/supplement.tex).",
+  "- [Candidate ledger](results/tables/candidate_ledger.csv) contains one row per mapped gene and cohort/model evidence; [the schema](docs/CANDIDATE_LEDGER_SCHEMA.md) explains missing assessments and diagnostic branches.",
+  "- [Review response matrix](docs/ICBINB_REVIEW_RESPONSE_MATRIX.md) connect the revision to the supplied review summary.",
+  "- [Validation record](docs/REVIEW_VALIDATION.md) and [command log](results/tables/revision_command_log.csv) report execution status; the [artifact inventory](results/tables/review_artifact_sources.csv) links every maintained output to its source and producer.",
+  "- [Overview figure edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) records why the old main-branch overview remains excluded and what to change before placing it after the abstract.",
+  "- [Protocol](protocol.md), [input hashes](results/tables/input_manifest.csv), and [package versions](environment/package_versions.csv) specify reproduction. Original cached-input retrieval dates are unknown.", "",
+  "## Regeneration", "",
+  "From the repository root, using R 4.6.1, the locked local R library, and MiKTeX:", "",
+  "```powershell", ".\\run_pipeline.ps1 -SkipInstall", ".\\build_paper.ps1", "```", "",
+  "The pipeline validates cached public input hashes before analysis. Primary nested-fold checkpoints are reused only when recorded source/input signatures match. Stage 44 can migrate benchmark metadata after exact source-equivalence, recorded preprocessing, and fresh primary-prediction checks; original checkpoints and hashes are preserved, and reused models are identified explicitly. `-ForceDownload` refreshes inputs and is a new retrieval, not reproduction from the saved inputs. Leave several gigabytes of free disk space for atomic DESeq2 cache writes and Windows paging.", "",
+  "After a failed stage has been repaired and successfully rerun, `-StartAt analysis/11_hardening_outputs.R` can resume from that named stage; prior outputs must already be validated. [Validation record](docs/REVIEW_VALIDATION.md) distinguish failures, retries, and cache checks from scientific results.", "",
+  "Stage 33 can reuse a complete permutation result only when source, inputs, first-repeat caches, R/package versions, and resampling count match its recorded signature. Cached resampling results are identified in the execution log.", "",
+  "The submitted commit is `1f345735013853f3a3c09a088475fc177329369f`, preserved under `icbinb-bio-2026-submitted`. The revision branch is `icbinb-review-improvements`. AI assisted this development draft; author verification is required before submission. No clinical decision or patient benefit was evaluated."
 )
-
-path <- "README.md"
-lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
-start <- which(lines == "<!-- nested-results:start -->")
-end <- which(lines == "<!-- nested-results:end -->")
-if (length(start) != 1L || length(end) != 1L || end <= start) {
-  stop("README nested-result markers are missing or out of order.")
-}
-writeLines(c(lines[seq_len(start)], line, lines[end:length(lines)]),
-           path, useBytes = TRUE)
-
-benchmark <- read_csv(file.path(DIRS$tables, "nested_benchmark_summary.csv"),
-                      show_col_types = FALSE)
-benchmark_folds <- read_csv(file.path(DIRS$tables, "nested_benchmark_folds.csv"),
-                            show_col_types = FALSE)
-arm <- function(strategy) {
-  row <- benchmark[benchmark$strategy == strategy, ]
-  if (nrow(row) != 1L) stop("Missing benchmark strategy: ", strategy)
-  row
-}
-fmt <- function(x) sprintf("%+.4f", x)
-interval <- function(row) {
-  paste0(fmt(row$patient_bootstrap_ci_low), " to ", fmt(row$patient_bootstrap_ci_high))
-}
-hydra <- arm("hydra")
-survival_arm <- arm("survival_only")
-de_arm <- arm("de_only")
-control <- arm("matched_control")
-ridge <- arm("ridge_eligible")
-clinical <- arm("clinical")
-ridge_sizes <- benchmark_folds$n_model_genes[benchmark_folds$strategy == "ridge_eligible"]
-if (any(benchmark$primary_hydra_mismatches != 0L) || nrow(benchmark) != 6L ||
-    length(ridge_sizes) != 50L) {
-  stop("Nested benchmark summary is incomplete.")
-}
-benchmark_line <- paste0(
-  "The [nested selection benchmark](results/tables/nested_benchmark_summary.csv) ",
-  "reused those ", clinical$n_patients, " patients and the same ten-by-five splits. ",
-  "The HYDRA arm matched the saved nested-CV gene in every fold. Its concordance ",
-  "increment was ", fmt(hydra$mean_delta_c), " (patient-resampled 95% interval ",
-  interval(hydra), "). Survival-only selection changed concordance by ",
-  fmt(survival_arm$mean_delta_c), " (interval ", interval(survival_arm), ") across ",
-  survival_arm$distinct_genes, " genes, and differential-expression-only selection changed it by ",
-  fmt(de_arm$mean_delta_c), " (interval ", interval(de_arm), ") across ",
-  de_arm$distinct_genes, " genes. Both made the mean three-year Brier score worse. ",
-  "An expression-matched control, varying across ", control$distinct_genes,
-  " genes, changed concordance by ", fmt(control$mean_delta_c), " (interval ",
-  interval(control), "). That interval is above zero and the gain is still several ",
-  "times smaller than 0.01, so a small nonzero lower bound is not a useful gain. ",
-  "Ridge-penalized Cox regression on the training-fold reproducible genes, averaging ",
-  formatC(round(mean(ridge_sizes)), format = "d", big.mark = ","),
-  " genes per fold, changed concordance by ", fmt(ridge$mean_delta_c),
-  " (interval ", interval(ridge), "). That interval clears 0.01. The mean Brier ",
-  "difference was ", fmt(ridge$mean_delta_brier3), " (interval ",
-  fmt(ridge$patient_bootstrap_brier_ci_low), " to ",
-  fmt(ridge$patient_bootstrap_brier_ci_high),
-  "), so the probability-score improvement is not stable under patient resampling. ",
-  "Calibration slopes were ", sprintf("%.2f", clinical$mean_calibration_slope),
-  " for the clinical model, ", sprintf("%.2f", hydra$mean_calibration_slope),
-  " after the HYDRA gene, and ", sprintf("%.2f", ridge$mean_calibration_slope),
-  " after the ridge model. The one-gene rules stayed near the clinical model. ",
-  "The ridge result means the eligible set still carries held-out ranking information ",
-  "when those genes are used together and the penalty is chosen inside the training fold. ",
-  "The ridge arm is not a validated signature. It does not replace the failed one-gene criterion. ",
-  "It was fit only on the TCGA nested splits and was not evaluated on GSE29609 or E-MTAB-1980. ",
-  "It was not the prespecified acceptance test, GEO evidence stayed fixed, and the ",
-  "patient bootstrap does not refit selection. The side-by-side comparison, including ",
-  "ClearCode34, is in [the master figure](results/figures/master_funnel_benchmark.png). ",
-  "Repeat-level increments are in [the benchmark figure](results/figures/nested_selection_benchmark.png)."
-)
-lines <- readLines(path, warn = FALSE, encoding = "UTF-8")
-b_start <- which(lines == "<!-- benchmark-results:start -->")
-b_end <- which(lines == "<!-- benchmark-results:end -->")
-if (length(b_start) != 1L || length(b_end) != 1L || b_end <= b_start) {
-  stop("README benchmark-result markers are missing or out of order.")
-}
-writeLines(c(lines[seq_len(b_start)], benchmark_line, lines[b_end:length(lines)]),
-           path, useBytes = TRUE)
-message("README nested and benchmark results regenerated from result tables.")
+writeLines(lines, "README.md", useBytes = TRUE)
+message("README regenerated from audited result tables.")

@@ -2,7 +2,9 @@
 
 ## Research question
 
-Among genes reproducibly dysregulated across independent ccRCC expression cohorts, which have clinically adjusted survival associations that remain credible after sensitivity analysis, coefficient-uncertainty estimation, external outcome checks, and cell-source triangulation?
+The primary question is: which tumor–normal transcriptomic associations retain prognostic support as replication, clinical adjustment, held-out evaluation, and tissue-composition checks strengthen the evidence?
+
+Three secondary questions ask whether survival associations agree across cohorts, whether the selection procedure improves prediction beyond clinical variables, and whether composition changes the interpretation of the associations. These questions separate prognostic association, prediction, and biological interpretation; clinical utility is not evaluated. HYDRA contributes a reproducible workflow and an evidence audit, without introducing a statistical algorithm.
 
 ## Datasets
 
@@ -27,7 +29,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 ## Survival selection
 
 - The outcome is overall survival, and expression is continuous and standardized.
-- The main Cox model adjusts for age, sex, categorical AJCC stage (reference Stage I), and grade collapsed to G1+G2 versus G3+G4 because G1 has 14 patients. The stage sensitivity is expression plus age, sex, and stage. The grade sensitivity is expression plus age, sex, and grade. The absolute log hazard-ratio gates log(1.25) and log(1.5), and the GEO absolute log2 fold-change gate of 0.25, are prespecified project thresholds.
+- The main Cox model adjusts for age, sex, categorical AJCC stage (reference Stage I), and grade collapsed to G1+G2 versus G3+G4 because G1 has 14 patients. The stage sensitivity is expression plus age, sex, and stage. The grade sensitivity is expression plus age, sex, and grade. The absolute log hazard-ratio gates log(1.25) and log(1.5), and the GEO absolute log2 fold-change gate of 0.25, are fixed project thresholds.
 - A strict candidate requires reproducible differential expression, main-model FDR below 0.05, absolute log hazard ratio of at least log(1.25), non-trivial GEO effects, and same-direction nominal support in both sensitivity models.
 - A high-confidence candidate additionally requires main-model FDR below 0.01 and absolute log hazard ratio of at least log(1.5).
 - `cox.zph` results are reported diagnostically. They do not exclude candidates, determine external support, or contribute to ranking; coefficients with diagnostic non-proportionality are interpreted as average hazard effects.
@@ -58,7 +60,7 @@ The current candidate definition is a reviewer-driven reanalysis. External outco
 - Ridge: ridge-penalized Cox (`glmnet` alpha = 0, Efron ties) on the training-fold reproducible DEG set, which is the pool the HYDRA rule is allowed to choose from. Clinical covariates are unpenalized. The penalty minimizes training-only event-stratified five-fold partial-likelihood deviance (`lambda.min`). Held-out concordance uses the glmnet linear predictor. The three-year risk is read from that model's survival curve at three years.
 - Matched control: one training gene at or below the median absolute residual correlation, with mean training expression closest to the HYDRA gene. If HYDRA selected none, the target is the median expression of the reproducible DEGs. Genes chosen by the other rules in that fold are excluded. Ties break by gene id.
 
-If a rule selects no gene, its prediction equals the clinical prediction. Concordance, three-year IPCW Brier score, and calibration slope use the primary definitions. Patient-bootstrap intervals resample the saved predictions and do not refit selection or redraw folds. This comparison does not replace the prespecified 0.01 concordance criterion.
+If a rule selects no gene, its prediction equals the clinical prediction. Concordance, three-year IPCW Brier score, and calibration slope use the primary definitions. Patient-bootstrap intervals resample the saved predictions and do not refit selection or redraw folds. This comparison does not replace the project 0.01 concordance criterion.
 
 ## External survival evaluation
 
