@@ -46,6 +46,13 @@ function Invoke-RStep {
   if ($exitCode -ne 0) {
     throw "Pipeline step failed: $Step"
   }
+  if ($Step -eq "analysis/40_review_figures.R") {
+    & python analysis/45_evidence_overview.py
+    $overviewExit = $LASTEXITCODE
+    [pscustomobject]@{command = "python analysis/45_evidence_overview.py"; exit_status = $overviewExit; completed_utc = [DateTime]::UtcNow.ToString("o")} |
+      Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation
+    if ($overviewExit -ne 0) { throw "Overview figure export failed." }
+  }
   if ($Step -eq "analysis/tests/test_candidate_ledger.R") {
     & python analysis/41_review_claim_audit.py
     $claimExit = $LASTEXITCODE

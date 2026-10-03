@@ -17,6 +17,7 @@ function Invoke-PaperCommand {
   if ($code -ne 0) { throw "Paper command failed: $Pass" }
 }
 
+Invoke-PaperCommand (Get-Command python).Source @('analysis/45_evidence_overview.py') 'overview export'
 Write-Host "Building paper/main.pdf"
 Push-Location $paperDir
 try {
