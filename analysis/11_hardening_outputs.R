@@ -55,7 +55,7 @@ manual_context <- tribble(
   "TNFAIP2", "TNF/inflammatory-response signal.", "Inflammation/cancer literature likely; ccRCC specificity needs review.", "Interpret as immune/inflammatory until cell source is resolved.",
   "FHOD1", "Actin/cytoskeletal remodeling signal.", "Cancer migration literature likely; ccRCC specificity needs review.", "Check whether survival signal reflects invasion biology or stromal composition.",
   "RBM47", "RNA-binding and splicing-regulatory signal with broad normal-tissue expression.", "Cancer-regulatory literature exists; ccRCC-specific evidence needs review.", "Interpret cautiously because HPA mapping is immune-dominant and the TCGA proportional-hazards diagnostic is nominally significant.",
-  "GJB1", "Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.", "Connexin biology is established; ccRCC-specific prognostic evidence needs review.", "Treat as a compartment-sensitive epithelial hypothesis and report the non-proportional-hazards diagnostic.",
+  "GJB1", "Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.", "Connexin biology is established; ccRCC-specific prognostic evidence needs review.", "Treat as a compartment-sensitive epithelial hypothesis; report the current proportional-hazards diagnostic without assuming a violation.",
   "LTB4R", "Leukotriene-receptor inflammatory signal with renal epithelial and immune expression.", "Inflammatory signaling is biologically plausible; ccRCC-specific cell source needs review.", "Treat as a composition-sensitive risk association and report the non-proportional-hazards diagnostic."
 )
 

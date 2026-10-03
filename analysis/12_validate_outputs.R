@@ -2,9 +2,19 @@ source("analysis/00_config.R")
 
 suppressPackageStartupMessages({
   library(readr)
+  library(dplyr)
 })
 
 required_files <- c(
+  file.path(DIRS$tables, "candidate_ledger.csv"),
+  file.path(DIRS$tables, "ledger_funnel_counts.csv"),
+  file.path(DIRS$tables, "claim_evidence_ledger.csv"),
+  file.path(DIRS$figures, "review_evidence_funnel.png"),
+  file.path(DIRS$figures, "review_evidence_funnel.pdf"),
+  file.path(DIRS$figures, "review_replicated_association.png"),
+  file.path(DIRS$figures, "review_replicated_association.pdf"),
+  file.path(DIRS$figures, "review_contradictory_case.png"),
+  file.path(DIRS$figures, "review_contradictory_case.pdf"),
   file.path(DIRS$tables, "tcga_kirc_sample_summary.csv"),
   file.path(DIRS$tables, "tcga_kirc_sample_selection_audit.csv"),
   file.path(DIRS$tables, "gse40435_sample_summary.csv"),
@@ -121,7 +131,6 @@ required_files <- c(
   file.path(DIRS$figures, "cohort_flow.png"),
   file.path(DIRS$figures, "external_direction_comparison.png"),
   file.path(DIRS$figures, "aliquot_sensitivity.png"),
-  file.path("paper", "figures", "hydra_evidence_overview.pdf"),
   file.path("paper", "evidence_matrix.tex")
 )
 
@@ -520,6 +529,36 @@ if (!setequal(benchmark$strategy, expected_arms) ||
     anyDuplicated(paste(benchmark_predictions$repeat_id, benchmark_predictions$strategy,
                         benchmark_predictions$patient_barcode))) {
   stop("Nested selection benchmark outputs are incomplete or do not match the primary HYDRA genes.")
+}
+primary_comparison <- benchmark_folds |>
+  filter(strategy == "hydra") |>
+  inner_join(nested_folds |>
+    select(repeat_id, fold, current_primary_gene = selected_gene,
+           current_primary_fallback = outlier_replacement_fallback),
+    by = c("repeat_id", "fold"))
+if (nrow(primary_comparison) != 50L ||
+    any(coalesce(primary_comparison$selected_gene, "no_gene") !=
+        coalesce(primary_comparison$current_primary_gene, "no_gene")) ||
+    any(primary_comparison$outlier_replacement_fallback !=
+        primary_comparison$current_primary_fallback)) {
+  stop("Benchmark genes or replacement policies differ from the current primary folds.")
+}
+primary_key <- paste(nested_predictions$repeat_id, nested_predictions$fold,
+                     nested_predictions$patient_barcode)
+for (arm in c("clinical", "hydra")) {
+  arm_predictions <- benchmark_predictions |> filter(strategy == arm)
+  index <- match(paste(arm_predictions$repeat_id, arm_predictions$fold,
+                       arm_predictions$patient_barcode), primary_key)
+  prefix <- if (arm == "clinical") "clinical" else "gene"
+  if (nrow(arm_predictions) != nrow(nested_predictions) || anyNA(index) ||
+      !identical(arm_predictions$os_event, nested_predictions$os_event[index]) ||
+      !isTRUE(all.equal(arm_predictions$os_time, nested_predictions$os_time[index], tolerance = 0)) ||
+      !isTRUE(all.equal(arm_predictions$lp,
+        nested_predictions[[paste0(prefix, "_lp")]][index], tolerance = 1e-12)) ||
+      !isTRUE(all.equal(arm_predictions$risk3,
+        nested_predictions[[paste0(prefix, "_risk3")]][index], tolerance = 1e-12))) {
+    stop("Benchmark ", arm, " predictions differ from the current primary analysis.")
+  }
 }
 
 tracerx_discordance <- read_csv(
