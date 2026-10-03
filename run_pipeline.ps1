@@ -1,6 +1,7 @@
 param(
   [switch]$ForceDownload,
   [switch]$SkipInstall,
+  [string]$StartAt = "",
   [ValidateRange(1, 5)][int]$NestedWorkers = 1
 )
 
@@ -39,8 +40,25 @@ function Invoke-RStep {
   $exitCode = $LASTEXITCODE
   $ErrorActionPreference = $previousPreference
 
+  [pscustomobject]@{command = "Rscript $Step $($StepArgs -join ' ')"; exit_status = $exitCode; completed_utc = [DateTime]::UtcNow.ToString('o')} |
+    Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation
+
   if ($exitCode -ne 0) {
     throw "Pipeline step failed: $Step"
+  }
+  if ($Step -eq "analysis/tests/test_candidate_ledger.R") {
+    & python analysis/41_review_claim_audit.py
+    $claimExit = $LASTEXITCODE
+    [pscustomobject]@{command = "python analysis/41_review_claim_audit.py"; exit_status = $claimExit; completed_utc = [DateTime]::UtcNow.ToString("o")} |
+      Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation
+    if ($claimExit -ne 0) { throw "Manuscript claim audit failed." }
+  }
+  if ($Step -eq "analysis/27_audit_figures.R") {
+    & python analysis/42_review_artifact_manifest.py
+    $artifactExit = $LASTEXITCODE
+    [pscustomobject]@{command = "python analysis/42_review_artifact_manifest.py"; exit_status = $artifactExit; completed_utc = [DateTime]::UtcNow.ToString("o")} |
+      Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation
+    if ($artifactExit -ne 0) { throw "Artifact source audit failed." }
   }
 }
 
@@ -110,7 +128,6 @@ $steps += @(
   "analysis/04b_paired_deg_tcga.R",
   "analysis/05_inspect_geo_metadata.R",
   "analysis/05_deg_geo.R",
-  "analysis/35_gse53757_pairing.R",
   "analysis/06_reproducibility.R",
   "analysis/07_survival_tcga.R",
   "analysis/07b_apeglm_global_survival_sensitivity.R",
@@ -118,6 +135,7 @@ $steps += @(
   "analysis/10_candidate_table.R",
   "analysis/10b_paired_candidates.R",
   "analysis/10c_compare_prior.R",
+  "analysis/35_gse53757_pairing.R",
   "analysis/36_aliquot_sensitivity.R",
   "analysis/11_hardening_outputs.R",
   "analysis/13_external_survival_gse29609.R",
@@ -131,6 +149,8 @@ $steps += @(
   "analysis/22_nested_cv.R",
   "analysis/28_null_summary.R",
   "analysis/33_survival_permutation_null.R",
+  "analysis/44_verify_benchmark_cache_equivalence.R",
+  "analysis/31_nested_selection_benchmark.R",
   "analysis/32_published_signature_benchmark.R",
   "analysis/34_evidence_display.R",
   "analysis/37_central_results.R",
@@ -138,13 +158,23 @@ $steps += @(
   "analysis/23_survival_shape.R",
   "analysis/24_funnel_ablations.R",
   "analysis/26_acceptance_report.R",
-  "analysis/30_update_readme.R",
   "analysis/25_paper_numbers.R",
+  "analysis/39_candidate_ledger.R",
+  "analysis/40_review_figures.R",
+  "analysis/30_update_readme.R",
+  "analysis/tests/test_candidate_ledger.R",
   "analysis/09_figures_tcga.R",
   "analysis/27_audit_figures.R",
   "analysis/18_write_manifest.R",
   "analysis/12_validate_outputs.R"
 )
+
+if ($StartAt) {
+  $startIndex = [Array]::IndexOf($steps, $StartAt)
+  if ($startIndex -lt 0) { throw "Unknown resume stage: $StartAt" }
+  $steps = $steps[$startIndex..($steps.Count - 1)]
+  Write-Host "Resuming at $StartAt; prior-stage outputs must already be validated."
+}
 
 foreach ($step in $steps) {
   if ($step -eq "analysis/22_nested_cv.R") {
@@ -156,3 +186,5 @@ foreach ($step in $steps) {
 
 Write-Host ""
 Write-Host "Pipeline complete."
+[pscustomobject]@{command = "run_pipeline.ps1 (SkipInstall=$SkipInstall; ForceDownload=$ForceDownload; NestedWorkers=$NestedWorkers; StartAt=$StartAt)"; exit_status = 0; completed_utc = [DateTime]::UtcNow.ToString('o')} |
+  Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation

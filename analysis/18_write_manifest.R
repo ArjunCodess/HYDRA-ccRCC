@@ -12,7 +12,7 @@ source_rows <- tribble(
   "TCGA-KIRC", "discovery expression and survival", SOURCE_URLS$tcga_gdc,
   "GSE40435", "tumor-normal expression validation", SOURCE_URLS$geo_gse40435,
   "GSE53757", "tumor-normal expression validation", SOURCE_URLS$geo_gse53757,
-  "GSE29609", "small external survival direction check", SOURCE_URLS$geo_gse29609,
+  "GSE29609", "previously inspected exploratory external survival direction check", SOURCE_URLS$geo_gse29609,
   "E-MTAB-1980", "previously inspected exploratory external survival comparison", SOURCE_URLS$emtab1980,
   "HPA-v25.1", "normal-tissue single-cell source context", SOURCE_URLS$hpa_single_cell,
   "TRACERx-Renal", "multiregion transportability sensitivity", SOURCE_URLS$tracerx_renal,
@@ -23,7 +23,7 @@ source_rows <- tribble(
     access_date = NA_character_,
     retrieval = "cached public input; original retrieval date not recorded",
     candidate_definition_role = if_else(
-      source_id %in% c("E-MTAB-1980", "HPA-v25.1", "TRACERx-Renal", "CheckMate-025-Braun", "Aran-2015-CPE"),
+      source_id %in% c("GSE29609", "E-MTAB-1980", "HPA-v25.1", "TRACERx-Renal", "CheckMate-025-Braun", "Aran-2015-CPE"),
       "downstream evaluation only; not used to define the reviewer-driven revised candidate set",
       "part of discovery or upstream replication"
     )
@@ -50,18 +50,22 @@ writeLines(
   "environment/sessionInfo.txt"
 )
 
-roots <- c("analysis", "results")
+roots <- c("analysis", "results", "docs")
 files <- unlist(lapply(roots, function(root) {
   list.files(root, recursive = TRUE, full.names = TRUE, all.files = FALSE)
 }))
-files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1",
+files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1", "build_paper.ps1",
            "environment/sessionInfo.txt", "environment/package_versions.csv",
            "paper/main.tex", "paper/results_macros.tex", "paper/evidence_matrix.tex",
            "paper/benchmark_table.tex", "paper/ridge_spec_table.tex",
-           "paper/main.pdf", "paper/figures/hydra_evidence_overview.pdf",
-           "paper/figures/hydra_evidence_overview.svg")
+           "paper/main.pdf")
 files <- files[file.exists(files) & !dir.exists(files)]
-files <- files[!grepl("run_manifest\\.csv$", files)]
+files <- c(files, list.files("paper", pattern = "\\.(tex|bib|csv|pdf|svg)$", full.names = TRUE),
+           "environment/review_figures_sessionInfo.txt", "environment/review_tool_versions.txt")
+files <- sort(unique(files[file.exists(files) & !dir.exists(files)]))
+# Command logging continues after manifest generation. It is an execution record,
+# not an immutable result dependency, and is deliberately excluded here.
+files <- files[!grepl("(run_manifest|revision_command_log)\\.csv$", files)]
 info <- file.info(files)
 
 manifest <- tibble(
