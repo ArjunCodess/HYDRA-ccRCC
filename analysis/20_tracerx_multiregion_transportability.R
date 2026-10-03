@@ -312,18 +312,18 @@ for (repeat_id in seq_len(RESAMPLING$tracerx_region_repeats)) {
       )
     })
 
-    repeat_rows[[row_index]] <- bind_rows(estimates) |>
-      mutate(
-        scenario = scenario,
-        repeat_id = repeat_id,
-        n = nrow(selected_regions),
-        events = sum(selected_regions$os_event),
-        same_tcga_direction = sign(log_hr) == sign(tcga_log_hr)
-      ) |>
-      select(
-        scenario, repeat_id, n, events, symbol, tcga_log_hr,
-        log_hr, hr, p_value, same_tcga_direction
-      )
+    # Assign recorded diagnostics directly, avoiding a runtime data-mask
+    # locked-binding error. Model fitting and sampling are unchanged.
+    recorded <- bind_rows(estimates)
+    recorded$scenario <- scenario
+    recorded$repeat_id <- repeat_id
+    recorded$n <- nrow(selected_regions)
+    recorded$events <- sum(selected_regions$os_event)
+    recorded$same_tcga_direction <- sign(recorded$log_hr) == sign(recorded$tcga_log_hr)
+    repeat_rows[[row_index]] <- recorded[, c(
+      "scenario", "repeat_id", "n", "events", "symbol", "tcga_log_hr",
+      "log_hr", "hr", "p_value", "same_tcga_direction"
+    )]
     row_index <- row_index + 1L
   }
 }

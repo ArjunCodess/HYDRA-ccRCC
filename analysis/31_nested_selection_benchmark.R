@@ -104,7 +104,7 @@ symbol_of <- function(gene_id) {
   if (length(hit) == 0L || is.na(hit)) NA_character_ else unname(hit)
 }
 
-make_fold_data <- function(train_idx, test_idx) {
+make_fold_data <- function(train_idx, test_idx, force_replacement_fallback = FALSE) {
   normals <- all_normal |> filter(!patient_barcode %in% patients$patient_barcode[test_idx])
   train_meta <- bind_rows(patients[train_idx, names(meta)], normals) |>
     mutate(condition = factor(condition, levels = c("NT", "TP")))
@@ -114,11 +114,11 @@ make_fold_data <- function(train_idx, test_idx) {
   train_meta <- as.data.frame(train_meta)
   rownames(train_meta) <- train_meta$sample_barcode
   dds <- DESeqDataSetFromMatrix(train_raw, train_meta, design = ~ condition)
-  replacement_fallback <- FALSE
+  replacement_fallback <- force_replacement_fallback
   fitted <- NULL
   for (attempt in seq_len(3L)) {
     fit <- tryCatch(
-      if (attempt == 1L) DESeq(dds, quiet = TRUE)
+      if (!force_replacement_fallback) DESeq(dds, quiet = TRUE)
       else DESeq(dds, quiet = TRUE, minReplicatesForReplace = Inf),
       error = identity
     )
@@ -129,9 +129,8 @@ make_fold_data <- function(train_idx, test_idx) {
     if (!identical(conditionMessage(fit),
                    "default method not implemented for type 'expression'") ||
         !identical(deparse(conditionCall(fit)), "is.finite(partial)")) stop(fit)
-    replacement_fallback <- TRUE
     say("DESeq2 trimmed-mean failure in fold, attempt ", attempt,
-        "; retrying without outlier replacement.")
+        "; retrying the recorded primary-fold replacement setting.")
     gc()
   }
   if (is.null(fitted)) stop("DESeq2 failed after three fold-fit attempts.")
@@ -232,7 +231,15 @@ run_fold <- function(repeat_id, fold, fold_id) {
   train_idx <- which(fold_id != fold)
   test_idx <- which(fold_id == fold)
   say("Benchmark fold: repeat ", repeat_id, "/", n_repeats, " fold ", fold, "/5")
-  fd <- make_fold_data(train_idx, test_idx)
+  # Every comparator must use the replacement setting actually used by the
+  # primary fit. A transient runtime error must not change that setting.
+  expected_fallback <- primary_folds$outlier_replacement_fallback[
+    primary_folds$repeat_id == repeat_id & primary_folds$fold == fold
+  ]
+  if (length(expected_fallback) != 1L || is.na(expected_fallback)) {
+    stop("Primary nested-CV replacement setting is missing.")
+  }
+  fd <- make_fold_data(train_idx, test_idx, force_replacement_fallback = expected_fallback)
   rng_after_deseq <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   train <- patients[train_idx, ]
   test <- patients[test_idx, ]

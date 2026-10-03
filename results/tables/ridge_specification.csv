@@ -16,4 +16,4 @@ inner_folds,five event-stratified folds of the training patients only
 inner_seed,"RESAMPLING$seed + 31000 + repeat_id * 10 + fold, drawn before cv.glmnet"
 outer_folds,the saved ten-by-five patient splits; test outcomes are not an input
 geo_gate,fixed full GEO tables; GEO cohorts are not re-split
-what_this_does_not_do,not the prespecified one-gene acceptance test; not a sparse gene selection; not a frozen biomarker panel; patient bootstrap does not refit lambda
+what_this_does_not_do,not the project one-gene acceptance test; not a sparse gene selection; not a frozen biomarker panel; patient bootstrap does not refit lambda

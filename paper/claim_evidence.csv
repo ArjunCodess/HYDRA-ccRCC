@@ -1,0 +1,22 @@
+claim_id,location,claim,evidence,scope
+Q1,introduction,primary and secondary questions,protocol.md,research framing
+F1,abstract and discovery,serial discovery counts,results/tables/candidate_ledger.csv;results/tables/ledger_funnel_counts.csv,selection gates only
+F2,discovery,alternate aliquot counts,results/tables/aliquot_sensitivity_summary.csv,sensitivity not independent validation
+F3,discovery,GSE53757 unpaired retention,results/tables/gse53757_unpaired_summary.csv,does not establish pairing identity
+E1,abstract and survival,external direction and strict support,results/tables/external_survival_gse29609.csv;results/tables/external_survival_emtab1980.csv,previously inspected outcomes
+E2,survival,DDC and TCIRG1 FDR reversals,results/tables/external_survival_gse29609.csv,exact set tested by ledger checks
+E3,survival,ACADM E-MTAB agreement and uncertain GSE reversal,results/tables/high_confidence_candidate_genes.csv;results/tables/external_survival_gse29609.csv;results/tables/external_survival_emtab1980.csv,cohort-specific support
+B1,prediction,conditional bootstrap support,results/tables/candidate_cox_bootstrap_summary.csv,conditions on full-data selection
+P1,abstract and prediction,primary nested increment and failed criterion,results/tables/nested_cv_summary.csv;results/tables/nested_cv_patient_bootstrap.csv,conditional saved-prediction uncertainty
+P2,prediction,variable top-gene identity,results/tables/nested_gene_selection_frequency.csv;results/tables/nested_cv_folds.csv,50 training folds
+P3,procedure comparison,equal-size DE-only versus complete lists,results/tables/funnel_external_summary.csv;results/tables/funnel_matched_lists.csv,22 requested genes and differing mapping denominators
+P4,procedure comparison,nested one-gene and ridge comparators,results/tables/nested_benchmark_summary.csv;results/tables/published_signature_summary.csv,within-TCGA exploratory comparison
+C1,composition,purity retention and six marker losses,results/tables/candidate_direct_tumor_purity_sensitivity.csv;results/tables/candidate_clinical_composition_sensitivity.csv,noncausal bulk adjustments
+C2,composition,normal-tissue cell-source cautions,results/tables/hpa_candidate_cell_source_summary.csv,not ccRCC tumor single-cell evidence
+V1,limitations,complete-case exclusions,results/tables/nested_cohort_exclusions.csv,missingness not modeled
+V2,limitations,PH flags,results/tables/high_confidence_candidate_genes.csv,nominal diagnostic not selection gate
+V3,limitations,zero SVA and no TCGA batch covariate,results/tables/gse40435_sample_summary.csv;results/tables/gse53757_sample_summary.csv;analysis/04_deg_tcga.R,batch effects remain unresolved
+V4,limitations,overlap and optimism boundaries,docs/REVIEW_VALIDATION.md;analysis/22_nested_cv.R;analysis/functions/nested_benchmark.R,documented limitations
+T1,supplement,no treatment interaction survives BH,results/tables/checkmate025_candidate_treatment_interactions.csv,post hoc inspected RNA subset
+R1,related work,REMARK and selection-aware validation,docs/REVIEW_SOURCE_VERIFICATION.md,verified primary sources
+D1,declarations,author name funding and conflicts,docs/REVIEW_VALIDATION.md,human supplied facts

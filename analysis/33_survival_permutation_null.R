@@ -16,6 +16,34 @@ suppressPackageStartupMessages({
 })
 
 n_perm <- as.integer(Sys.getenv("HYDRA_PERMUTATIONS", "200"))
+stopifnot(n_perm >= 1L)
+fold_paths <- sprintf("data/processed/nested_cv_fold_checkpoints/repeat_01_fold_%d.rds", 1:5)
+null_signature <- list(permutations = n_perm, r_version = R.version.string,
+  files = unname(tools::md5sum(c("analysis/33_survival_permutation_null.R",
+    "analysis/00_config.R", "analysis/functions/io.R", "analysis/functions/tcga_metadata.R",
+    "analysis/functions/patient_samples.R", "environment/package_versions.csv",
+    FILES$tcga_se, FILES$tcga_clinical, fold_paths))))
+if (anyNA(null_signature$files)) stop("Permutation-null inputs or source files are missing.")
+null_checkpoint <- file.path(DIRS$processed, "review_survival_permutation_checkpoint.rds")
+emit_null <- function(result) {
+  stopifnot(nrow(result) == n_perm, identical(result$simulation, seq_len(n_perm)),
+    identical(result$fold, ((seq_len(n_perm) - 1L) %% 5L) + 1L),
+    all(result$gene_selected == !is.na(result$gene_id)))
+  write_csv_atomic(result, file.path(DIRS$tables, "survival_permutation_null.csv"))
+  write_csv_atomic(tibble(
+    metric = c("simulations", "folds_cycled", "gene_selected", "seed"),
+    value = c(nrow(result), 5, sum(result$gene_selected), RESAMPLING$seed + 33L)
+  ), file.path(DIRS$tables, "survival_permutation_null_summary.csv"))
+  message("Permutation null selected a gene in ", sum(result$gene_selected), " of ", n_perm, " simulations.")
+}
+if (file.exists(null_checkpoint)) {
+  saved_null <- readRDS(null_checkpoint)
+  if (identical(saved_null$signature, null_signature)) {
+    emit_null(saved_null$result)
+    message("Reused verified permutation checkpoint; source, inputs, R/package versions and resampling count match.")
+    quit(save = "no", status = 0L)
+  }
+}
 se <- read_required_rds(FILES$tcga_se)
 counts <- assay(se, "unstranded")
 meta <- as.data.frame(colData(se)) |>
@@ -124,10 +152,6 @@ for (i in seq_len(n_perm)) {
   if (i %% 10L == 0L) message("Permutation ", i, " of ", n_perm)
 }
 result <- bind_rows(rows)
-write_csv_atomic(result, file.path(DIRS$tables, "survival_permutation_null.csv"))
-selected <- result |> filter(gene_selected)
-write_csv_atomic(tibble(
-  metric = c("simulations", "folds_cycled", "gene_selected", "seed"),
-  value = c(nrow(result), 5, sum(result$gene_selected), RESAMPLING$seed + 33L)
-), file.path(DIRS$tables, "survival_permutation_null_summary.csv"))
-message("Permutation null selected a gene in ", sum(result$gene_selected), " of ", n_perm, " simulations.")
+emit_null(result)
+write_rds_atomic(list(signature = null_signature, result = result,
+  completed_utc = format(Sys.time(), tz = "UTC", usetz = TRUE)), null_checkpoint)

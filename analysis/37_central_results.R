@@ -107,6 +107,26 @@ write_csv_atomic(evidence, file.path(DIRS$tables, "candidate_evidence_matrix.csv
 ridge_folds <- tab("nested_benchmark_folds.csv") |> filter(strategy == "ridge_eligible")
 ridge_summary <- tab("nested_benchmark_summary.csv") |> filter(strategy == "ridge_eligible")
 nested <- tab("nested_cv_summary.csv")
+# Verify the current ridge summary from held-out patient predictions, not a
+# hard-coded estimate from the submitted run.
+ridge_prediction_scores <- tab("nested_benchmark_predictions.csv") |>
+  filter(strategy %in% c("clinical", "ridge_eligible")) |>
+  group_by(repeat_id, strategy) |>
+  summarise(n = n(), patients = n_distinct(patient_barcode),
+            c_recomputed = unname(survival::concordance(
+              survival::Surv(os_time, os_event) ~ lp, reverse = TRUE)$concordance),
+            .groups = "drop")
+stopifnot(nrow(ridge_prediction_scores) == 20L,
+          all(ridge_prediction_scores$n == nested$n_patients),
+          all(ridge_prediction_scores$patients == nested$n_patients),
+          all(is.finite(ridge_prediction_scores$c_recomputed)))
+ridge_deltas <- ridge_prediction_scores |>
+  select(repeat_id, strategy, c_recomputed) |>
+  pivot_wider(names_from = strategy, values_from = c_recomputed) |>
+  mutate(delta_recomputed = ridge_eligible - clinical)
+ridge_repeat_checks <- tab("nested_benchmark_repeat_metrics.csv") |>
+  filter(strategy == "ridge_eligible") |>
+  inner_join(ridge_deltas, by = "repeat_id")
 hydra <- tab("nested_benchmark_summary.csv") |> filter(strategy == "hydra")
 unpaired <- tab("gse53757_unpaired_summary.csv")
 clearcode <- tab("published_signature_summary.csv") |>
@@ -142,7 +162,7 @@ spec <- tibble(
     "RESAMPLING$seed + 31000 + repeat_id * 10 + fold, drawn before cv.glmnet",
     "the saved ten-by-five patient splits; test outcomes are not an input",
     "fixed full GEO tables; GEO cohorts are not re-split",
-    "not the prespecified one-gene acceptance test; not a sparse gene selection; not a frozen biomarker panel; patient bootstrap does not refit lambda"
+    "not the project one-gene acceptance test; not a sparse gene selection; not a frozen biomarker panel; patient bootstrap does not refit lambda"
   )
 )
 write_csv_atomic(spec, file.path(DIRS$tables, "ridge_specification.csv"))
@@ -168,13 +188,15 @@ write_csv_atomic(tibble(
 
 checks <- tibble(
   check = c("high_confidence_n", "hydra_matches_nested", "ridge_no_fallback",
-            "ridge_delta", "unpaired_keeps_23", "unpaired_jaccard", "clearcode_genes",
+            "ridge_delta_from_predictions", "ridge_repeat_deltas_from_predictions", "unpaired_keeps_23", "unpaired_jaccard", "clearcode_genes",
             "no_interaction_fdr"),
   passed = c(
     nrow(evidence) == 23L,
     abs(hydra$mean_delta_c - nested$mean_delta_c) < 1e-12,
     all(!ridge_folds$fallback_to_clinical),
-    abs(ridge_summary$mean_delta_c - 0.025688259109311752) < 1e-12,
+    abs(ridge_summary$mean_delta_c - mean(ridge_deltas$delta_recomputed)) < 1e-12,
+    nrow(ridge_repeat_checks) == 10L &&
+      all(abs(ridge_repeat_checks$delta_c - ridge_repeat_checks$delta_recomputed) < 1e-12),
     value_of(unpaired, "high_confidence_still_reproducible") == 23,
     value_of(unpaired, "reproducible_jaccard") > 0.99,
     clearcode$genes_used == 33,
