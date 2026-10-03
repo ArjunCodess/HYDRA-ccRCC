@@ -58,7 +58,8 @@ files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1", "bu
            "environment/sessionInfo.txt", "environment/package_versions.csv",
            "paper/main.tex", "paper/results_macros.tex", "paper/evidence_matrix.tex",
            "paper/benchmark_table.tex", "paper/ridge_spec_table.tex",
-           "paper/main.pdf")
+           "paper/main.pdf", "paper/figures/hydra_evidence_overview.svg",
+           "paper/figures/hydra_evidence_overview.pdf")
 files <- files[file.exists(files) & !dir.exists(files)]
 files <- c(files, list.files("paper", pattern = "\\.(tex|bib|csv|pdf|svg)$", full.names = TRUE),
            "environment/review_figures_sessionInfo.txt", "environment/review_tool_versions.txt")

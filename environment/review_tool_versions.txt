@@ -3,3 +3,4 @@ Revision tool versions; verified UTC 2026-10-01T18:19:46.2403496Z Rscript (R) ve
 Bundled PDF-audit Python: 3.12.14
 pypdf: 6.10.0
 Poppler pdftoppm: 26.07.0
+Overview vector export: Python 3.14.0; ReportLab 4.4.7; verified 2026-10-03.

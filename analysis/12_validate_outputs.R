@@ -6,6 +6,8 @@ suppressPackageStartupMessages({
 })
 
 required_files <- c(
+  "paper/figures/hydra_evidence_overview.svg",
+  "paper/figures/hydra_evidence_overview.pdf",
   file.path(DIRS$tables, "candidate_ledger.csv"),
   file.path(DIRS$tables, "ledger_funnel_counts.csv"),
   file.path(DIRS$tables, "claim_evidence_ledger.csv"),
