@@ -6,9 +6,8 @@ Matrix products: default
   LAPACK version 3.12.1
 
 locale:
-[1] LC_COLLATE=English_India.utf8  LC_CTYPE=English_India.utf8
-[3] LC_MONETARY=English_India.utf8 LC_NUMERIC=C
-[5] LC_TIME=English_India.utf8
+[1] C
+system code page: 65001
 
 time zone: Asia/Calcutta
 tzcode source: internal

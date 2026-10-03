@@ -1,0 +1,5 @@
+PASS: 151 maintained result/manuscript artifacts have verified producers.
+Producer edges: 152; unmapped maintained artifacts: 0.
+Historical results/archive files are excluded. Manuscript source and claim files are maintained inputs.
+Coverage is a dependency check, not proof that all commands have completed.
+Original input access dates remain unknown; verification date is 2026-10-01.

@@ -1,0 +1,5 @@
+Revision tool versions; verified UTC 2026-10-01T18:19:46.2403496Z Rscript (R) version 4.6.1 (2026-06-24) Python 3.14.0 MiKTeX-pdfTeX 4.23 (MiKTeX 25.12) MiKTeX-BibTeX 4.2 (MiKTeX 25.12) Initial sandboxed TeX probes encountered the unavailable existing user cache (pdflatex exit 1); cache-enabled probes exited 0.
+
+Bundled PDF-audit Python: 3.12.14
+pypdf: 6.10.0
+Poppler pdftoppm: 26.07.0
