@@ -80,7 +80,24 @@ fit_rule <- function(rule) {
   counts <- counts[, coldata$sample_barcode, drop = FALSE]
   keep <- rowSums(counts >= THRESHOLDS$min_count) >= THRESHOLDS$min_samples
   dds <- DESeqDataSetFromMatrix(counts[keep, , drop = FALSE], coldata, design = ~ condition)
-  dds <- DESeq(dds, quiet = TRUE)
+  # Retry only the recorded R trimmed-mean execution error, with identical
+  # DESeq2 settings. Do not disable Cook replacement or alter the model.
+  fitted <- NULL
+  for (attempt in seq_len(3L)) {
+    fit <- tryCatch(DESeq(dds, quiet = TRUE), error = identity)
+    if (!inherits(fit, "error")) {
+      fitted <- fit
+      break
+    }
+    if (!identical(conditionMessage(fit),
+                   "default method not implemented for type 'expression'") ||
+        !identical(deparse(conditionCall(fit)), "is.finite(partial)")) stop(fit)
+    message("R trimmed-mean execution failure for ", rule, ", attempt ", attempt,
+            "; retrying identical DESeq2 settings.")
+    gc()
+  }
+  if (is.null(fitted)) stop("Aliquot DESeq2 failed after three identical attempts.")
+  dds <- fitted
   res <- as.data.frame(results(dds, contrast = c("condition", "TP", "NT")))
   res$gene_id <- rownames(res)
   vsd <- assay(vst(dds, blind = TRUE))
@@ -152,7 +169,8 @@ fit_rule <- function(rule) {
   genes <- joined |> filter(high_confidence) |> pull(symbol)
   write_csv_atomic(joined |> filter(high_confidence) |> select(symbol, gene_id, main_beta, main_fdr),
                    file.path(out_dir, paste0(rule, "_high_confidence.csv")))
-  tibble(rule = rule, n_patients = n_distinct(tumors_only$patient_barcode),
+  tibble(rule = rule, deseq_attempts = attempt,
+         n_patients = n_distinct(tumors_only$patient_barcode),
          n_reproducible = nrow(joined), n_strict = sum(joined$strict_candidate, na.rm = TRUE),
          n_high_confidence = length(genes),
          retained = paste(sort(intersect(genes, primary)), collapse = ";"),
