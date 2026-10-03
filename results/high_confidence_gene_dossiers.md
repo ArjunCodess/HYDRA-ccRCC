@@ -88,7 +88,7 @@ Candidates are listed alphabetically. The discovery evidence score is a selectio
 - Survival signal: HR 0.652 (95% CI 0.567-0.751), FDR 7.55e-07, PH p 0.057
 - Cell-type sanity: Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.
 - Literature prior: Connexin biology is established; ccRCC-specific prognostic evidence needs review.
-- Manual review note: Treat as a compartment-sensitive epithelial hypothesis and report the non-proportional-hazards diagnostic.
+- Manual review note: Treat as a compartment-sensitive epithelial hypothesis; report the current proportional-hazards diagnostic without assuming a violation.
 - PubMed query: https://pubmed.ncbi.nlm.nih.gov/?term=GJB1%20%28ccRCC%20OR%20clear%20cell%20renal%20cell%20carcinoma%20OR%20kidney%20cancer%29
 
 ## GRAMD1A

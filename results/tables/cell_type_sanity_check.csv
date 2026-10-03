@@ -6,7 +6,7 @@ CLCN5,Unclassified,Renal proximal tubule/endocytic biology prior.,moderate_conte
 CRYL1,Unclassified,Metabolic enzyme signal compatible with renal epithelial biology.,moderate_contextual_risk,Check whether downregulation is a renal identity/metabolic-loss signal.
 CYFIP2,Metabolism,Broad cytoskeletal/regulatory signal; not kidney-cell-type specific from this pipeline alone.,unresolved_cell_source,Prioritize whether the survival signal reflects tumor biology or tissue composition.
 DDC,Metabolism,Metabolic/decarboxylase signal compatible with epithelial metabolic rewiring.,moderate_contextual_risk,"Check whether expression is kidney-lineage, neuroendocrine-like, or stromal."
-GJB1,Unclassified,Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.,moderate_contextual_risk,Treat as a compartment-sensitive epithelial hypothesis and report the non-proportional-hazards diagnostic.
+GJB1,Unclassified,Gap-junction protein with renal epithelial expression but stronger expression in other normal tissues.,moderate_contextual_risk,Treat as a compartment-sensitive epithelial hypothesis; report the current proportional-hazards diagnostic without assuming a violation.
 GRAMD1A,Unclassified,Cholesterol transport/contact-site biology; cell type unresolved.,unresolved_cell_source,Review with lipid/metabolic adaptation lens.
 HHLA2,Unclassified,Immune-checkpoint-like signal; may reflect tumor-immune interaction.,high_cell_composition_risk,Interpret as immune/microenvironmental until cell source is resolved.
 HIBCH,Metabolism,Mitochondrial branched-chain amino-acid metabolism.,unresolved_cell_source,Candidate metabolic-adaptation gene.
