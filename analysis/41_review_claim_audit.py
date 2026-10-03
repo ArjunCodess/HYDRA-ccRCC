@@ -9,6 +9,23 @@ import re
 from pathlib import Path
 
 root = Path.cwd()
+# Keep the readable execution record complete after follow-up builds. The CSV
+# remains authoritative for invocation timestamps and intentional stops.
+validation_path = root / "docs/REVIEW_VALIDATION.md"
+validation = validation_path.read_text(encoding="utf-8")
+with (root / "results/tables/revision_command_log.csv").open(encoding="utf-8-sig", newline="") as stream:
+    statuses = {}
+    for command in csv.DictReader(stream):
+        statuses.setdefault(command["command"].strip(), set()).add(int(command["exit_status"]))
+table_start = validation.index("| Command | Observed exit statuses |")
+table_end = validation.index("\n## Author confirmation record", table_start)
+command_table = ["| Command | Observed exit statuses |", "| --- | --- |"]
+for command, codes in sorted(statuses.items()):
+    command = command.replace("|", "&#124;").replace("`", "&#96;")
+    command_table.append(f"| `{command}` | {', '.join(map(str, sorted(codes)))} |")
+updated_validation = validation[:table_start] + "\n".join(command_table) + "\n" + validation[table_end:]
+if updated_validation != validation:
+    validation_path.write_text(updated_validation, encoding="utf-8")
 main = (root / "paper/main.tex").read_text(encoding="utf-8")
 supplement = (root / "paper/supplement.tex").read_text(encoding="utf-8")
 all_text = main + "\n" + supplement

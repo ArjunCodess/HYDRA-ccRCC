@@ -32,7 +32,7 @@ These checks validate artifact identity and manuscript consistency. They do not 
 
 ## Observed commands and exit statuses
 
-Repeated commands are grouped; `results/tables/revision_command_log.csv` preserves every logged invocation and UTC completion time. Exit −1 denotes an intentional process stop. Failed attempts, including labeled layout-gate failures, are followed by the successful retries documented in the execution history below. All required stages and the final manuscript build/audit passed.
+Stage 41 regenerates this table from the execution CSV whenever the claim audit runs. Repeated commands are grouped; `results/tables/revision_command_log.csv` preserves every logged invocation and UTC completion time. Exit −1 denotes an intentional process stop. Failed attempts, including labeled layout-gate failures, are followed by the successful retries documented in the execution history below. All required stages and the final manuscript build/audit passed.
 
 | Command | Observed exit statuses |
 | --- | --- |
@@ -113,6 +113,9 @@ Repeated commands are grouped; `results/tables/revision_command_log.csv` preserv
 | `python - [final artifact and producer SHA-256 verification]` | 0 |
 | `python analysis/41_review_claim_audit.py` | 0 |
 | `python analysis/42_review_artifact_manifest.py` | 0 |
+| `python analysis/45_evidence_overview.py [deterministic regeneration SHA-256 check]` | 0 |
+| `python inline artifact/producer/source-map/input-inventory SHA-256 verification` | 0 |
+| `python.exe analysis/45_evidence_overview.py [overview export]` | 0 |
 | `run_pipeline.ps1 (SkipInstall=True; ForceDownload=False; NestedWorkers=1; StartAt=analysis/18_write_manifest.R)` | 0 |
 | `run_pipeline.ps1 (SkipInstall=True; ForceDownload=False; NestedWorkers=1; StartAt=analysis/34_evidence_display.R)` | 0 |
 
@@ -179,3 +182,7 @@ On 2026-10-03, nine obsolete or redundant documents were removed. Unique executi
 ## Overview placement follow-up (2026-10-03)
 
 The SVG/PDF overview was rebuilt from recorded tables and visually inspected at standalone size and in the compiled paper. It occupies page 2 after the abstract, before the introduction on page 3. README uses the same SVG as its first image. Repeated export preserved byte-identical SVG and PDF hashes. The compiled 22-page manuscript retains three main figures, all 23 priority genes, and current numerical macros. No statistical analysis was refitted for this display change. Stages 41/43 check source and compiled placement; stages 42/18/12 refresh producer coverage and output hashes. Commands and actual exit statuses are appended to the execution log.
+
+## Completion audit follow-up (2026-10-04)
+
+The original task and subsequent figure, document-cleanup, build, and commit requests were checked against maintained artifacts and executable audits. All requested scientific and manuscript changes are implemented. The readable command table was stale after overview inclusion; stage 41 now regenerates it from the execution CSV before hashing claim sources. The requirements audit is recorded in `ICBINB_REVIEW_RESPONSE_MATRIX.md` rather than a new redundant document. Current environment/input locks, patient identity/endpoints, benchmark helpers and cache equivalence, the candidate ledger, claim sources, compiled PDF, producer coverage, and manifest hashes are checked again. No new model fit is justified by this recordkeeping correction. Scientific limitations remain unchanged and explicit in the manuscript.
