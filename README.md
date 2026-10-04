@@ -14,12 +14,12 @@ Survival direction agrees for 5/21 mapped genes in GSE29609 and 21/22 in E-MTAB-
 - [Candidate ledger](results/tables/candidate_ledger.csv) contains one row per mapped gene and cohort/model evidence; [the schema](docs/CANDIDATE_LEDGER_SCHEMA.md) explains missing assessments and diagnostic branches.
 - [Review response matrix](docs/ICBINB_REVIEW_RESPONSE_MATRIX.md) connects the revision to the supplied review summary.
 - [Validation record](docs/REVIEW_VALIDATION.md) and [command log](results/tables/revision_command_log.csv) report execution status; the [artifact inventory](results/tables/review_artifact_sources.csv) links every maintained output to its source and producer.
-- [Overview figure edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) records the corrections and scripted SVG/PDF export for Figure 1.
+- [Overview figure edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) records the author-maintained SVG and its scripted PDF export.
 - [Protocol](protocol.md), [input hashes](results/tables/input_manifest.csv), and [package versions](environment/package_versions.csv) specify reproduction. Original cached-input retrieval dates are unknown.
 
 ## Regeneration
 
-From the repository root, using R 4.6.1, the locked local R library, Python with ReportLab for the overview, and MiKTeX:
+From the repository root, using R 4.6.1, the locked local R library, Python, Chrome/Edge for SVG export, and MiKTeX:
 
 ```powershell
 .\run_pipeline.ps1 -SkipInstall

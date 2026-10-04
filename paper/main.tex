@@ -20,7 +20,7 @@ Which tumor--normal transcriptomic associations in clear cell renal cell carcino
 
 \begin{figure}[!ht]
 \centering\includegraphics[width=\linewidth]{figures/hydra_evidence_overview.pdf}
-\caption{HYDRA evidence overview. Six selection gates yield \HighGenes\ priority associations. Downstream assessments answer distinct questions rather than defining further exclusions. All \HighGenes\ shortlisted coefficients retain conditional bootstrap support; held-out prediction instead reruns selection within training folds. Its interval conditions on saved predictions. The exploratory ridge benchmark uses a separate bootstrap seed and has no external prediction validation. Neither association nor biological context establishes clinical utility.}
+\caption{HYDRA evidence overview. The author-updated artwork shows the six selection gates and parallel downstream assessments. The HYDRA benchmark interval is a conditional patient-bootstrap 95\% interval from saved predictions; the primary analysis uses a separate bootstrap seed. Expression replication and prognostic support do not establish clinical utility.}
 \label{fig:funnel}
 \end{figure}
 \clearpage
@@ -47,7 +47,7 @@ For prediction, ten repeats of five patient folds rerun TCGA selection and train
 
 \section{Results along the evidence funnel}
 \subsection{Discovery contracts to a small association shortlist}
-The funnel contracts from \MappedDeg\ mapped TCGA discovery genes to \ReproDeg\ expression-reproducible genes, \MainSurvival\ adjusted survival associations, \SensitivityPass\ passing covariate sensitivity, \StrictGenes\ strict candidates, and \HighGenes\ priority associations. Figure~\ref{fig:funnel} separates these selection counts from downstream assessments. The ledger records each mapped gene, including failed gates and explicit missing downstream evidence, so favorable candidates cannot conceal the denominator.
+The funnel contracts from \MappedDeg\ mapped TCGA discovery genes to \ReproDeg\ expression-reproducible genes, \MainSurvival\ adjusted survival associations, \SensitivityPass\ passing covariate sensitivity, \StrictGenes\ strict candidates, and \HighGenes\ priority associations. Figure~\ref{fig:funnel} shows the six selection gates and parallel downstream assessments; the counts are audited in the ledger. The ledger records each mapped gene, including failed gates and explicit missing downstream evidence, so favorable candidates cannot conceal the denominator.
 
 
 
