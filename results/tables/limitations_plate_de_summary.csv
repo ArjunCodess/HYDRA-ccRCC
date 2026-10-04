@@ -1,0 +1,3 @@
+model,n_samples,n_tumors,n_normals,plates,same_direction,fdr_supported,primary_de_gate_retained,tested_genes
+all_plates,605,533,72,21,23,23,19,32192
+mixed_plates,213,145,68,3,23,23,19,27644
