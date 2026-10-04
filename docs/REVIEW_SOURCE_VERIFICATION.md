@@ -19,3 +19,11 @@ Sources below were checked through the browsing tool on **2026-10-01**, the user
 | Cox, 1972 | [Publisher](https://academic.oup.com/jrsssb/article/34/2/187/7027194), [original paper](https://web.stanford.edu/~lutian/coursepdf/cox1972paper.pdf), DOI 10.1111/j.2517-6161.1972.tb00899.x | Retained proportional-hazards regression method. |
 
 Bibliographic existence checks do not certify every interpretation in older project notes. The main scientific results are supported by study artifacts and the executable claim/ledger checks. The retained supplement describes the all-gene Cox sensitivity accurately: apeglm estimates are differential-expression annotations, not its survival-test engine.
+
+## Limitation-audit source checks, 2026-10-04
+
+The [official GDC barcode documentation](https://docs.gdc.cancer.gov/Encyclopedia/pages/TCGA_Barcode/) identifies the two-character field after `TCGA-` as tissue source site. Stage 46 uses that field for collection-site baseline-hazard strata. It does not treat site as a measured technical batch. The same documentation defines the four-character plate field used by stage 49 as a technical-processing proxy, with full-rank designs checked locally.
+
+The [DESeq2 primary source](https://github.com/thelovelab/DESeq2/blob/devel/R/core.R) implements median ratios and re-centers their geometric mean when a reference is supplied. The installed DESeq2 1.52.0 function was inspected directly and the behavior reproduced in `test_frozen_normalization.R`. A one-sample supplied-reference call returns factor one; the corrected helper retains the training scale and passes batch-invariance and depth-scaling tests. The live development source supports the mechanism; installed runtime behavior and study corrections are verified locally rather than assumed identical to a moving branch.
+
+White and Royston's [primary imputation study](https://pmc.ncbi.nlm.nih.gov/articles/PMC2998703/) was consulted when defining the missing-covariate threat. No multiple-imputation result is claimed or citation added to imply that the eight deterministic completion scenarios implement that method.

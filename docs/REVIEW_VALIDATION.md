@@ -1,34 +1,32 @@
 # Revision validation
 
-Status: completed on 2026-10-03 using frozen cached public inputs. All required analysis writers, gene/count checks, claim checks, current-model prediction checks, and output-hash validation passed. All 50 primary folds were refitted and both null checks completed 200 iterations. Benchmark regeneration uses 45 verified-equivalent reused models and five fresh refits, with every fold agreeing directly with current primary predictions and preprocessing settings. The 22-page manuscript builds without undefined references/citations or overfull text, and its refreshed first page, three main figures, and priority table passed rendered inspection. Earlier failures and intentional stops remain in the command log. Fresh download reproduction was not tested.
+Status: the 2026-10-04 limitation extension has completed all 50 corrected benchmark fits, both 200-iteration null audits, both plate sensitivity models, derived artifact regeneration, manuscript compilation, and PDF inspection. Final consistency checks passed. Changes are committed in small groups before the authorized plain push. The execution CSV preserves every observed failure, interruption, retry, and success; partial checkpoints never establish completion.
 
 ## Preserved submission and scope
 
-The submitted commit is `1f345735013853f3a3c09a088475fc177329369f`, confirmed by the author and preserved by annotated tag `icbinb-bio-2026-submitted`. The starting tree was clean. Work is on `icbinb-review-improvements`; no push or pull request is authorized or performed.
+The author confirmed submission commit `1f345735013853f3a3c09a088475fc177329369f`, preserved by annotated tag `icbinb-bio-2026-submitted`. The follow-up started from clean commit `4bc0e75892dc5641286eb269dfde1811e36bd0bc` on `icbinb-review-improvements`. The author authorized short lowercase commits after validation, followed by plain `git push`. No pull request was requested.
 
-## Commands and execution evidence
+## Correction and sensitivity evidence
 
-`results/tables/revision_command_log.csv` records each observed analysis and manuscript command, its actual exit status, and UTC completion time. Failures and intentional interruption remain in that log; successful retries do not erase them. The execution history below explains the stage-36 and stage-20 repairs, the stopped auxiliary worker, and checkpoint reuse. The command table below lists all recorded analysis and manuscript checks, including unsuccessful attempts.
+Stage 46 keeps the shortlist fixed while harmonizing cohort adjustment, describing standardized-coefficient heterogeneity, testing eight deterministic missing-covariate scenarios, stratifying by collection site, and screening accession IDs. Stage 49 adds plate-adjusted and mixed-plate tissue contrasts. These analyses address defined threats without replacing the primary funnel or establishing patient independence, missingness mechanisms, causality, or clinical utility.
 
-The cached-input pipeline uses `run_pipeline.ps1 -SkipInstall`, followed by documented `-StartAt` resumptions after failures. It does not force a new download or claim current retrieval of public source data. Original access dates remain unknown in `source_provenance.csv`. Source-verification dates and command execution dates describe different events.
+Stage 47 reproduced predictions from all 50 original primary folds before correcting held-out normalization. Training expression and selections were preserved; Cox prediction models were refitted. This is an audited test-transform correction, not 50 fresh differential-expression fits. Stage 31 requires all 50 benchmark folds to fit under the corrected transform. Stage 48 checks their current source signatures and produces the before/after comparison and exact SVG edit guide.
 
-## Artifacts and inputs
+Stages 50 and 33 checkpoint null iterations and RNG state. Both completed 200 iterations. Stage 51 verifies a validation-only type-coercion repair for the all-missing permutation results. Stage 52 proves that removing an unused input object and invoking garbage collection were the only source changes for 42 already corrected benchmark results; predictions, fold metadata, and RNG were preserved. No pre-correction result was migrated. Original source and numerical outputs are archived under `results/archive/normalization_20261004`; workstation checkpoint backups remain ignored.
 
-`results/tables/review_artifact_sources.csv` inventories every maintained result table, result figure, and generated manuscript artifact, with producer, source description, SHA-256 hashes, configuration and package-lock hashes, and observed command status. `docs/REVIEW_ARTIFACT_SOURCES.md` gives the verified dependency graph. Historical `results/archive/` files are excluded. Unchanged output bytes still require a verified producer and successful regeneration command.
+Several heavy fits were interrupted when Windows paging exhausted C: storage. The execution log records their actual unsuccessful statuses. Completed checkpoints were retained. The final launcher uses one fresh R process per missing fold, replays saved preceding-fold RNG states, and restores runtime variables afterward. Earlier fits used `R_GC_MEM_GROW=0` under memory pressure. Aggregation subsequently failed once with a locked-binding error and once with an integer/expression error after disabling JIT. The successful final retry unset the garbage-collection override and used `R_ENABLE_JIT=0`, with unchanged scoring code, predictions, and seeds. These observations do not establish the underlying cause. Closing the author's memory-heavy browser and freeing storage allowed fitting to continue. File presence alone does not establish checkpoint validity.
 
-The gene ledger is built from recorded DE, Cox, external-survival, bootstrap, conditional prediction, purity, marker, and HPA tables. The main figures use the author-updated overview in the original design, cohort-specific ACADM estimates, and DDC reversal/composition estimates. The updated six-gate counts agree with the text and ledger. The manuscript uses generated numerical macros and gene tables. TCGA-KIRC, the three GEO expression/survival accessions, E-MTAB-1980, HPA, the pinned TRACERx data commit, the Braun CheckMate supplement, and the Aran purity supplement are identified in source provenance and the cohort dictionary. The input manifest checks the cached files separately from output hashes. Final SHA-256 verification matched all fixed artifact hashes, every producer hash, and the source-map and input-inventory hashes. The four mutable inventory/log/manifest rows are explicitly exempt from a fixed artifact hash.
+The corrected HYDRA concordance increment is 0.00468 with a conditional primary bootstrap interval of [-0.00786, 0.01744]. Plate adjustment and the mixed-plate contrast preserve direction and FDR support for all 23 genes, but only 19 retain the original expression-magnitude gate. CRYL1, RBM47, KNTC1, and TNFAIP2 fall below that gate in both contrasts. External age/grade/T-category adjustment reduces E-MTAB-1980 same-direction FDR support to one gene; ACADM retains its direction but loses FDR support after T-category adjustment. These are sensitivity findings, not a newly selected panel.
 
-The maintained SVG is preserved unchanged by `analysis/45_evidence_overview.py`, which exports a PDF using a headless browser. It is Figure 1 after the abstract and the first README image. The submitted tag preserves the earlier original artwork. `docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md` records the maintained SVG and its browser export.
+During the ledger commit, Git reported corrupt loose blob `94d2793ec1179f499262d328f9a7b848b2dc9929`. The working ledger produced exactly that Git object ID. The damaged compressed object was preserved in ignored local storage, then reconstructed from the validated working file without changing its bytes or commit history. `git fsck --full --no-dangling` subsequently exited 0. The cause of the corruption is unknown.
 
-## Versions, seeds, and cache treatment
+## Artifacts, versions, and validation boundaries
 
-R 4.6.1 and the actual package versions are recorded in `environment/package_versions.csv` and session information. `environment/review_tool_versions.txt` records system Python 3.14.0, bundled PDF-audit Python 3.12.14 with pypdf 6.10.0, Poppler 26.07.0, MiKTeX-pdfTeX 4.23, and MiKTeX-BibTeX 4.2 (MiKTeX 25.12). `analysis/00_config.R` records the base seed and resampling configuration; each source stage records its offsets and resampling counts. Figure jitter has a display-only seed. No package installation is needed for the recorded cached-input run.
+`results/tables/revision_command_log.csv` is the authoritative command/status/time record. Stage 41 generates the readable table below. Stage 42 inventories maintained tables, figures, generated manuscript artifacts, producers, inputs, configuration/package hashes, and observed execution status. Stage 18 writes the final output manifest; stage 12 checks its hashes and numerical consistency. Historical archives and ignored workstation-only checkpoint backups are excluded from the published artifact inventory.
 
-All 50 primary nested checkpoints with unexplained configuration signatures were refitted. Benchmark reuse is allowed only by the exact source-equivalence and fresh-prediction checks in stage 44. Original files are preserved, original and migrated hashes are recorded, and the audit explicitly identifies reused models. Regenerating tables from verified checkpoints does not mean that every fitted benchmark model was refitted.
+R 4.6.1 matches the 258-package lock. Runtime details are recorded in `environment/review_tool_versions.txt` and stage session information; seeds and resampling settings are in the configuration and producer scripts. The run uses frozen cached public inputs, without claiming fresh-download reproduction. Original retrieval dates remain unknown and are distinguished from execution and source-verification dates.
 
-## Validation boundaries
-
-These checks validate artifact identity and manuscript consistency. They do not verify cross-accession independence, account for adaptive selection uncertainty, or establish clinical utility. Study limitations and full methods are in the manuscript and supplement.
+The author-maintained SVG remains first in README and Figure 1 before the introduction, with its bytes preserved during PDF export. Its prediction values predate the normalization correction. Current manuscript estimates and the generated edit guide identify the replacements; no artwork edits are applied by this extension. The 23-page PDF passed its text audit and visual inspection of pages 1, 2, 4, 6, 18, and 23, covering the first pages, all three main figures, the supplementary harmonized table, and the full priority-gene table. No clipping or layout repairs were needed. Conditional prediction intervals omit training and selection uncertainty. Untouched external cohorts, cross-accession patient links, and prospective clinical evaluation remain unavailable from the supplied artifacts.
 
 ## Observed commands and exit statuses
 
@@ -36,6 +34,55 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 
 | Command | Observed exit statuses |
 | --- | --- |
+| `HYDRA_REPEAT_IDS=1,2,3,4,5,6,7,8,9,10 Rscript analysis/31_nested_selection_benchmark.R` | 1 |
+| `HYDRA_REPEAT_IDS=1,3,5,7,9 Rscript analysis/31_nested_selection_benchmark.R` | -1 |
+| `R_ENABLE_JIT=0 HYDRA_NULL_SIMS=0 Rscript analysis/22_nested_cv.R` | 0 |
+| `R_ENABLE_JIT=0 HYDRA_NULL_SIMS=0 Rscript analysis/28_null_summary.R` | 0 |
+| `R_ENABLE_JIT=0 HYDRA_NULL_SIMS=0 Rscript analysis/33_survival_permutation_null.R` | 0 |
+| `R_ENABLE_JIT=0 HYDRA_NULL_SIMS=0 Rscript analysis/50_clinical_null_refits.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/09_figures_tcga.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/12_validate_outputs.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/18_write_manifest.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/23_survival_shape.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/24_funnel_ablations.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/25_paper_numbers.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/26_acceptance_report.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/27_audit_figures.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/30_update_readme.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/32_published_signature_benchmark.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/34_evidence_display.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/37_central_results.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/38_presentation_figures.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/39_candidate_ledger.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/40_review_figures.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/46_limitations_sensitivity.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/48_normalization_report.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/49_plate_de_sensitivity.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/tests/test_candidate_ledger.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/tests/test_limitations_sensitivity.R` | 0 |
+| `R_ENABLE_JIT=0 Rscript analysis/tests/test_plate_sensitivity.R` | 0 |
+| `R_GC_MEM_GROW unset; R_ENABLE_JIT=0 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW unset; R_ENABLE_JIT=0 Rscript analysis/49_plate_de_sensitivity.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=10 HYDRA_FOLD_IDS=1 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=10 HYDRA_FOLD_IDS=1,2 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=10 HYDRA_FOLD_IDS=1,2,3 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=10 HYDRA_FOLD_IDS=1,2,3,4 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=10 HYDRA_FOLD_IDS=1,2,3,4,5 Rscript analysis/31_nested_selection_benchmark.R` | 0, 1073807364 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=8 HYDRA_FOLD_IDS=1 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=8 HYDRA_FOLD_IDS=1,2 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=8 HYDRA_FOLD_IDS=1,2,3 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=8 HYDRA_FOLD_IDS=1,2,3,4 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=8 HYDRA_FOLD_IDS=1,2,3,4,5 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=9 HYDRA_FOLD_IDS=1 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=9 HYDRA_FOLD_IDS=1,2 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=9 HYDRA_FOLD_IDS=1,2,3 Rscript analysis/31_nested_selection_benchmark.R` | 0, 1 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=9 HYDRA_FOLD_IDS=1,2,3,4 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 HYDRA_REPEAT_IDS=9 HYDRA_FOLD_IDS=1,2,3,4,5 Rscript analysis/31_nested_selection_benchmark.R` | 0 |
+| `R_GC_MEM_GROW=0 R_ENABLE_JIT=0 Rscript analysis/31_nested_selection_benchmark.R` | 1 |
+| `R_GC_MEM_GROW=0 Rscript analysis/31_nested_selection_benchmark.R` | 1 |
+| `R_GC_MEM_GROW=0 Rscript analysis/46_limitations_sensitivity.R` | 0 |
+| `R_GC_MEM_GROW=0 Rscript analysis/52_verify_benchmark_memory_cleanup.R` | 0 |
+| `R_GC_MEM_GROW=0 Rscript analysis/tests/test_limitations_sensitivity.R` | 0 |
 | `Rscript -e invisible(lapply(c("analysis/12_validate_outputs.R", "analysis/31_nested_selection_benchmark.R", "analysis/44_verify_benchmark_cache_equivalence.R"), parse))` | 0 |
 | `Rscript analysis/00_check_environment.R` | 0 |
 | `Rscript analysis/00_verify_inputs.R` | 0 |
@@ -77,8 +124,9 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 | `Rscript analysis/30_update_readme.R` | 0 |
 | `Rscript analysis/31_nested_selection_benchmark.R` | -1, 0 |
 | `Rscript analysis/32_published_signature_benchmark.R` | 0 |
-| `Rscript analysis/33_survival_permutation_null.R` | -1, 0 |
+| `Rscript analysis/33_survival_permutation_null.R` | -1, 0, 1 |
 | `Rscript analysis/33_survival_permutation_null.R (independent current-input run)` | 0 |
+| `Rscript analysis/33_survival_permutation_null.R (verified type-only checkpoint repair)` | 0 |
 | `Rscript analysis/34_evidence_display.R` | 0 |
 | `Rscript analysis/35_gse53757_pairing.R` | 0 |
 | `Rscript analysis/35_gse53757_pairing.R (after regenerated selection)` | 0 |
@@ -91,15 +139,34 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 | `Rscript analysis/40_review_figures.R` | 0 |
 | `Rscript analysis/44_verify_benchmark_cache_equivalence.R` | 0 |
 | `Rscript analysis/44_verify_benchmark_cache_equivalence.R --audit-only` | 0 |
+| `Rscript analysis/46_limitations_sensitivity.R` | 0, 1 |
+| `Rscript analysis/47_correct_primary_normalization.R` | 0 |
+| `Rscript analysis/49_plate_de_sensitivity.R` | 1 |
+| `Rscript analysis/50_clinical_null_refits.R` | 0 |
+| `Rscript analysis/51_verify_permutation_checkpoint.R` | 0 |
 | `Rscript analysis/tests/test_candidate_ledger.R` | 0 |
+| `Rscript analysis/tests/test_frozen_normalization.R` | 0 |
 | `Rscript analysis/tests/test_identity_and_endpoints.R` | 0 |
+| `Rscript analysis/tests/test_limitations_sensitivity.R` | 0, 1 |
 | `Rscript analysis/tests/test_nested_benchmark.R` | 0 |
+| `Rscript analysis/tests/test_null_checkpointing.R` | 0 |
+| `Rscript count corrected-source benchmark signatures (26 of 50)` | 0 |
+| `Rscript count corrected-source benchmark signatures (initial shell quoting error)` | 1 |
+| `Rscript diagnose permutation comparison types (all 200 selections match after type normalization)` | 0 |
+| `Rscript diagnose permutation comparison types (missing locked-library setup)` | 1 |
+| `Rscript parse limitation and checkpoint sources` | 0 |
+| `Rscript parse new analysis sources` | 0 |
+| `benchmark worker 1 intentionally stopped to run conservatively while plate sensitivity completes; saved folds retained` | -1 |
+| `benchmark workers 2 and 3 intentionally stopped after C-drive paging pressure; completed folds retained` | -1 |
+| `benchmark workers intentionally stopped to repartition four workers; completed folds retained` | -1 |
 | `bibtex.exe main [bibliography]` | 0 |
 | `build_paper.ps1` | 0 |
 | `build_paper.ps1 [final layout gate]` | 1 |
+| `bundled Python analysis/43_review_pdf_audit.py` | 0 |
 | `bundled-python --version and pypdf version; pdftoppm -v` | 0 |
 | `bundled-python [initial PDF text inspection; cp1252 console]` | 1 |
 | `bundled-python analysis/43_review_pdf_audit.py` | 0, 1 |
+| `correction to preceding attempted worker-1 stop: target was already absent; no termination performed` | 0 |
 | `git diff --check` | 0 |
 | `pdflatex --version; bibtex --version (existing user cache enabled)` | 0 |
 | `pdflatex.exe -interaction=nonstopmode -halt-on-error main.tex [final pass]` | 0, 1 |
@@ -118,8 +185,13 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 | `python analysis/45_evidence_overview.py [deterministic regeneration SHA-256 check]` | 0 |
 | `python inline artifact/producer/source-map/input-inventory SHA-256 verification` | 0 |
 | `python.exe analysis/45_evidence_overview.py [overview export]` | 0 |
+| `rebuild_prediction.ps1 -Workers 1 (R_GC_MEM_GROW=0 worker stopped at 35 folds to switch to per-fold processes)` | 1 |
+| `rebuild_prediction.ps1 -Workers 1 (default-GC worker stopped to restart with R_GC_MEM_GROW=0)` | 1 |
+| `rebuild_prediction.ps1 -Workers 1 (intentionally stopped for C-drive storage)` | 1 |
+| `rebuild_prediction.ps1 -Workers 1 (resumed; intentionally stopped at 30 folds for C-drive storage)` | 1 |
 | `run_pipeline.ps1 (SkipInstall=True; ForceDownload=False; NestedWorkers=1; StartAt=analysis/18_write_manifest.R)` | 0 |
 | `run_pipeline.ps1 (SkipInstall=True; ForceDownload=False; NestedWorkers=1; StartAt=analysis/34_evidence_display.R)` | 0 |
+| `run_pipeline.ps1 (SkipInstall=True; ForceDownload=False; NestedWorkers=1; StartAt=analysis/46_limitations_sensitivity.R)` | 0 |
 
 ## Author confirmation record
 
@@ -127,7 +199,7 @@ On 2026-10-01 the user supplied the author name **Arjun Vijay Prakash** and repo
 
 OpenAI Codex assisted with the code, evidence audit, figures, and manuscript revision in this session. This records observed assistance, not certification that the author has independently verified the final draft. The study uses public de-identified datasets; no new recruitment, intervention, or institutional ethics approval is claimed.
 
-## Execution history
+## Earlier revision execution history
 
 The initial cached-input pipeline regenerated the primary differential-expression, replication, adjusted-survival, and candidate outputs successfully. Their serial counts remained 8,534 → 3,323 → 1,186 → 1,117 → 538 → 23. The GSE53757 pairing sensitivity was repeated after current candidate generation and retained 23/23 genes in the unpaired expression gate.
 

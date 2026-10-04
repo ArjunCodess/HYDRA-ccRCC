@@ -6,6 +6,7 @@ ledger tests; it does not automatically establish causality or scientific validi
 import csv
 import hashlib
 import re
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 root = Path.cwd()
@@ -34,14 +35,26 @@ keys = set(re.findall(r"@\w+\s*\{\s*([^,]+),", bib))
 cited = {key.strip() for group in re.findall(r"\\cite\w*\{([^}]+)\}", all_text) for key in group.split(",")}
 assert cited <= keys, f"Undefined citation keys: {cited - keys}"
 macros = {}
-for name in ("results_macros.tex", "review_macros.tex"):
+for name in ("results_macros.tex", "review_macros.tex", "limitations_macros.tex", "plate_macros.tex"):
     source = (root / "paper" / name).read_text(encoding="utf-8")
     for key, value in re.findall(r"\\newcommand\{\\(\w+)\}\{([^}]*)\}", source):
         assert key not in macros, f"Duplicate generated macro: {key}"
         macros[key] = value
+svg_text = {"".join(node.itertext()).strip() for node in
+            ET.parse(root / "paper/figures/hydra_evidence_overview.svg").iter()
+            if node.tag.endswith("}text")}
+for name in ("OriginalTumorSamples", "TumorPatients", "NormalPatients", "MappedDeg",
+             "ReproDeg", "MainSurvival", "SensitivityPass", "StrictGenes", "HighGenes"):
+    assert macros[name] in svg_text, f"Author overview count does not match manuscript ledger macro: {name}"
+for cohort, same, mapped in (("E-MTAB-1980", "EmSame", "EmMapped"),
+                             ("GSE29609", "GseSame", "GseMapped")):
+    assert any(re.search(re.escape(cohort) + r":\s*" + macros[same] + "/" + macros[mapped], text)
+               for text in svg_text), f"Author overview external direction count differs: {cohort}"
+# Prediction labels are deliberately preserved as historical author artwork;
+# stage 48 supplies replacements and the caption identifies their scope.
 for key in macros:
     all_text = re.sub(r"\\" + key + r"\b", lambda _: macros[key], all_text)
-assert not re.search(r"\\(?:Review\w+|MappedDeg|ReproDeg|MainSurvival|SensitivityPass|StrictGenes|HighGenes)\b", all_text)
+assert not re.search(r"\\(?:Review\w+|Limit\w+|MappedDeg|ReproDeg|MainSurvival|SensitivityPass|StrictGenes|HighGenes)\b", all_text)
 for target in re.findall(r"\\(?:input|includegraphics)(?:\[[^]]*\])?\{([^}]+)\}", main + supplement):
     assert (root / "paper" / target).is_file(), f"Missing LaTeX dependency: {target}"
 assert main.count(r"\includegraphics") == 3, "The main manuscript must contain exactly three figures."

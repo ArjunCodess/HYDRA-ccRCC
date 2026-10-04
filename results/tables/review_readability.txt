@@ -1,4 +1,4 @@
-Main prose sentence count: 118
-Mean words per sentence: 14.8
+Main prose sentence count: 127
+Mean words per sentence: 14.7
 Longest sentence: 35 words
 Sentences above 40 words require manual inspection:
