@@ -29,6 +29,8 @@ paper/*.synctex.gz
 paper/*.txt
 paper/qa_render/
 tmp/
+results/archive/normalization_20261004/nested_cv_fold_checkpoints/
+results/archive/normalization_20261004/nested_benchmark_checkpoints/
 
 # OS/editor
 .DS_Store

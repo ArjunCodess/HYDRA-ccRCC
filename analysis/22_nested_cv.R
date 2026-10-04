@@ -2,6 +2,7 @@ source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
 source("analysis/functions/patient_samples.R")
+source("analysis/functions/frozen_normalization.R")
 
 suppressPackageStartupMessages({
   library(DESeq2)
@@ -124,7 +125,7 @@ make_fold_data <- function(train_idx, test_idx) {
   train_sf <- sizeFactors(dds)
   geo_mean <- exp(rowMeans(log(train_raw)))
   test_raw <- tumor_counts[rownames(train_raw), test_idx, drop = FALSE]
-  test_sf <- DESeq2::estimateSizeFactorsForMatrix(test_raw, geoMeans = geo_mean)
+  test_sf <- frozen_size_factors(test_raw, geo_mean)
   all_sf <- c(setNames(train_sf, colnames(train_raw)),
               setNames(test_sf, colnames(test_raw)))
   chosen <- intersect(de$gene_id, rownames(train_raw))
@@ -254,6 +255,7 @@ if (anyNA(repeat_ids) || anyDuplicated(repeat_ids) ||
 checkpoint_dir <- file.path(DIRS$processed, "nested_cv_fold_checkpoints")
 dir.create(checkpoint_dir, showWarnings = FALSE)
 checkpoint_inputs <- c("analysis/22_nested_cv.R", "analysis/00_config.R",
+                       "analysis/functions/frozen_normalization.R",
                        "analysis/functions/patient_samples.R", FILES$tcga_se,
                        FILES$tcga_clinical,
                        file.path(DIRS$tables, "gse40435_limma_tumor_vs_normal.csv"),

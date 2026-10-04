@@ -63,10 +63,16 @@ files <- c(files, "README.md", "protocol.md", "plan.md", "run_pipeline.ps1", "bu
 files <- files[file.exists(files) & !dir.exists(files)]
 files <- c(files, list.files("paper", pattern = "\\.(tex|bib|csv|pdf|svg)$", full.names = TRUE),
            "environment/review_figures_sessionInfo.txt", "environment/review_tool_versions.txt")
+files <- c(files, "environment/limitations_sensitivity_sessionInfo.txt",
+           "environment/normalization_correction_sessionInfo.txt", "environment/plate_sensitivity_sessionInfo.txt",
+           "rebuild_prediction.ps1")
 files <- sort(unique(files[file.exists(files) & !dir.exists(files)]))
 # Command logging continues after manifest generation. It is an execution record,
 # not an immutable result dependency, and is deliberately excluded here.
 files <- files[!grepl("(run_manifest|revision_command_log)\\.csv$", files)]
+# Local pre-correction RDS backups preserve the audit trail but are ignored by
+# Git. Published manifests must not require those workstation-only backups.
+files <- files[!grepl("results/archive/normalization_20261004/.*checkpoints/", gsub("\\\\", "/", files))]
 info <- file.info(files)
 
 manifest <- tibble(

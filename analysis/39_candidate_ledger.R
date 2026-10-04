@@ -56,6 +56,11 @@ sources <- c(external_gse29609_json = "external_survival_gse29609", external_emt
   purity_sensitivity_json = "candidate_direct_tumor_purity_sensitivity", composition_sensitivity_json = "candidate_clinical_composition_sensitivity",
   cell_source_json = "hpa_candidate_cell_source_summary", evidence_profile_json = "candidate_evidence_matrix")
 for (name in names(sources)) ledger <- attach_json(ledger, name, tab(sources[[name]]))
+ledger <- attach_json(ledger, "harmonized_cohort_models_json", tab("limitations_harmonized_cox"))
+ledger <- attach_json(ledger, "heterogeneity_json", tab("limitations_heterogeneity"))
+ledger <- attach_json(ledger, "missing_covariate_scenarios_json", tab("limitations_missing_covariate_scenarios"))
+ledger <- attach_json(ledger, "source_site_sensitivity_json", tab("limitations_source_site_cox"))
+ledger <- attach_json(ledger, "plate_de_sensitivity_json", tab("limitations_plate_de_candidates"))
 external <- tab("external_survival_emtab1980")
 ledger$external_replication <- ifelse(ledger$symbol %in% external$symbol[external$external_strict_support %in% TRUE],
   "E-MTAB-1980 same-direction FDR support; see cohort-specific evidence", ifelse(ledger$priority_shortlist, "mixed_or_unavailable; see cohort-specific evidence", "not_assessed"))

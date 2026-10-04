@@ -1,19 +1,33 @@
-# Evidence overview corrections and export
+# Author-maintained overview
 
-The overview at `paper/figures/hydra_evidence_overview.svg` is now the first image in README and Figure 1 immediately after the manuscript abstract. The paper includes its matching vector PDF. The submitted tag preserves the original artwork; the revised figure retains its discovery, evidence-funnel, downstream-assessment, and conclusion structure and palette, with simpler typography and fewer secondary diagnostics.
+The author's SVG remains Figure 1 and the first README image. Stage 45 exports it without changing its bytes, layout, or labels. The author-updated artwork predates the 2026-10-04 normalization correction, so its prediction labels and marks need the edits below. Other funnel counts, external direction counts, and composition counts remain current.
 
-## Corrections completed
+## Prediction labels to update
 
-- The six selection gates are 8,534 → 3,323 → 1,186 → 1,117 → 538 → 23, including the previously missing covariate-sensitivity gate. The final set is called priority associations.
-- GSE40435/GSE53757 replication belongs within selection. External survival, prediction, and composition are explicitly parallel assessments, not further exclusion gates.
-- The one-gene procedure reruns TCGA selection inside training folds with GEO evidence fixed. Its primary conditional patient-bootstrap interval is +0.0045 [−0.0082, +0.0174], in 517 patients and 10 × 5 folds. The separate benchmark-bootstrap interval is not substituted here.
-- External direction agrees for 21/22 mapped genes in E-MTAB-1980 and 5/21 in GSE29609. E-MTAB has 12 genes passing both FDR support rules; GSE has no same-direction nominal support, and DDC/TCIRG1 reverse with FDR support. These cohorts were previously inspected.
-- Marker adjustment retains FDR support for 17/23 genes, while consensus purity retains direction and FDR support for 23/23. Cell-source context does not establish malignant-cell origin or causality.
-- The exploratory ridge benchmark has ΔC +0.0257 [ +0.0116, +0.0414 ]; its Brier-difference interval spans zero. It has no external prediction validation. TRACERx, CheckMate, and secondary comparators remain in the supplement.
-- The conclusion identifies a priority shortlist and little one-gene prediction gain, without claiming a validated panel or clinical utility.
+Replace the one-gene and affected comparator point labels and move their plotted marks to the corrected positions. Use the benchmark interval on the HYDRA whisker; the primary interval uses a different bootstrap seed. Keep the original design.
 
-## Source and regeneration
+| Benchmark arm | Corrected concordance increment | Conditional 95% interval |
+| --- | --- | --- |
+| de_only | -0.0014 | [-0.0119, +0.0079] |
+| hydra | +0.0047 | [-0.0069, +0.0191] |
+| matched_control | +0.0018 | [+0.0001, +0.0039] |
+| ridge_eligible | +0.0257 | [+0.0115, +0.0412] |
+| survival_only | -0.0010 | [-0.0150, +0.0139] |
 
-Run `python analysis/45_evidence_overview.py` from the repository root. This deterministic producer reads `ledger_funnel_counts.csv`, `tcga_kirc_sample_selection_audit.csv`, primary/benchmark nested summaries, external survival summaries and GSE gene results, and both composition sensitivity tables under `results/tables/`. It asserts the serial ordering, cohort reversal identities, candidate denominators, primary/benchmark point-estimate agreement, failed primary prediction criterion, and ridge Brier interval before export. The SVG metadata records SHA-256 hashes of those inputs.
+ClearCode34 uses per-sample CPM and is unaffected by this correction. Keep its existing point. These are research-procedure comparisons, not a validated panel.
 
-Python 3.14.0 and ReportLab 4.4.7 produce matching SVG/PDF vector geometry and text. ReportLab's invariant PDF mode removes timestamp variability. The producer can use the existing bundled Codex Python if the default Python lacks ReportLab; it does not install dependencies. `run_pipeline.ps1` invokes it after stage 40, and `build_paper.ps1` exports it again before compilation. Stage 41 asserts that this is the first paper figure and README image; stage 43 checks the compiled caption precedes the introduction. Stages 42, 18, and 12 cover its producer, hashes, and required outputs.
+The corrected primary HYDRA estimate is +0.0047 [-0.0079, +0.0174]; the one-gene criterion still fails.
+
+## Wording to clarify
+
+Label the external direction counts as unadjusted; retain 21/22 and 5/21. Harmonized clinical adjustment is a separate assessment reported in the paper.
+
+Replace 'Broader reproducible gene space retains held-out ranking signal.' with 'The joint ridge predictor improves held-out ranking within TCGA.' Ridge estimates clinical and gene coefficients together, so its contrast does not isolate the contribution of individual genes.
+
+## Export and source evidence
+
+Run `python analysis/45_evidence_overview.py` after an author edit, then rebuild the paper. The export uses Chrome/Edge/Chromium and the SVG viewBox dimensions. Temporary print HTML and the isolated browser profile stay in ignored `paper/qa_render/`.
+
+Values above are generated by `analysis/48_normalization_report.R` from `results/tables/nested_benchmark_summary.csv` and `nested_cv_summary.csv`. `normalization_prediction_comparison.csv` preserves before/after estimates, `normalization_primary_correction_audit.csv` verifies unchanged training and original predictions, and `normalization_benchmark_refit_audit.csv` identifies all 50 fresh benchmark fits. Original outputs are in `results/archive/normalization_20261004`.
+
+Predictions from all 50 original primary folds were reproduced before correction; maximum linear-predictor change was 0.065053. The artwork is preserved and its prediction values are identified as pre-correction in the manuscript caption and README.

@@ -1,5 +1,5 @@
-PASS: 153 maintained result/manuscript artifacts have verified producers.
-Producer edges: 154; unmapped maintained artifacts: 0.
+PASS: 172 maintained result/manuscript artifacts have verified producers.
+Producer edges: 174; unmapped maintained artifacts: 0.
 Historical results/archive files are excluded. Manuscript source and claim files are maintained inputs.
 Coverage is a dependency check, not proof that all commands have completed.
-Original input access dates remain unknown; verification date is 2026-10-01.
+Original input access dates remain unknown; dependency-map verification date is 2026-10-04.

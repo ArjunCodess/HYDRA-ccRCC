@@ -8,6 +8,8 @@
 \hypersetup{hidelinks}
 \input{results_macros.tex}
 \input{review_macros.tex}
+\input{limitations_macros.tex}
+\input{plate_macros.tex}
 \title{Hardening Transcriptomic Prognostic Evidence in Clear Cell Renal Cell Carcinoma}
 \author{Arjun Vijay Prakash}
 \date{}
@@ -20,7 +22,7 @@ Which tumor--normal transcriptomic associations in clear cell renal cell carcino
 
 \begin{figure}[!ht]
 \centering\includegraphics[width=\linewidth]{figures/hydra_evidence_overview.pdf}
-\caption{HYDRA evidence overview. Six selection gates yield \HighGenes\ priority associations. Downstream assessments answer distinct questions rather than defining further exclusions. All \HighGenes\ shortlisted coefficients retain conditional bootstrap support; held-out prediction instead reruns selection within training folds. Its interval conditions on saved predictions. The exploratory ridge benchmark uses a separate bootstrap seed and has no external prediction validation. Neither association nor biological context establishes clinical utility.}
+\caption{HYDRA evidence overview. The preserved author artwork shows the six selection gates and parallel downstream assessments. Its prediction labels precede the normalization correction; current estimates appear in the results and supplement. External direction counts use unadjusted models. The HYDRA whisker is a conditional patient-bootstrap interval from saved benchmark predictions. Expression replication and prognostic support do not establish clinical utility.}
 \label{fig:funnel}
 \end{figure}
 \clearpage
@@ -47,16 +49,18 @@ For prediction, ten repeats of five patient folds rerun TCGA selection and train
 
 \section{Results along the evidence funnel}
 \subsection{Discovery contracts to a small association shortlist}
-The funnel contracts from \MappedDeg\ mapped TCGA discovery genes to \ReproDeg\ expression-reproducible genes, \MainSurvival\ adjusted survival associations, \SensitivityPass\ passing covariate sensitivity, \StrictGenes\ strict candidates, and \HighGenes\ priority associations. Figure~\ref{fig:funnel} separates these selection counts from downstream assessments. The ledger records each mapped gene, including failed gates and explicit missing downstream evidence, so favorable candidates cannot conceal the denominator.
+The funnel contracts from \MappedDeg\ mapped TCGA discovery genes to \ReproDeg\ expression-reproducible genes, \MainSurvival\ adjusted survival associations, \SensitivityPass\ passing covariate sensitivity, \StrictGenes\ strict candidates, and \HighGenes\ priority associations. Figure~\ref{fig:funnel} shows the six selection gates and parallel downstream assessments; the counts are audited in the ledger. The ledger records each mapped gene, including failed gates and explicit missing downstream evidence, so favorable candidates cannot conceal the denominator.
 
 
 
 Changing aliquot rules leaves \AliquotDrop, \AliquotFirst, or \AliquotSum\ priority genes instead of \HighGenes. This sensitivity shows that the shortlist boundary depends on sample handling. The unpaired GSE53757 analysis retains all \HighGenes\ genes, but agreement between fits cannot verify the assumed patient pairs. Full gene tables and both sensitivities are reported in the supplement.
 
 \subsection{Survival evidence depends on the cohort}
-E-MTAB-1980 retains the TCGA hazard direction for \EmSame\ of \EmMapped\ mapped genes; \EmStrict\ meet the directional FDR rule in both unadjusted and limited-adjustment models. GSE29609 retains the direction for only \GseSame\ of \GseMapped, with no same-direction nominal support. DDC and TCIRG1 have opposite-direction FDR support there. Cohort size, platform, and clinical adjustment differ, so these results describe disagreement rather than identifying its cause.
+E-MTAB-1980 retains the TCGA hazard direction for \EmSame\ of \EmMapped\ mapped genes; \EmStrict\ meet the directional FDR rule in both unadjusted and limited-adjustment models. Unadjusted GSE29609 models retain the direction for only \GseSame\ of \GseMapped, with no same-direction nominal support. DDC and TCIRG1 have opposite-direction FDR support there. Cohort size, platform, and clinical adjustment differ, so these results describe disagreement rather than identifying its cause.
 
-ACADM illustrates agreement between TCGA and E-MTAB-1980, while its GSE29609 estimate points in the opposite direction with uncertainty spanning no association. Figure~\ref{fig:replicated} shows every cohort rather than presenting the favorable comparison alone. The primary conclusion is therefore cohort-specific support, not uniform replication.
+Harmonized age-and-grade adjustment leaves \LimitEmAgeGrade\ supported E-MTAB associations; adding T category leaves \LimitEmAgeGradeT. The two GSE29609 reversals retain opposite directions but lose FDR support after adjustment. Thus, comparable adjustment weakens external support rather than resolving cohort disagreement.
+
+ACADM illustrates agreement between TCGA and E-MTAB-1980, while its GSE29609 estimate points in the opposite direction with uncertainty spanning no association. Its E-MTAB association loses FDR support after age, grade, and T adjustment. Figure~\ref{fig:replicated} shows every cohort rather than presenting the favorable comparison alone. The primary conclusion is therefore cohort-specific support, not uniform replication.
 
 \begin{figure}[htbp]
 \centering\includegraphics[width=0.92\linewidth]{../results/figures/review_replicated_association.pdf}
@@ -84,9 +88,11 @@ Consensus-purity adjustment on matched patients retains all \HighGenes\ hazard d
 \section{Discussion and limitations}
 The strongest result is the mismatch between a reproducible association shortlist and the evidence needed for a transportable prognostic claim. Expression replication and covariate adjustment yield \HighGenes\ associations, yet cross-cohort directions disagree, the selected one-gene procedure adds little held-out discrimination, and some associations depend on the composition adjustment. The workflow makes these differences inspectable. It does not prove that evidence hardening is universally superior to simpler discovery procedures.
 
-Several threats remain. Complete-case analysis excludes \NestedExcluded\ TCGA patients and does not model missingness. GSE53757 pair identities are inferred from adjacent sample order. TCGA differential expression has no explicit batch covariate, and the GEO analyses estimate zero surrogate variables, so unwanted variation and platform confounding remain possible. Distinct accessions do not establish patient independence: cross-accession overlap has not been verified using shared identities. The external cohorts differ in event counts and available clinical covariates, preventing an equivalent adjusted comparison.
+Post hoc sensitivities address missing covariates, collection site, technical plates, and unequal cohort adjustment without redefining the shortlist. All \LimitMissingRetained\ associations retain direction and FDR support across eight explicit covariate-completion scenarios, and \LimitSiteRetained\ retain support after stratification by collection site. Plate-adjusted tumor--normal models retain the primary DE gate for \LimitPlateAllRetained\ candidates across all plates and \LimitPlateMixedRetained\ on the three plates with both tissue types. These losses reflect the fold-change cutoff; direction and FDR support remain for all \HighGenes.
 
-Benjamini--Hochberg (BH) correction applies within defined testing families, not to every adaptive choice across the workflow. The expression screen and repeated project development limit interpretation of nominal FDR guarantees. \ReviewPhFlags\ primary gene models have nominal proportional-hazards flags; non-significant shape diagnostics cannot establish proportional hazards. Conditional bootstrap intervals omit selection and training uncertainty. Human Protein Atlas (HPA) describes normal-tissue cell sources, not ccRCC tumor cells. Previously inspected outcomes and bulk composition proxies cannot establish causality, prospective validation, or clinical utility. No decision threshold, prospective assay, or patient-benefit evaluation is available.
+Several threats remain. Complete-case analysis excludes \NestedExcluded\ TCGA patients; completion scenarios do not model missingness or restore zero-time outcomes. GSE53757 pair identities are inferred from adjacent sample order. Plate labels are incomplete technical proxies, so unwanted variation remains possible. The accession screen detects no shared identifiers, but cannot establish patient independence. Different platforms, clinical contexts, and small external event counts still limit transportability.
+
+Benjamini--Hochberg (BH) correction applies within defined testing families, not to every adaptive choice across the workflow. The expression screen and repeated project development limit interpretation of nominal FDR guarantees. \ReviewPhFlags\ primary gene models have nominal proportional-hazards flags; non-significant shape diagnostics cannot establish proportional hazards. Corrected held-out normalization uses a frozen training reference without test-batch re-centering. Conditional bootstrap intervals still omit selection and training uncertainty. Human Protein Atlas (HPA) describes normal-tissue cell sources, not ccRCC tumor cells. Previously inspected outcomes and bulk composition proxies cannot establish causality, prospective validation, or clinical utility. No decision threshold, prospective assay, or patient-benefit evaluation is available.
 
 \section*{Data availability and reproducibility}
 Public inputs are identified by accession and source URL, with a pinned TRACERx commit, cached-input hashes, package versions, and seeds. Original retrieval dates were not recorded and remain unknown. The revision records current execution dates separately from original data access. The candidate ledger and claim checks are generated by scripted commands; the source-to-output manifest identifies regenerated tables and figures. Cached data are excluded from Git and can be retrieved through the documented pipeline. Full procedures, gene tables, and secondary checks follow in the supplement.

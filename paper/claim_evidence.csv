@@ -5,7 +5,7 @@ F2,discovery,alternate aliquot counts,results/tables/aliquot_sensitivity_summary
 F3,discovery,GSE53757 unpaired retention,results/tables/gse53757_unpaired_summary.csv,does not establish pairing identity
 E1,abstract and survival,external direction and strict support,results/tables/external_survival_gse29609.csv;results/tables/external_survival_emtab1980.csv,previously inspected outcomes
 E2,survival,DDC and TCIRG1 FDR reversals,results/tables/external_survival_gse29609.csv,exact set tested by ledger checks
-E3,survival,ACADM E-MTAB agreement and uncertain GSE reversal,results/tables/high_confidence_candidate_genes.csv;results/tables/external_survival_gse29609.csv;results/tables/external_survival_emtab1980.csv,cohort-specific support
+E3,survival,ACADM E-MTAB agreement and uncertain GSE reversal,results/tables/high_confidence_candidate_genes.csv;results/tables/external_survival_gse29609.csv;results/tables/external_survival_emtab1980.csv;results/tables/limitations_harmonized_cox.csv,cohort-specific support that weakens after harmonized adjustment
 B1,prediction,conditional bootstrap support,results/tables/candidate_cox_bootstrap_summary.csv,conditions on full-data selection
 P1,abstract and prediction,primary nested increment and failed criterion,results/tables/nested_cv_summary.csv;results/tables/nested_cv_patient_bootstrap.csv,conditional saved-prediction uncertainty
 P2,prediction,variable top-gene identity,results/tables/nested_gene_selection_frequency.csv;results/tables/nested_cv_folds.csv,50 training folds
@@ -20,3 +20,9 @@ V4,limitations,overlap and optimism boundaries,docs/REVIEW_VALIDATION.md;analysi
 T1,supplement,no treatment interaction survives BH,results/tables/checkmate025_candidate_treatment_interactions.csv,post hoc inspected RNA subset
 R1,related work,REMARK and selection-aware validation,docs/REVIEW_SOURCE_VERIFICATION.md,verified primary sources
 D1,declarations,author name funding and conflicts,docs/REVIEW_VALIDATION.md,human supplied facts
+L1,cohort results and supplement,harmonized cohort adjustment support,results/tables/limitations_harmonized_cox.csv;results/tables/limitations_covariate_availability.csv,post hoc fixed-shortlist models with 23-hypothesis BH families
+L2,limitations and supplement,completion scenarios and collection-site sensitivity,results/tables/limitations_missing_covariate_scenarios.csv;results/tables/limitations_missing_covariate_summary.csv;results/tables/limitations_source_site_cox.csv;results/tables/limitations_source_site_strata.csv,not multiple imputation or technical batch correction
+L3,supplement,cohort-standardized coefficient heterogeneity,results/tables/limitations_heterogeneity.csv,exploratory after selection and assumes independent cohort estimates
+L4,limitations and supplement,literal accession overlap screen,results/tables/limitations_accession_overlap.csv,disjoint identifiers cannot establish patient independence
+L5,prediction and supplement,held-out normalization correction,results/tables/normalization_primary_correction_audit.csv;analysis/functions/frozen_normalization.R;analysis/tests/test_frozen_normalization.R,original predictions reproduced and training unchanged
+L6,limitations and supplement,plate-adjusted and mixed-plate tissue contrasts,results/tables/limitations_plate_coverage.csv;results/tables/limitations_plate_de_candidates.csv;results/tables/limitations_plate_de_summary.csv,technical-processing proxy and changed sampled population; shortlist remains fixed

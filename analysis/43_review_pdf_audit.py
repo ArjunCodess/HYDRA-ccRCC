@@ -17,7 +17,7 @@ assert "Arjun Vijay Prakash" in plain
 assert "Hardening Transcriptomic Prognostic Evidence" in plain
 assert "Development draft" not in plain and "??" not in plain
 for caption in ("Figure 1:", "Figure 2:", "Figure 3:",
-                "Complete priority association table", "AI use"):
+                "Complete priority association table", "Exploratory harmonized adjustment", "AI use"):
     assert caption in plain, f"Missing compiled manuscript content: {caption}"
 
 macro_text = (root / "paper/results_macros.tex").read_text(encoding="utf-8")

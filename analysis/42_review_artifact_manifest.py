@@ -78,7 +78,9 @@ descriptions["analysis/42_review_artifact_manifest.py"] = "Verified source map, 
 maintained = {path.relative_to(ROOT).as_posix()
               for directory in ("results/tables", "results/figures")
               for path in (ROOT / directory).rglob("*") if path.is_file()}
-maintained |= {"paper/figures/hydra_evidence_overview.svg", "paper/figures/hydra_evidence_overview.pdf", "paper/main.pdf", "paper/results_macros.tex", "paper/review_macros.tex",
+maintained |= {"paper/figures/hydra_evidence_overview.pdf", "paper/main.pdf", "paper/results_macros.tex", "paper/review_macros.tex",
+               "paper/limitations_macros.tex", "paper/limitations_table.tex",
+               "paper/plate_macros.tex",
                "paper/review_candidate_table.tex", "paper/evidence_matrix.tex",
                "paper/benchmark_table.tex", "paper/ridge_spec_table.tex",
                "results/tables/review_artifact_sources.csv", "results/tables/review_artifact_coverage.txt"}
@@ -105,7 +107,7 @@ for artifact in sorted(maintained):
                      "frozen_input_inventory_sha256": sha256("results/tables/input_manifest.csv"),
                      "version_lock_sha256": sha256("environment/package_versions.csv"),
                      "configuration_sha256": sha256("analysis/00_config.R"),
-                     "verification_date": "2026-10-01",
+                     "verification_date": "2026-10-04",
                      "original_input_access_date": "unknown; see source_provenance.csv",
                      "observed_command": observed.get(producer, {}).get("command", ""),
                      "observed_exit_status": observed.get(producer, {}).get("exit_status", ""),
@@ -129,6 +131,6 @@ report = (f"PASS: {len(maintained)} maintained result/manuscript artifacts have 
           f"Producer edges: {len(rows)}; unmapped maintained artifacts: 0.\n"
           "Historical results/archive files are excluded. Manuscript source and claim files are maintained inputs.\n"
           "Coverage is a dependency check, not proof that all commands have completed.\n"
-          "Original input access dates remain unknown; verification date is 2026-10-01.\n")
+          "Original input access dates remain unknown; dependency-map verification date is 2026-10-04.\n")
 (ROOT / "results/tables/review_artifact_coverage.txt").write_text(report, encoding="utf-8")
 print(report, end="")

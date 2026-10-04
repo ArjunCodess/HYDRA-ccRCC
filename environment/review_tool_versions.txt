@@ -4,3 +4,5 @@ Bundled PDF-audit Python: 3.12.14
 pypdf: 6.10.0
 Poppler pdftoppm: 26.07.0
 Overview vector export: Python 3.14.0; ReportLab 4.4.7; verified 2026-10-03.
+Author SVG export: Google Chrome 154.0.8037.95; source preserved; verified 2026-10-04.
+2026-10-04 runtime settings: earlier resumed fits used R_GC_MEM_GROW=0 under memory pressure. Final rebuild/pipeline processes unset that override and use R_ENABLE_JIT=0; caller settings are restored afterward. Installed R 4.6.1 base::Memory documentation and startup JIT level were checked locally. These execution settings do not change statistical source, inputs or seeds. Failed aggregation attempts remain in the command log.
