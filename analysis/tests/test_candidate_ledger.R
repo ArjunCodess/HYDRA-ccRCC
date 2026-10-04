@@ -57,6 +57,22 @@ for (pair in list(c("reproducible_deg", "reproducible_de"), c("main_stage_grade_
   stopifnot(summary$value[summary$metric == pair[1]] == funnel$count[funnel$stage == pair[2]])
 }
 for (field in grep("_json$", names(ledger), value = TRUE)) stopifnot(all(vapply(ledger[[field]], jsonlite::validate, logical(1))))
+new_sources <- c(harmonized_cohort_models_json = "limitations_harmonized_cox",
+  heterogeneity_json = "limitations_heterogeneity",
+  missing_covariate_scenarios_json = "limitations_missing_covariate_scenarios",
+  source_site_sensitivity_json = "limitations_source_site_cox",
+  plate_de_sensitivity_json = "limitations_plate_de_candidates")
+for (field in names(new_sources)) {
+  source_rows <- tab(new_sources[[field]])
+  stopifnot(field %in% names(ledger))
+  for (gene_symbol in unique(source_rows$symbol)) {
+    stored <- fromJSON(ledger[[field]][ledger$symbol == gene_symbol])
+    expected_rows <- as.data.frame(source_rows[source_rows$symbol == gene_symbol, ])
+    stopifnot(isTRUE(all.equal(stored, expected_rows, check.attributes = FALSE, tolerance = 1e-12)))
+  }
+  missing_rows <- !ledger$symbol %in% source_rows$symbol
+  stopifnot(all(ledger[[field]][missing_rows] == '{"status":"not_assessed"}'))
+}
 stopifnot(all(ledger$effect_direction[is.na(ledger$log_hr)] == "not_assessed"),
   all(ledger$ph_check[is.na(ledger$ph_p_value)] == "not_assessed"))
 
@@ -127,4 +143,22 @@ stopifnot(nrow(acadm) == 1L, acadm$external_strict_support)
 table_lines <- readLines("paper/review_candidate_table.tex", warn = FALSE)
 named_rows <- sub(" .*", "", table_lines[grepl("^[A-Z0-9]+ & ", table_lines)])
 stopifnot(length(named_rows) == sum(ledger$priority_shortlist), setequal(named_rows, ledger$symbol[ledger$priority_shortlist]))
+main_text <- paste(readLines("paper/main.tex", warn = FALSE), collapse = "\n")
+supplement_text <- paste(readLines("paper/supplement.tex", warn = FALSE), collapse = "\n")
+benchmark <- tab("nested_benchmark_summary")
+ridge <- benchmark[benchmark$strategy == "ridge_eligible", ]
+control <- benchmark[benchmark$strategy == "matched_control", ]
+if (grepl("Its Brier difference interval spans zero", main_text, fixed = TRUE)) {
+  stopifnot(ridge$patient_bootstrap_brier_ci_low <= 0, ridge$patient_bootstrap_brier_ci_high >= 0)
+}
+if (grepl("The interval sits above zero and remains well below 0.01", supplement_text, fixed = TRUE)) {
+  stopifnot(control$patient_bootstrap_ci_low > 0, control$patient_bootstrap_ci_high < .01)
+}
+if (grepl("Both left the mean three-year Brier score worse", supplement_text, fixed = TRUE)) {
+  stopifnot(all(benchmark$mean_delta_brier3[benchmark$strategy %in% c("survival_only", "de_only")] > 0))
+}
+if (grepl("the latter was farther from one", supplement_text, fixed = TRUE)) {
+  slopes <- benchmark$mean_calibration_slope[match(c("clinical", "hydra"), benchmark$strategy)]
+  stopifnot(abs(slopes[2] - 1) > abs(slopes[1] - 1))
+}
 message("PASS: candidate ledger, reconstructed selection gates, BH families, source gene sets, JSON evidence and manuscript funnel macros.")

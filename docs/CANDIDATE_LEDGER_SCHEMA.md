@@ -22,6 +22,11 @@ The JSON columns retain all rows and all fields from each source table, with una
 | `composition_sensitivity_json` | `candidate_clinical_composition_sensitivity.csv` |
 | `cell_source_json` | `hpa_candidate_cell_source_summary.csv` |
 | `evidence_profile_json` | `candidate_evidence_matrix.csv` |
+| `harmonized_cohort_models_json` | `limitations_harmonized_cox.csv`; post hoc identical cohort adjustments and 23-hypothesis families |
+| `heterogeneity_json` | `limitations_heterogeneity.csv`; exploratory standardized coefficient heterogeneity |
+| `missing_covariate_scenarios_json` | `limitations_missing_covariate_scenarios.csv`; explicit completion scenarios, not imputation |
+| `source_site_sensitivity_json` | `limitations_source_site_cox.csv`; collection-site strata, not technical batch correction |
+| `plate_de_sensitivity_json` | `limitations_plate_de_candidates.csv`; plate-adjusted discovery contrast and restriction to plates containing both tissues |
 
 External replication, bootstrap uncertainty, conditional held-out prediction, purity and marker adjustment, and HPA cell-source reference evidence annotate the shortlist. They are not sequential selection stages. The `external_replication` scalar summarizes E-MTAB-1980's recorded support, while the cohort JSON columns preserve contradictory GSE29609 evidence. Cell-source evidence comes from normal tissue and does not establish malignant-cell origin. Conditional cross-validation does not remove selection optimism; nested prediction results remain cohort-level artifacts rather than per-gene validation claims.
 
