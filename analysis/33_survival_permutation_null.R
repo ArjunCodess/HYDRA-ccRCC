@@ -64,6 +64,8 @@ patients <- meta |>
   filter(is.finite(os_time), os_time > 0, os_event %in% c(0L, 1L),
          is.finite(age), !is.na(sex), !is.na(stage), !is.na(grade)) |>
   arrange(patient_barcode)
+rm(se, counts, meta, clinical)
+gc()
 
 gene_fit <- function(dat, expr, covariates) {
   dat$expr <- expr
@@ -136,7 +138,16 @@ message("Selector check matched ", observed$gene_id)
 
 set.seed(RESAMPLING$seed + 33L)
 rows <- vector("list", n_perm)
-for (i in seq_len(n_perm)) {
+iteration_checkpoint <- file.path(DIRS$processed, "review_permutation_iterations.rds")
+saved_iterations <- if (file.exists(iteration_checkpoint)) readRDS(iteration_checkpoint) else NULL
+completed <- 0L
+if (!is.null(saved_iterations) && identical(saved_iterations$signature, null_signature)) {
+  completed <- length(saved_iterations$rows)
+  rows[seq_len(completed)] <- saved_iterations$rows
+  assign(".Random.seed", saved_iterations$rng_after, envir = .GlobalEnv)
+  message("Resumed ", completed, " completed permutation iterations.")
+}
+if (completed < n_perm) for (i in seq.int(completed + 1L, n_perm)) {
   fold <- ((i - 1L) %% 5L) + 1L
   saved <- folds[[fold]]
   train <- saved$cache$train
@@ -149,9 +160,19 @@ for (i in seq_len(n_perm)) {
   rows[[i]] <- tibble(simulation = i, fold = fold, gene_id = picked$gene_id,
                       main_fdr = picked$main_fdr, main_beta = picked$main_beta,
                       gene_selected = !is.na(picked$gene_id))
+  write_rds_atomic(list(signature = null_signature, rows = rows[seq_len(i)],
+                       rng_after = .Random.seed), iteration_checkpoint)
   if (i %% 10L == 0L) message("Permutation ", i, " of ", n_perm)
 }
 result <- bind_rows(rows)
+original_path <- "results/archive/normalization_20261004/survival_permutation_null.csv"
+if (file.exists(original_path) && n_perm == 200L) {
+  original <- read_csv(original_path, show_col_types = FALSE)
+  stopifnot(identical(as.character(result$gene_id), as.character(original$gene_id)))
+  for (column in c("main_fdr", "main_beta")) {
+    stopifnot(isTRUE(all.equal(as.numeric(result[[column]]), as.numeric(original[[column]]), tolerance = 1e-10)))
+  }
+}
 emit_null(result)
 write_rds_atomic(list(signature = null_signature, result = result,
   completed_utc = format(Sys.time(), tz = "UTC", usetz = TRUE)), null_checkpoint)
