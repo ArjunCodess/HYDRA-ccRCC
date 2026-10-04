@@ -2,11 +2,13 @@
 
 ![HYDRA evidence overview](paper/figures/hydra_evidence_overview.svg)
 
+The author-maintained image retains its original design. Its prediction labels precede the normalization correction; the current estimates appear below, and [the edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) gives the replacement labels and marks.
+
 HYDRA is a computational-genomics evidence-hardening study. It asks which tumor-normal transcriptomic associations in clear cell renal cell carcinoma retain prognostic support under expression replication, clinical adjustment, held-out evaluation, and tissue-composition checks. It contributes a reproducible workflow and evidence audit, not a new statistical algorithm or a validated clinical panel.
 
 The discovery funnel is 8,534 -> 3,323 -> 1,186 -> 1,117 -> 538 -> 23 genes. External survival, coefficient uncertainty, prediction, purity, and cell-source analyses assess the shortlist; they are not further exclusion gates.
 
-Survival direction agrees for 5/21 mapped genes in GSE29609 and 21/22 in E-MTAB-1980. Both cohorts were previously inspected. The selection-aware one-gene procedure changes held-out concordance by 0.0045 in 517 patients, with a conditional patient-bootstrap 95% interval of -0.0082 to 0.0174, and fails the project's prediction criterion. These results do not establish clinical utility.
+Survival direction agrees for 5/21 mapped genes in GSE29609 and 21/22 in E-MTAB-1980. Both cohorts were previously inspected. The selection-aware one-gene procedure changes held-out concordance by 0.0047 in 517 patients, with a conditional patient-bootstrap 95% interval of -0.0079 to 0.0174, and fails the project's prediction criterion. These results do not establish clinical utility.
 
 ## Manuscript and evidence
 
@@ -26,7 +28,7 @@ From the repository root, using R 4.6.1, the locked local R library, Python, Chr
 .\build_paper.ps1
 ```
 
-The pipeline validates cached public input hashes before analysis. Primary nested-fold checkpoints are reused only when recorded source/input signatures match. Stage 44 can migrate benchmark metadata after exact source-equivalence, recorded preprocessing, and fresh primary-prediction checks; original checkpoints and hashes are preserved, and reused models are identified explicitly. `-ForceDownload` refreshes inputs and is a new retrieval, not reproduction from the saved inputs. Leave several gigabytes of free disk space for atomic DESeq2 cache writes and Windows paging.
+The pipeline validates cached public input hashes before analysis. Primary and benchmark checkpoints are reused only when recorded source/input signatures match. The normalization audit preserved original outputs, reproduced all original primary predictions before correcting test transforms, and required fresh benchmark fits. Stage 44's historical migration does not authorize reuse across this preprocessing change. `-ForceDownload` refreshes inputs and is a new retrieval, not reproduction from the saved inputs. Leave several gigabytes of free disk space for atomic DESeq2 cache writes and Windows paging.
 
 After a failed stage has been repaired and successfully rerun, `-StartAt analysis/11_hardening_outputs.R` can resume from that named stage; prior outputs must already be validated. [Validation record](docs/REVIEW_VALIDATION.md) distinguishes failures, retries, and cache checks from scientific results.
 
