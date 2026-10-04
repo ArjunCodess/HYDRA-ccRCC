@@ -1,0 +1,13 @@
+cohort,variable,n,available,missing
+TCGA-KIRC,age,529,TRUE,1
+TCGA-KIRC,sex,529,TRUE,0
+TCGA-KIRC,grade_high,529,TRUE,8
+TCGA-KIRC,t_high,529,TRUE,0
+GSE29609,age,39,TRUE,0
+GSE29609,sex,39,FALSE,39
+GSE29609,grade_high,39,TRUE,0
+GSE29609,t_high,39,TRUE,0
+E-MTAB-1980,age,101,TRUE,0
+E-MTAB-1980,sex,101,TRUE,0
+E-MTAB-1980,grade_high,101,TRUE,2
+E-MTAB-1980,t_high,101,TRUE,0

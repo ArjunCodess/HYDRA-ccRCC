@@ -1,0 +1,11 @@
+cohort_a,cohort_b,shared_accession_ids,shared_ids,patient_independence
+GSE40435,GSE53757,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE40435,GSE29609,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE40435,TCGA-KIRC,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE40435,E-MTAB-1980,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE53757,GSE29609,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE53757,TCGA-KIRC,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE53757,E-MTAB-1980,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE29609,TCGA-KIRC,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+GSE29609,E-MTAB-1980,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
+TCGA-KIRC,E-MTAB-1980,0,,unverified; accession-ID screen cannot exclude different identifiers for the same patient
