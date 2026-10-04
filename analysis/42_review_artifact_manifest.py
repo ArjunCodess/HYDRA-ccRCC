@@ -78,7 +78,7 @@ descriptions["analysis/42_review_artifact_manifest.py"] = "Verified source map, 
 maintained = {path.relative_to(ROOT).as_posix()
               for directory in ("results/tables", "results/figures")
               for path in (ROOT / directory).rglob("*") if path.is_file()}
-maintained |= {"paper/figures/hydra_evidence_overview.svg", "paper/figures/hydra_evidence_overview.pdf", "paper/main.pdf", "paper/results_macros.tex", "paper/review_macros.tex",
+maintained |= {"paper/figures/hydra_evidence_overview.pdf", "paper/main.pdf", "paper/results_macros.tex", "paper/review_macros.tex",
                "paper/review_candidate_table.tex", "paper/evidence_matrix.tex",
                "paper/benchmark_table.tex", "paper/ridge_spec_table.tex",
                "results/tables/review_artifact_sources.csv", "results/tables/review_artifact_coverage.txt"}
