@@ -11,6 +11,7 @@ source("analysis/00_config.R")
 source("analysis/functions/io.R")
 source("analysis/functions/tcga_metadata.R")
 source("analysis/functions/patient_samples.R")
+source("analysis/functions/frozen_normalization.R")
 source("analysis/functions/nested_benchmark.R")
 
 suppressPackageStartupMessages({
@@ -63,6 +64,8 @@ meta <- as.data.frame(colData(se)) |>
   mutate(patient_barcode = substr(sample_barcode, 1, 12),
          condition = factor(shortLetterCode, levels = c("NT", "TP")))
 meta <- select_tcga_patient_samples(meta, counts)
+rm(se)
+gc()
 clinical <- read_csv(FILES$tcga_clinical, show_col_types = FALSE) |>
   transmute(patient_barcode = submitter_id, os_time, os_event,
             age = suppressWarnings(as.numeric(age_at_diagnosis)) / 365.25,
@@ -163,7 +166,7 @@ make_fold_data <- function(train_idx, test_idx, force_replacement_fallback = FAL
   train_sf <- sizeFactors(dds)
   geo_mean <- exp(rowMeans(log(train_raw)))
   test_raw <- tumor_counts[rownames(train_raw), test_idx, drop = FALSE]
-  test_sf <- DESeq2::estimateSizeFactorsForMatrix(test_raw, geoMeans = geo_mean)
+  test_sf <- frozen_size_factors(test_raw, geo_mean)
   all_sf <- c(setNames(train_sf, colnames(train_raw)),
               setNames(test_sf, colnames(test_raw)))
   expr_all <- log2(sweep(counts[rownames(train_raw), patients$sample_barcode, drop = FALSE],
@@ -203,6 +206,7 @@ dir.create(checkpoint_dir, showWarnings = FALSE, recursive = TRUE)
 checkpoint_inputs <- c(
   "analysis/31_nested_selection_benchmark.R",
   "analysis/functions/nested_benchmark.R",
+  "analysis/functions/frozen_normalization.R",
   "analysis/00_config.R",
   "analysis/functions/patient_samples.R",
   FILES$tcga_se,
