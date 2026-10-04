@@ -36,11 +36,28 @@ function Invoke-RStep {
 
   $previousPreference = $ErrorActionPreference
   $ErrorActionPreference = "Continue"
+  $previousNullSetting = $env:HYDRA_NULL_SIMS
+  $previousGcGrowth = $env:R_GC_MEM_GROW
+  $previousJitLevel = $env:R_ENABLE_JIT
+  Remove-Item Env:R_GC_MEM_GROW -ErrorAction SilentlyContinue
+  $env:R_ENABLE_JIT = "0"
+  if ($Step -eq "analysis/22_nested_cv.R") { $env:HYDRA_NULL_SIMS = "0" }
   & $RscriptPath $Step @StepArgs
   $exitCode = $LASTEXITCODE
+  if ($null -eq $previousGcGrowth) { Remove-Item Env:R_GC_MEM_GROW -ErrorAction SilentlyContinue }
+  else { $env:R_GC_MEM_GROW = $previousGcGrowth }
+  if ($null -eq $previousJitLevel) { Remove-Item Env:R_ENABLE_JIT -ErrorAction SilentlyContinue }
+  else { $env:R_ENABLE_JIT = $previousJitLevel }
+  if ($Step -eq "analysis/22_nested_cv.R") {
+    if ($null -eq $previousNullSetting) { Remove-Item Env:HYDRA_NULL_SIMS -ErrorAction SilentlyContinue }
+    else { $env:HYDRA_NULL_SIMS = $previousNullSetting }
+  }
   $ErrorActionPreference = $previousPreference
 
-  [pscustomobject]@{command = "Rscript $Step $($StepArgs -join ' ')"; exit_status = $exitCode; completed_utc = [DateTime]::UtcNow.ToString('o')} |
+  $recordedCommand = "Rscript $Step $($StepArgs -join ' ')"
+  if ($Step -eq "analysis/22_nested_cv.R") { $recordedCommand = "HYDRA_NULL_SIMS=0 $recordedCommand" }
+  $recordedCommand = "R_ENABLE_JIT=0 $recordedCommand"
+  [pscustomobject]@{command = $recordedCommand; exit_status = $exitCode; completed_utc = [DateTime]::UtcNow.ToString('o')} |
     Export-Csv -LiteralPath "results/tables/revision_command_log.csv" -Append -NoTypeInformation
 
   if ($exitCode -ne 0) {
@@ -126,6 +143,8 @@ $steps += @(
   "analysis/00_check_environment.R",
   "analysis/tests/test_identity_and_endpoints.R",
   "analysis/tests/test_nested_benchmark.R",
+  "analysis/tests/test_frozen_normalization.R",
+  "analysis/tests/test_null_checkpointing.R",
   "analysis/01_download_tcga.R",
   "analysis/02_download_geo_manifest.R",
   "analysis/02_download_geo.R",
@@ -154,10 +173,11 @@ $steps += @(
   "analysis/20_tracerx_multiregion_transportability.R",
   "analysis/21_checkmate025_treatment_interaction.R",
   "analysis/22_nested_cv.R",
+  "analysis/50_clinical_null_refits.R",
   "analysis/28_null_summary.R",
   "analysis/33_survival_permutation_null.R",
-  "analysis/44_verify_benchmark_cache_equivalence.R",
   "analysis/31_nested_selection_benchmark.R",
+  "analysis/48_normalization_report.R",
   "analysis/32_published_signature_benchmark.R",
   "analysis/34_evidence_display.R",
   "analysis/37_central_results.R",
@@ -166,6 +186,10 @@ $steps += @(
   "analysis/24_funnel_ablations.R",
   "analysis/26_acceptance_report.R",
   "analysis/25_paper_numbers.R",
+  "analysis/46_limitations_sensitivity.R",
+  "analysis/49_plate_de_sensitivity.R",
+  "analysis/tests/test_limitations_sensitivity.R",
+  "analysis/tests/test_plate_sensitivity.R",
   "analysis/39_candidate_ledger.R",
   "analysis/40_review_figures.R",
   "analysis/30_update_readme.R",
@@ -186,6 +210,9 @@ if ($StartAt) {
 foreach ($step in $steps) {
   if ($step -eq "analysis/22_nested_cv.R") {
     Invoke-NestedCV -RscriptPath $rscript -Workers $NestedWorkers
+  } elseif ($step -eq "analysis/31_nested_selection_benchmark.R") {
+    & (Join-Path (Get-Location) "rebuild_prediction.ps1") -Workers 1 -RscriptPath $rscript
+    if (-not $?) { throw "Per-fold benchmark rebuild failed." }
   } else {
     Invoke-RStep -RscriptPath $rscript -Step $step
   }
