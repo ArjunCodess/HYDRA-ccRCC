@@ -2,7 +2,7 @@
 
 ![HYDRA evidence overview](paper/figures/hydra_evidence_overview.svg)
 
-The author-maintained image retains its original design. Its prediction labels precede the normalization correction; the current estimates appear below, and [the edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) gives the replacement labels and marks.
+The overview is the author-supplied SVG. The paper uses a PDF conversion of this same artwork.
 
 HYDRA is a computational-genomics evidence-hardening study. It asks which tumor-normal transcriptomic associations in clear cell renal cell carcinoma retain prognostic support under expression replication, clinical adjustment, held-out evaluation, and tissue-composition checks. It contributes a reproducible workflow and evidence audit, not a new statistical algorithm or a validated clinical panel.
 

@@ -10,7 +10,7 @@ stopifnot(nrow(nested) == 1, length(selection) == 6, all(diff(selection) <= 0))
 lines <- c(
   "# HYDRA-ccRCC", "",
   "![HYDRA evidence overview](paper/figures/hydra_evidence_overview.svg)", "",
-  "The author-maintained image retains its original design. Its prediction labels precede the normalization correction; the current estimates appear below, and [the edit guide](docs/HYDRA_OVERVIEW_FIGURE_EDIT_GUIDE.md) gives the replacement labels and marks.", "",
+  "The overview is the author-supplied SVG. The paper uses a PDF conversion of this same artwork.", "",
   "HYDRA is a computational-genomics evidence-hardening study. It asks which tumor-normal transcriptomic associations in clear cell renal cell carcinoma retain prognostic support under expression replication, clinical adjustment, held-out evaluation, and tissue-composition checks. It contributes a reproducible workflow and evidence audit, not a new statistical algorithm or a validated clinical panel.", "",
   sprintf("The discovery funnel is %s genes. External survival, coefficient uncertainty, prediction, purity, and cell-source analyses assess the shortlist; they are not further exclusion gates.", paste(format(selection, big.mark = ",", trim = TRUE), collapse = " -> ")), "",
   sprintf("Survival direction agrees for %d/%d mapped genes in GSE29609 and %d/%d in E-MTAB-1980. Both cohorts were previously inspected. The selection-aware one-gene procedure changes held-out concordance by %.4f in %d patients, with a conditional patient-bootstrap 95%% interval of %.4f to %.4f, and fails the project's prediction criterion. These results do not establish clinical utility.",
