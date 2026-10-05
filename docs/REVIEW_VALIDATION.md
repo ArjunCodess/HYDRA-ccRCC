@@ -26,7 +26,7 @@ During the ledger commit, Git reported corrupt loose blob `94d2793ec1179f499262d
 
 R 4.6.1 matches the 258-package lock. Runtime details are recorded in `environment/review_tool_versions.txt` and stage session information; seeds and resampling settings are in the configuration and producer scripts. The run uses frozen cached public inputs, without claiming fresh-download reproduction. Original retrieval dates remain unknown and are distinguished from execution and source-verification dates.
 
-The author-maintained SVG remains first in README and Figure 1 before the introduction, with its bytes preserved during PDF export. Its prediction values predate the normalization correction. Current manuscript estimates and the generated edit guide identify the replacements; no artwork edits are applied by this extension. The 23-page PDF passed its text audit and visual inspection of pages 1, 2, 4, 6, 18, and 23, covering the first pages, all three main figures, the supplementary harmonized table, and the full priority-gene table. No clipping or layout repairs were needed. Conditional prediction intervals omit training and selection uncertainty. Untouched external cohorts, cross-accession patient links, and prospective clinical evaluation remain unavailable from the supplied artifacts.
+The author-maintained SVG remains first in README and Figure 1 before the introduction, with its bytes preserved during PDF export. The author supplied the corrected prediction labels on 2026-10-05; the source SVG is used directly, with PDF conversion for LaTeX. The 23-page PDF passed its text audit and visual inspection of pages 1, 2, 4, 6, 18, and 23, covering the first pages, all three main figures, the supplementary harmonized table, and the full priority-gene table. No clipping or layout repairs were needed. Conditional prediction intervals omit training and selection uncertainty. Untouched external cohorts, cross-accession patient links, and prospective clinical evaluation remain unavailable from the supplied artifacts.
 
 ## Observed commands and exit statuses
 
@@ -141,6 +141,8 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 | `Rscript analysis/44_verify_benchmark_cache_equivalence.R --audit-only` | 0 |
 | `Rscript analysis/46_limitations_sensitivity.R` | 0, 1 |
 | `Rscript analysis/47_correct_primary_normalization.R` | 0 |
+| `Rscript analysis/48_normalization_report.R [initial author artwork run]` | 1 |
+| `Rscript analysis/48_normalization_report.R [verified LF helper]` | 0 |
 | `Rscript analysis/49_plate_de_sensitivity.R` | 1 |
 | `Rscript analysis/50_clinical_null_refits.R` | 0 |
 | `Rscript analysis/51_verify_permutation_checkpoint.R` | 0 |
@@ -168,12 +170,14 @@ Stage 41 regenerates this table from the execution CSV whenever the claim audit 
 | `bundled-python analysis/43_review_pdf_audit.py` | 0, 1 |
 | `correction to preceding attempted worker-1 stop: target was already absent; no termination performed` | 0 |
 | `git diff --check` | 0 |
+| `git fsck --full --no-dangling` | 0 |
 | `pdflatex --version; bibtex --version (existing user cache enabled)` | 0 |
 | `pdflatex.exe -interaction=nonstopmode -halt-on-error main.tex [final pass]` | 0, 1 |
 | `pdflatex.exe -interaction=nonstopmode -halt-on-error main.tex [first pass]` | 0 |
 | `pdflatex.exe -interaction=nonstopmode -halt-on-error main.tex [second pass]` | 0 |
 | `pdftoppm -f 1 -l 1 -scale-to 1500 -png paper/main.pdf paper/qa_render/final_inspection` | 0 |
 | `pdftoppm -f 2 -l 2 -scale-to 1450 -png paper/main.pdf paper/qa_render/author_overview_final` | 0 |
+| `pdftoppm -f 2 -l 2 -scale-to 1600 -png paper/main.pdf paper/qa_render/supplied_20261005` | 0 |
 | `pdftoppm -f 21 -l 21 -scale-to 1500 -png paper/main.pdf paper/qa_render/final_inspection` | 0 |
 | `pdftoppm -f 3 -l 3 -scale-to 1500 -png paper/main.pdf paper/qa_render/final_inspection` | 0 |
 | `pdftoppm -f 4 -l 4 -scale-to 1500 -png paper/main.pdf paper/qa_render/final_inspection` | 0 |
@@ -270,3 +274,9 @@ The author requested the original image rather than the redesign. Both original 
 The author supplied a corrected SVG retaining the original design. Stage 45 now exports that maintained input to PDF with a headless browser, verifies unchanged SVG bytes, and never restores an older version. The updated image stays first in README and after the abstract in the paper. Historical restoration/redesign entries above describe superseded versions. Current numerical results and manuscript audits remain authoritative. The author subsequently authorized building and committing all changes in short lowercase commits.
 
 The final author-image run regenerated derived outputs from stage 34 through stage 27 using the existing source analyses. Stage 42 encountered a transient invalid-argument file-write error and passed on retry. The earlier original-artwork build also had a transient disk-space failure before its successful retry. Failures remain recorded rather than being removed. The author SVG SHA-256 is `eab7a6a7cde3282d22e1e7c490ebb47f6f48b88e366d769f4366b648090358df`; browser export checks it unchanged. Final compilation, claim/PDF checks, artifact coverage, and output hashes are refreshed after regeneration.
+
+## Current author overview, 2026-10-05
+
+The author supplied a new SVG with corrected benchmark labels, the HYDRA interval, unadjusted external-direction wording, and the joint-ridge conclusion. This supplied artwork is used directly as the first README image and converted to PDF for Figure 1. No diagram is generated or redesigned. Earlier artwork warnings describe superseded versions. The caption and README no longer label current values as pre-correction.
+
+The new-artwork build passed, and page 2 was rendered and visually checked with no clipping. Claim and PDF audits passed. The first stage-48 attempt rejected the local normalization helper because Git had converted LF to CRLF; its LF bytes exactly matched the saved MD5. Restoring those line endings made the signature check pass without changing code, checkpoint metadata, fitted models, or results.
